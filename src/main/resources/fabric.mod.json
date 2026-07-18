@@ -4,8 +4,13 @@
   "version": "${mod_version}",
   "name": "${mod_name}",
   "description": "${mod_description}",
-  "icon": "${mod_id}.icon.png",
-  "authors": ["Aikoyori - Port of Port","VanderCat - Quilt Port","Ocelot - Maintainer","Jackson - Owner","Farcr - Art","Echolite - Art","AstraZoey - Sound Design"],
+  "icon": "etched.icon.png",
+  "authors": ["FugginBeenus - Refabricated Maintainer","Aikoyori - Port of Port","VanderCat - Quilt Port","Ocelot - Maintainer","Jackson - Owner","Farcr - Art","Echolite - Art","AstraZoey - Sound Design"],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/etched-refabricated",
+    "sources": "https://github.com/FugginBeenus/etched-refabricated",
+    "issues": "https://github.com/FugginBeenus/etched-refabricated/issues"
+  },
 
   "entrypoints": {
     "main": [

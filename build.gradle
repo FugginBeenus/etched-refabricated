@@ -74,6 +74,8 @@ dependencies {
             {exclude group: "com.github.llamalad7.mixinextras" }
 
     shadowCommon(implementation("javazoom:jlayer:1.0.1"))
+    // AAC/.m4a decoding (net.sourceforge.jaad.*) — bundled and relocated in shadowJar
+    shadowCommon(implementation("de.sfuhrm:jaad:0.8.7"))
 }
 
 processResources {
@@ -113,6 +115,7 @@ java {
 shadowJar {
     configurations = [project.configurations.shadowCommon]
     relocate "javazoom", "gg.moonflower.etched.javazoom"
+    relocate "net.sourceforge.jaad", "gg.moonflower.etched.jaad"
     archiveClassifier = "dev-shadow"
 }
 

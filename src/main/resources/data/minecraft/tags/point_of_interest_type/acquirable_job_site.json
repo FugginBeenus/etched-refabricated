@@ -1,6 +1,9 @@
 {
   "replace": false,
   "values": [
-    "etched:bard"
+    {
+      "id": "etched:bard",
+      "required": false
+    }
   ]
 }

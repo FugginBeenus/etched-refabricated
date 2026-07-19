@@ -43,8 +43,8 @@ import org.apache.commons.codec.language.bm.Lang;
 
 public class EtchedBlocks {
 
-    //public static final ResourceKey<Registry<Block>> BLOCK = ResourceKey.createRegistryKey(new ResourceLocation("etched_blocks"));
-    //public static final ResourceKey<Registry<BlockEntity>> BLOCK_ENTITIES = ResourceKey.createRegistryKey(new ResourceLocation("etched_block_entities"));
+    //public static final ResourceKey<Registry<Block>> BLOCK = ResourceKey.createRegistryKey(gg.moonflower.etched.api.util.EtchedResourceLocation.of("etched_blocks"));
+    //public static final ResourceKey<Registry<BlockEntity>> BLOCK_ENTITIES = ResourceKey.createRegistryKey(gg.moonflower.etched.api.util.EtchedResourceLocation.of("etched_block_entities"));
 
     public static final BlockEntry<EtchingTableBlock> ETCHING_TABLE =
             Etched.REGISTRATE.block("etching_table", EtchingTableBlock::new)

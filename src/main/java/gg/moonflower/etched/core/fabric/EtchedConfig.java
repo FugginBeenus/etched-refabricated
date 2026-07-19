@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class EtchedConfig {
     public static ConfigClassHandler<EtchedConfig> HANDLER = ConfigClassHandler.createBuilder(EtchedConfig.class)
-            .id(new ResourceLocation(Etched.MOD_ID, "config"))
+            .id(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "config"))
             .serializer(config -> GsonConfigSerializerBuilder.create(config)
                     .setPath(FabricLoader.getInstance().getConfigDir().resolve("etched.json5"))
                     .appendGsonBuilder(GsonBuilder::setPrettyPrinting) // not needed, pretty print by default

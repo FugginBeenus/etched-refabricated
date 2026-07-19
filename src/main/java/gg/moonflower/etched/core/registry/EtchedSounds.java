@@ -15,7 +15,7 @@ public class EtchedSounds {
     public static final SoundEvent UI_ETCHER_TAKE_RESULT = registerSound("ui.etching_table.take_result");
 
     private static SoundEvent registerSound(String id) {
-        var full_id = new ResourceLocation(Etched.MOD_ID, id);
+        var full_id = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, id);
         return Registry.register(BuiltInRegistries.SOUND_EVENT, full_id, SoundEvent.createVariableRangeEvent(full_id));
     }
     public static void register() {}

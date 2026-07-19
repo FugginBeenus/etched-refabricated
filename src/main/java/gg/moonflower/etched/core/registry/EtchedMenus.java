@@ -48,6 +48,6 @@ public class EtchedMenus {
     public static void register() {}
 
     public static <T extends AbstractContainerMenu> MenuType<T> register(String name, MenuType.MenuSupplier<T> supplier) {
-        return Registry.register(BuiltInRegistries.MENU, new ResourceLocation(Etched.MOD_ID, name), new MenuType<T>(supplier, FeatureFlags.VANILLA_SET));
+        return Registry.register(BuiltInRegistries.MENU, gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, name), new MenuType<T>(supplier, FeatureFlags.VANILLA_SET));
     }
 }

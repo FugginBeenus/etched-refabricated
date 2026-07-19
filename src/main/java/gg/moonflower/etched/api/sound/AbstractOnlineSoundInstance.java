@@ -60,7 +60,7 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
     private final boolean stereo;
 
     public AbstractOnlineSoundInstance(String url, @Nullable String subtitle, int attenuationDistance, SoundSource source, DownloadProgressListener progressListener, AudioSource.AudioFileType type, boolean stereo) {
-        super(new ResourceLocation(Etched.MOD_ID, DigestUtils.sha1Hex(url)), source, SoundInstance.createUnseededRandom());
+        super(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, DigestUtils.sha1Hex(url)), source, SoundInstance.createUnseededRandom());
         this.url = url;
         this.subtitle = subtitle;
         this.attenuationDistance = attenuationDistance;
@@ -94,7 +94,7 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
         }
 
         if (TrackData.isLocalSound(onlineSound.getURL())) {
-            WeighedSoundEvents weighedSoundEvents = Minecraft.getInstance().getSoundManager().getSoundEvent(new ResourceLocation(onlineSound.getURL()));
+            WeighedSoundEvents weighedSoundEvents = Minecraft.getInstance().getSoundManager().getSoundEvent(gg.moonflower.etched.api.util.EtchedResourceLocation.of(onlineSound.getURL()));
             if (weighedSoundEvents == null) {
                 CompletableFuture<AudioStream> future = new CompletableFuture<>();
                 future.completeExceptionally(new FileNotFoundException("Unable to play unknown soundEvent: " + sound.getPath()));

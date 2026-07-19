@@ -36,13 +36,13 @@ public class EtchedEntities {
 
 
     public static <R extends Entity> EntityType<R> register(String name, Supplier<EntityType<R>>value) {
-        var id = new ResourceLocation(Etched.MOD_ID, name);
+        var id = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, name);
         return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, value.get());
     }
-    public ResourceKey<PoiType> BARD_POI_KEY = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, new ResourceLocation(Etched.MOD_ID+":bard"));
+    public ResourceKey<PoiType> BARD_POI_KEY = ResourceKey.create(Registries.POINT_OF_INTEREST_TYPE, gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID+":bard"));
     //public static VillagerProfession MUSIC_BARD = new VillagerProfession(Etched.MOD_ID + ":bard", poi -> poi.is(BARD_POI.getId()), poi -> poi.is(BARD_POI.getId()), ImmutableSet.of(), ImmutableSet.of(), null));
     public static void register() {
-        Registry.register(BuiltInRegistries.ENTITY_TYPE,new ResourceLocation(Etched.MOD_ID,"jukebox_minecart"),JUKEBOX_MINECART);
+        Registry.register(BuiltInRegistries.ENTITY_TYPE,gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID,"jukebox_minecart"),JUKEBOX_MINECART);
         //register("jukebox_minecart", () -> EntityType.Builder.<MinecartJukebox>of(MinecartJukebox::new, MobCategory.MISC).sized(0.98F, 0.7F).clientTrackingRange(8).build("minecart_jukebox"));
 
     }

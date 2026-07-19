@@ -18,7 +18,7 @@ import net.minecraft.world.entity.player.Inventory;
  */
 public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(Etched.MOD_ID, "textures/gui/radio.png");
+    private static final ResourceLocation TEXTURE = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/gui/radio.png");
 
     private boolean canEdit;
     private EditBox url;

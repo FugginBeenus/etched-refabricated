@@ -82,8 +82,8 @@ public abstract class RecordItemMixin extends Item implements PlayableRecord {
     @Override
     public CompletableFuture<AlbumCover> getAlbumCover(ItemStack stack, Proxy proxy, ResourceManager resourceManager) {
         ResourceLocation key = BuiltInRegistries.ITEM.getKey(this);
-        return resourceManager.getResource(new ResourceLocation(key.getNamespace(), "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME + "/" + key.getPath() + ".json")).isPresent() ?
-                CompletableFuture.completedFuture(AlbumCover.of(new ResourceLocation(key.getNamespace(), AlbumCoverItemRenderer.FOLDER_NAME + "/" + key.getPath()))) :
+        return resourceManager.getResource(gg.moonflower.etched.api.util.EtchedResourceLocation.of(key.getNamespace(), "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME + "/" + key.getPath() + ".json")).isPresent() ?
+                CompletableFuture.completedFuture(AlbumCover.of(gg.moonflower.etched.api.util.EtchedResourceLocation.of(key.getNamespace(), AlbumCoverItemRenderer.FOLDER_NAME + "/" + key.getPath()))) :
                 CompletableFuture.completedFuture(AlbumCover.EMPTY);
     }
 

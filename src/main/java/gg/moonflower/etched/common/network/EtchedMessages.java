@@ -32,7 +32,7 @@ public class EtchedMessages {
     public static final ResourceLocation SHARED_SET_ALBUM_JUKEBOX_TRACK = key("shared_set_album_jukebox_track");
 
     private static ResourceLocation key(String name) {
-        return new ResourceLocation(Etched.MOD_ID, name);
+        return gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, name);
     }
 
     public static synchronized void init() {

@@ -45,8 +45,8 @@ public class EtchedVillagers {
     private static Set<BlockState> getBlockStates(Block block) {
         return ImmutableSet.copyOf((Collection)block.getStateDefinition().getPossibleStates());
     }
-    public static final PoiType BARD_POI = PointOfInterestHelper.register(new ResourceLocation(Etched.MOD_ID,"bard"),1,1,getBlockStates(EtchedBlocks.ETCHING_TABLE.get()));
-        public static final VillagerProfession BARD_PROFESSION = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, (new ResourceLocation(Etched.MOD_ID,"bard")), new VillagerProfession(Etched.MOD_ID + ":bard", poi -> poi.value().equals(BARD_POI), poi -> poi.value().equals(BARD_POI), ImmutableSet.of(), ImmutableSet.of(), null));
+    public static final PoiType BARD_POI = PointOfInterestHelper.register(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID,"bard"),1,1,getBlockStates(EtchedBlocks.ETCHING_TABLE.get()));
+        public static final VillagerProfession BARD_PROFESSION = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, (gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID,"bard")), new VillagerProfession(Etched.MOD_ID + ":bard", poi -> poi.value().equals(BARD_POI), poi -> poi.value().equals(BARD_POI), ImmutableSet.of(), ImmutableSet.of(), null));
 
     public static void registers(){
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,1,itemListings -> {
@@ -166,8 +166,8 @@ public class EtchedVillagers {
     }
 
     private static void createVillagePiece(Registry<StructureTemplatePool> templatePools, Registry<StructureProcessorList> processorLists, String village, String name, int houseId, int weight, ResourceKey<StructureProcessorList> normalProcessor, ResourceKey<StructureProcessorList> zombieProcessor) {
-        EtchedVillagers.addToPool(templatePools.get(new ResourceLocation("village/" + village + "/houses")), new ResourceLocation(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(normalProcessor).orElse(null), weight);
-        EtchedVillagers.addToPool(templatePools.get(new ResourceLocation("village/" + village + "/zombie/houses")), new ResourceLocation(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(zombieProcessor).orElse(null), weight);
+        EtchedVillagers.addToPool(templatePools.get(gg.moonflower.etched.api.util.EtchedResourceLocation.of("village/" + village + "/houses")), gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(normalProcessor).orElse(null), weight);
+        EtchedVillagers.addToPool(templatePools.get(gg.moonflower.etched.api.util.EtchedResourceLocation.of("village/" + village + "/zombie/houses")), gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(zombieProcessor).orElse(null), weight);
     }
 
     private static void addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId, @Nullable Holder<StructureProcessorList> processorList, int weight) {

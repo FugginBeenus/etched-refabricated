@@ -35,7 +35,7 @@ import net.minecraft.world.item.CreativeModeTabs;
 
 @Environment(EnvType.CLIENT)
 public class EtchedClient {
-    public static final ModelResourceLocation BOOMBOX_IN_HAND_MODEL = new ModelResourceLocation(new ResourceLocation(Etched.MOD_ID, "boombox_in_hand"), "inventory");
+    public static final ModelResourceLocation BOOMBOX_IN_HAND_MODEL = new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "boombox_in_hand"), "inventory");
 
     public static void registerItemGroups() {
         MenuScreens.register(EtchedMenus.ETCHING_MENU, EtchingScreen::new);
@@ -61,9 +61,9 @@ public class EtchedClient {
     public static void registerCustomModels(ModelEvent.RegisterAdditional event) {
         ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
         String folder = "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME;
-        event.register(new ModelResourceLocation(new ResourceLocation(Etched.MOD_ID, "boombox_in_hand"), "inventory"));
+        event.register(new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "boombox_in_hand"), "inventory"));
         for (ResourceLocation location : resourceManager.listResources(folder, name -> name.getPath().endsWith(".json")).keySet()) {
-            event.register(new ModelResourceLocation(new ResourceLocation(location.getNamespace(), location.getPath().substring(12, location.getPath().length() - 5)), "inventory"));
+            event.register(new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(location.getNamespace(), location.getPath().substring(12, location.getPath().length() - 5)), "inventory"));
         }
     }
 

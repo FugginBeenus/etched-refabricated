@@ -2,7 +2,6 @@ package gg.moonflower.etched.core.registry;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
-import com.tterrag.registrate.fabric.RegistryObject;
 import gg.moonflower.etched.core.Etched;
 import gg.moonflower.etched.core.mixin.StructureTemplatePoolAccessor;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;

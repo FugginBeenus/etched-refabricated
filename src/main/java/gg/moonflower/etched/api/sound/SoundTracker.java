@@ -23,7 +23,11 @@ import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.Style;
+//? if >=1.21 {
+/*import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents;
+*///?} else {
 import net.minecraft.network.chat.contents.LiteralContents;
+//?}
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;

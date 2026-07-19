@@ -1,6 +1,10 @@
 package gg.moonflower.etched.api.sound;
 
+//? if >=1.21 {
+/*import net.minecraft.client.sounds.JOrbisAudioStream;
+*///?} else {
 import com.mojang.blaze3d.audio.OggAudioStream;
+//?}
 import gg.moonflower.etched.api.record.TrackData;
 import gg.moonflower.etched.api.sound.source.AudioSource;
 import gg.moonflower.etched.api.sound.stream.MonoWrapper;
@@ -136,7 +140,11 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
                 // Try loading as OGG
                 try {
                     InputStream is = createCombinedStream.get();
+                    //? if >=1.21 {
+                    /*return getStream(repeatInstantly ? new LoopingAudioStream(JOrbisAudioStream::new, is) : new JOrbisAudioStream(is), sound);
+                    *///?} else {
                     return getStream(repeatInstantly ? new LoopingAudioStream(OggAudioStream::new, is) : new OggAudioStream(is), sound);
+                    //?}
                 } catch (Exception e) {
                     LOGGER.debug("Failed to load as OGG", e);
 

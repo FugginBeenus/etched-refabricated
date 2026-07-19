@@ -3,7 +3,11 @@ package gg.moonflower.etched.common.item;
 //import gg.moonflower.etched.common.entity.MinecartJukebox;
 import gg.moonflower.etched.common.entity.MinecartJukebox;
 import net.minecraft.core.BlockPos;
+//? if >=1.21 {
+/*import net.minecraft.core.dispenser.BlockSource;
+*///?} else {
 import net.minecraft.core.BlockSource;
+//?}
 import net.minecraft.core.Direction;
 import net.minecraft.core.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.core.dispenser.DispenseItemBehavior;

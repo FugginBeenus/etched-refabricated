@@ -1,7 +1,6 @@
 package gg.moonflower.etched.core.registry;
 
 import com.google.common.collect.ImmutableSet;
-import com.tterrag.registrate.fabric.RegistryObject;
 import com.tterrag.registrate.util.entry.EntityEntry;
 import gg.moonflower.etched.common.entity.MinecartJukebox;
 import gg.moonflower.etched.core.Etched;

@@ -33,7 +33,9 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+//? if <1.21 {
 import net.minecraft.world.item.RecordItem;
+//?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -356,9 +358,18 @@ public class SoundTracker {
 
         ItemStack disc = jukebox.getItem(jukebox.getPlayingIndex());
         SoundInstance sound = null;
+        //? if >=1.21 {
+        /*if (disc.has(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE)) {
+            Optional<net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong>> etched$song = net.minecraft.world.item.JukeboxSong.fromStack(level.registryAccess(), disc);
+            if (etched$song.isPresent()) {
+                sound = StopListeningSound.create(getEtchedRecord(etched$song.get().value().soundEvent().value().getLocation().toString(), disc.getHoverName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
+            }
+        } else if (disc.getItem() instanceof PlayableRecord) {
+        *///?} else {
         if (disc.getItem() instanceof RecordItem) {
             sound = StopListeningSound.create(getEtchedRecord(((RecordItem) disc.getItem()).getSound().getLocation().toString(), ((RecordItem) disc.getItem()).getDisplayName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
         } else if (disc.getItem() instanceof PlayableRecord) {
+        //?}
             Optional<TrackData[]> optional = PlayableRecord.getStackMusic(disc);
             if (optional.isPresent()) {
                 TrackData[] tracks = optional.get();

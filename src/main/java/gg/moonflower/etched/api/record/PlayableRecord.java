@@ -11,7 +11,11 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+//? if >=1.21 {
+/*import net.minecraft.core.component.DataComponents;
+*///?} else {
 import net.minecraft.world.item.RecordItem;
+//?}
 
 import java.net.Proxy;
 import java.util.Optional;
@@ -32,7 +36,11 @@ public interface PlayableRecord {
      * @return Whether that stack can play
      */
     static boolean isPlayableRecord(ItemStack stack) {
+        //? if >=1.21 {
+        /*return stack.getItem() instanceof PlayableRecord && ((PlayableRecord) stack.getItem()).canPlay(stack) || stack.has(DataComponents.JUKEBOX_PLAYABLE);
+        *///?} else {
         return stack.getItem() instanceof PlayableRecord && ((PlayableRecord) stack.getItem()).canPlay(stack) || stack.getItem() instanceof RecordItem;
+        //?}
     }
 
     /**

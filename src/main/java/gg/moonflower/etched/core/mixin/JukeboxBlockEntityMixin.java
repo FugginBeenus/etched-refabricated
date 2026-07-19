@@ -11,7 +11,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+//? if >=1.21 {
+/*import net.minecraft.core.component.DataComponents;
+*///?} else {
 import net.minecraft.world.item.RecordItem;
+//?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -91,7 +95,11 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
     public void tick(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
         if (this.isRecordPlaying()) {
             Item item = this.getFirstItem().getItem();
+            //? if >=1.21 {
+            /*if (!this.getFirstItem().has(DataComponents.JUKEBOX_PLAYABLE) && item instanceof PlayableRecord) {
+            *///?} else {
             if (!(item instanceof RecordItem) && item instanceof PlayableRecord) {
+            //?}
                 ++this.ticksSinceLastEvent;
 
                 // Allow music particles and events to play for custom records

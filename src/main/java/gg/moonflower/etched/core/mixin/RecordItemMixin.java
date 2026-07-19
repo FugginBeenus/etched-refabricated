@@ -20,7 +20,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+//? if <1.21 {
 import net.minecraft.world.item.RecordItem;
+//?}
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -30,6 +32,14 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+// In 1.21 vanilla RecordItem was removed (discs use the JukeboxPlayable data component), so this
+// mixin cannot exist there. It becomes an inert no-op mixin on 1.21+; vanilla-disc detection is
+// handled via the component instead. See PlayableRecord and SoundTracker.
+//? if >=1.21 {
+/*@Mixin(Item.class)
+public abstract class RecordItemMixin {
+}
+*///?} else {
 @Mixin(RecordItem.class)
 public abstract class RecordItemMixin extends Item implements PlayableRecord {
 
@@ -92,3 +102,4 @@ public abstract class RecordItemMixin extends Item implements PlayableRecord {
         return 1;
     }
 }
+//?}

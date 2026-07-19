@@ -28,6 +28,9 @@ public record TrackData(String url, String artist, Component title) {
     public static final Codec<TrackData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.fieldOf("Url").forGetter(TrackData::url),
             Codec.STRING.optionalFieldOf("Author", EMPTY.artist()).forGetter(TrackData::artist),
+            //? if >=1.21 {
+            /*net.minecraft.network.chat.ComponentSerialization.CODEC.optionalFieldOf("Title", EMPTY.title()).forGetter(TrackData::title)
+            *///?} else {
             Codec.STRING.optionalFieldOf("Title", Component.Serializer.toJson(EMPTY.title())).<Component>xmap(json -> {
                 if (!json.startsWith("{")) {
                     return Component.literal(json);
@@ -38,6 +41,7 @@ public record TrackData(String url, String artist, Component title) {
                     return Component.literal(json);
                 }
             }, Component.Serializer::toJson).forGetter(TrackData::title)
+            //?}
     ).apply(instance, TrackData::new));
 
     private static final Pattern RESOURCE_LOCATION_PATTERN = Pattern.compile("[a-z0-9_.-]+");
@@ -94,7 +98,11 @@ public record TrackData(String url, String artist, Component title) {
             nbt.putString("Url", this.url);
         }
         if (this.title != null) {
+            //? if >=1.21 {
+            /*net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, this.title).result().ifPresent(t -> nbt.put("Title", t));
+            *///?} else {
             nbt.putString("Title", Component.Serializer.toJson(this.title));
+            //?}
         }
         if (this.artist != null) {
             nbt.putString("Author", this.artist);

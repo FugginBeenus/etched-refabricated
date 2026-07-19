@@ -26,13 +26,21 @@ Support for newer Minecraft versions is planned.
 
 ## Building
 
-Requires JDK 17.
+Requires JDK 21 (to run Gradle; Minecraft 1.20.1 itself still compiles to and runs on Java 17).
+
+The project uses [Stonecutter](https://stonecutter.kikugie.dev/) to build one source tree across multiple Minecraft versions. To build the active version:
 
 ```
 ./gradlew build
 ```
 
-The built mod lands in `build/libs/`.
+To run the development client for a specific version:
+
+```
+./gradlew :1.20.1:runClient
+```
+
+Built jars land in `versions/<version>/build/libs/`.
 
 ## License and credits
 

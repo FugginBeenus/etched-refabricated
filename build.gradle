@@ -9,12 +9,20 @@ base {
 }
 
 
-version = project.mod_version
+version = project.mod_version + "+" + stonecutter.current.version
 group = project.maven_group
 
 loom {
-    accessWidenerPath = file("src/main/resources/etched.accesswidener")
+    accessWidenerPath = rootProject.file("src/main/resources/etched.accesswidener")
+}
 
+if (stonecutter.current.active) {
+    loom {
+        runConfigs.all {
+            ideConfigGenerated = true
+            runDir "../../run"
+        }
+    }
 }
 
 repositories {
@@ -126,7 +134,7 @@ remapJar {
 }
 
 jar {
-    from('LICENSE') {
+    from(rootProject.file('LICENSE')) {
         rename { "${it}_${base.archivesName.get()}" }
     }
 }

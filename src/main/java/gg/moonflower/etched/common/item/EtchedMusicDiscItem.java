@@ -2,6 +2,7 @@ package gg.moonflower.etched.common.item;
 
 import gg.moonflower.etched.api.record.PlayableRecordItem;
 import gg.moonflower.etched.api.record.TrackData;
+import gg.moonflower.etched.api.util.EtchedData;
 import gg.moonflower.etched.core.Etched;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -26,7 +27,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
 
     @Override
     public Optional<TrackData[]> getMusic(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null || (!nbt.contains("Music", Tag.TAG_COMPOUND) && !nbt.contains("Music", Tag.TAG_LIST))) {
             return Optional.empty();
         }
@@ -63,7 +64,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
 
     @Override
     public Optional<TrackData> getAlbum(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null || !nbt.contains("Album", Tag.TAG_COMPOUND) && !nbt.contains("Music", Tag.TAG_LIST)) {
             return this.getMusic(stack).filter(data -> data.length > 0).map(data -> data[0]);
         }
@@ -72,7 +73,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
 
     @Override
     public int getTrackCount(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null || (!nbt.contains("Music", Tag.TAG_COMPOUND) && !nbt.contains("Music", Tag.TAG_LIST))) {
             return 0;
         }
@@ -101,7 +102,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      * @return The pattern for that item
      */
     public static LabelPattern getPattern(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null || !nbt.contains("Pattern", Tag.TAG_ANY_NUMERIC)) {
             return LabelPattern.FLAT;
         }
@@ -116,7 +117,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      * @return The color for the physical disc
      */
     public static int getDiscColor(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
             return 0x515151;
         }
@@ -140,7 +141,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      * @return The color for the label
      */
     public static int getLabelPrimaryColor(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
             return 0xFFFFFF;
         }
@@ -164,7 +165,7 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      * @return The color for the label
      */
     public static int getLabelSecondaryColor(ItemStack stack) {
-        CompoundTag nbt = stack.getTag();
+        CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
             return 0xFFFFFF;
         }
@@ -189,20 +190,22 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      */
     public static void setMusic(ItemStack stack, TrackData... tracks) {
         if (tracks.length == 0) {
-            stack.removeTagKey("Music");
-            stack.removeTagKey("Album");
+            EtchedData.removeTag(stack, "Music");
+            EtchedData.removeTag(stack, "Album");
         } else if (tracks.length == 1) {
-            CompoundTag nbt = stack.getOrCreateTag();
-            nbt.put("Music", tracks[0].save(new CompoundTag()));
-            nbt.remove("Album");
+            EtchedData.mutateTag(stack, nbt -> {
+                nbt.put("Music", tracks[0].save(new CompoundTag()));
+                nbt.remove("Album");
+            });
         } else {
             ListTag musicNbt = new ListTag();
             for (int i = 1; i < tracks.length; i++) {
                 musicNbt.add(tracks[i].save(new CompoundTag()));
             }
-            CompoundTag nbt = stack.getOrCreateTag();
-            nbt.put("Music", musicNbt);
-            nbt.put("Album", tracks[0].save(new CompoundTag()));
+            EtchedData.mutateTag(stack, nbt -> {
+                nbt.put("Music", musicNbt);
+                nbt.put("Album", tracks[0].save(new CompoundTag()));
+            });
         }
     }
 
@@ -214,9 +217,9 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      */
     public static void setPattern(ItemStack stack, @Nullable LabelPattern pattern) {
         if (pattern == null) {
-            stack.removeTagKey("Pattern");
+            EtchedData.removeTag(stack, "Pattern");
         } else {
-            stack.getOrCreateTag().putByte("Pattern", (byte) pattern.ordinal());
+            EtchedData.mutateTag(stack, nbt -> nbt.putByte("Pattern", (byte) pattern.ordinal()));
         }
     }
 
@@ -228,13 +231,14 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
      * @param secondaryColor The color to use for the label
      */
     public static void setColor(ItemStack stack, int discColor, int primaryColor, int secondaryColor) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putInt("DiscColor", discColor);
+        EtchedData.mutateTag(stack, tag -> {
+            tag.putInt("DiscColor", discColor);
 
-        CompoundTag labelTag = tag.getCompound("LabelColor");
-        labelTag.putInt("Primary", primaryColor);
-        labelTag.putInt("Secondary", secondaryColor);
-        tag.put("LabelColor", labelTag);
+            CompoundTag labelTag = tag.getCompound("LabelColor");
+            labelTag.putInt("Primary", primaryColor);
+            labelTag.putInt("Secondary", secondaryColor);
+            tag.put("LabelColor", labelTag);
+        });
     }
 
     /**

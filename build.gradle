@@ -73,11 +73,14 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${forge_cofig_api_version}"
-    modImplementation("dev.isxander:yet-another-config-lib:3.4.4+1.20.1-fabric")
-    modLocalRuntime "fuzs.forgeconfigscreens:forgeconfigscreens-fabric:${forge_cofig_api_version}"
-    modLocalRuntime 'com.terraformersmc:modmenu:7.1.0';
-    modApi 'com.terraformersmc:modmenu:7.1.0';
-    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:0.3.6")))
+    modImplementation("dev.isxander:yet-another-config-lib:${project.yacl_version}")
+    // forgeconfigscreens (dev-only config UI) was never updated past 1.20.1
+    if (stonecutter.eval(stonecutter.current.version, "<1.21")) {
+        modLocalRuntime "fuzs.forgeconfigscreens:forgeconfigscreens-fabric:${forge_cofig_api_version}"
+    }
+    modLocalRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
+    modApi "com.terraformersmc:modmenu:${project.modmenu_version}"
+    include(implementation(annotationProcessor("io.github.llamalad7:mixinextras-fabric:${project.mixinextras_version}")))
     modImplementation(include("com.tterrag.registrate_fabric:Registrate:${project.registrate_version}"))
             {exclude group: "com.github.llamalad7.mixinextras" }
 
@@ -107,15 +110,17 @@ processResources {
     }
 }
 
+def javaVersion = stonecutter.eval(stonecutter.current.version, ">=1.20.5") ? 21 : 17
+
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = 'UTF-8'
-    // Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-    it.options.release = 17
+    it.options.release = javaVersion
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    def jv = JavaVersion.toVersion(javaVersion)
+    sourceCompatibility = jv
+    targetCompatibility = jv
 
     withSourcesJar()
 }

@@ -39,17 +39,6 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         super(properties);
     }
 
-    /* //FIXME
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return AlbumCoverItemRenderer.INSTANCE;
-            }
-        });
-    } */
-
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
@@ -119,6 +108,16 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         return false;
     }
 
+    //? if >=1.21 {
+    /*@Override
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> list, TooltipFlag tooltipFlag) {
+        for (ItemStack record : getRecords(stack)) {
+            if (record.getItem() instanceof PlayableRecord) {
+                record.getItem().appendHoverText(record, context, list, tooltipFlag);
+            }
+        }
+    }
+    *///?} else {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
         for (ItemStack record : getRecords(stack)) {
@@ -127,10 +126,15 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
             }
         }
     }
+    //?}
 
     @Override
     public void onDestroyed(ItemEntity itemEntity) {
+        //? if >=1.21 {
+        /*ItemUtils.onContainerDestroyed(itemEntity, getRecords(itemEntity.getItem()));
+        *///?} else {
         ItemUtils.onContainerDestroyed(itemEntity, getRecords(itemEntity.getItem()).stream());
+        //?}
     }
 
     private void playRemoveOneSound(Entity entity) {
@@ -146,38 +150,28 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
     }
 
     private static Optional<ItemStack> removeOne(ItemStack albumCover) {
-        CompoundTag tag = albumCover.getOrCreateTag();
-        if (!tag.contains("Records", Tag.TAG_LIST)) {
+        List<ItemStack> records = new ArrayList<>(getRecords(albumCover));
+        if (records.isEmpty()) {
             return Optional.empty();
         }
-
-        ListTag recordsNbt = tag.getList("Records", Tag.TAG_COMPOUND);
-        if (recordsNbt.isEmpty()) {
-            return Optional.empty();
-        }
-
-        CompoundTag recordNbt = recordsNbt.getCompound(recordsNbt.size() - 1);
-        ItemStack recordStack = ItemStack.of(recordNbt);
-        recordsNbt.remove(recordsNbt.size() - 1);
-
-        return Optional.of(recordStack);
+        ItemStack removed = records.remove(records.size() - 1);
+        setRecords(albumCover, records);
+        return Optional.of(removed);
     }
 
     private static boolean dropContents(ItemStack itemStack, Player player) {
-        CompoundTag tag = itemStack.getOrCreateTag();
-        if (!tag.contains("Records")) {
+        List<ItemStack> records = getRecords(itemStack);
+        if (records.isEmpty()) {
             return false;
         }
 
         if (player instanceof ServerPlayer) {
-            ListTag listTag = tag.getList("Records", Tag.TAG_COMPOUND);
-
-            for (int i = 0; i < listTag.size(); i++) {
-                player.getInventory().placeItemBackInInventory(ItemStack.of(listTag.getCompound(i)));
+            for (ItemStack record : records) {
+                player.getInventory().placeItemBackInInventory(record);
             }
         }
 
-        itemStack.removeTagKey("Records");
+        setRecords(itemStack, List.of());
         return true;
     }
 
@@ -186,20 +180,15 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
             return;
         }
 
-        CompoundTag tag = albumCover.getOrCreateTag();
-        if (!tag.contains("Records")) {
-            tag.put("Records", new ListTag());
+        List<ItemStack> records = new ArrayList<>(getRecords(albumCover));
+        if (records.size() >= MAX_RECORDS) {
+            return;
         }
-
-        ListTag recordsNbt = tag.getList("Records", Tag.TAG_COMPOUND);
-
-        ItemStack singleRecord = record.split(1);
-        CompoundTag recordTag = new CompoundTag();
-        singleRecord.save(recordTag);
-        recordsNbt.add(recordTag);
+        records.add(record.split(1));
+        setRecords(albumCover, records);
 
         if (getCoverStack(albumCover).isEmpty()) {
-            getRecords(albumCover).stream().filter(stack -> !stack.isEmpty()).findFirst().ifPresent(stack -> setCover(albumCover, stack));
+            records.stream().filter(stack -> !stack.isEmpty()).findFirst().ifPresent(stack -> setCover(albumCover, stack));
         }
     }
 
@@ -207,7 +196,7 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         if (!albumCover.is(EtchedItems.ALBUM_COVER.asItem()) || !AlbumCoverMenu.isValid(record)) {
             return false;
         }
-        return albumCover.getTag() == null || !albumCover.getTag().contains("Records", Tag.TAG_LIST) || albumCover.getTag().getList("Records", Tag.TAG_COMPOUND).size() < MAX_RECORDS;
+        return getRecords(albumCover).size() < MAX_RECORDS;
     }
 
     @Override
@@ -226,31 +215,46 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         return getRecords(stack).stream().filter(record -> record.getItem() instanceof PlayableRecord).mapToInt(record -> ((PlayableRecord) record.getItem()).getTrackCount(record)).sum();
     }
 
-    /* //FIXME
-    @Override
-    public boolean canGrindstoneRepair(ItemStack stack) {
-        return getCoverStack(stack).isPresent();
-    } */
+    // ---- version-abstracted storage: typed component on 1.21+, item NBT on 1.20.1 ----
 
     public static Optional<ItemStack> getCoverStack(ItemStack stack) {
         if (stack.getItem() != EtchedItems.ALBUM_COVER.asItem()) {
             return Optional.empty();
         }
+        ItemStack cover = getCover(stack);
+        return cover.isEmpty() ? Optional.empty() : Optional.of(cover);
+    }
 
+    private static ItemStack getCover(ItemStack stack) {
+        //? if >=1.21 {
+        /*gg.moonflower.etched.common.component.AlbumCoverComponent component = stack.get(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER);
+        return component != null ? component.cover() : ItemStack.EMPTY;
+        *///?} else {
         CompoundTag nbt = stack.getTag();
         if (nbt == null || !nbt.contains("CoverRecord", Tag.TAG_COMPOUND)) {
-            return Optional.empty();
+            return ItemStack.EMPTY;
         }
-
-        ItemStack cover = ItemStack.of(nbt.getCompound("CoverRecord"));
-        return cover.isEmpty() ? Optional.empty() : Optional.of(cover);
+        return ItemStack.of(nbt.getCompound("CoverRecord"));
+        //?}
     }
 
     public static List<ItemStack> getRecords(ItemStack stack) {
         if (stack.getItem() != EtchedItems.ALBUM_COVER.asItem()) {
             return Collections.emptyList();
         }
-
+        //? if >=1.21 {
+        /*gg.moonflower.etched.common.component.AlbumCoverComponent component = stack.get(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER);
+        if (component == null) {
+            return Collections.emptyList();
+        }
+        List<ItemStack> list = new ArrayList<>();
+        for (ItemStack record : component.records()) {
+            if (!record.isEmpty() && list.size() < MAX_RECORDS) {
+                list.add(record);
+            }
+        }
+        return list;
+        *///?} else {
         CompoundTag nbt = stack.getTag();
         if (nbt == null || !nbt.contains("Records", Tag.TAG_LIST)) {
             return Collections.emptyList();
@@ -270,38 +274,44 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         }
 
         return list;
+        //?}
     }
 
     public static void setCover(ItemStack stack, ItemStack record) {
         if (stack.getItem() != EtchedItems.ALBUM_COVER.asItem()) {
             return;
         }
-
+        //? if >=1.21 {
+        /*gg.moonflower.etched.common.component.AlbumCoverComponent component = stack.getOrDefault(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER, gg.moonflower.etched.common.component.AlbumCoverComponent.EMPTY);
+        stack.set(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER, component.withCover(record.isEmpty() ? ItemStack.EMPTY : record.copyWithCount(1)));
+        *///?} else {
         if (record.isEmpty()) {
             stack.removeTagKey("CoverRecord");
             return;
         }
         stack.getOrCreateTag().put("CoverRecord", record.save(new CompoundTag()));
+        //?}
     }
 
     public static void setRecords(ItemStack stack, Collection<ItemStack> records) {
-        if (stack.getItem() != EtchedItems.ALBUM_COVER.asItem() || records.isEmpty()) {
+        if (stack.getItem() != EtchedItems.ALBUM_COVER.asItem()) {
             return;
         }
-
-        CompoundTag nbt = stack.getOrCreateTag();
-        ListTag recordsNbt = new ListTag();
-        int i = 0;
+        List<ItemStack> trimmed = new ArrayList<>();
         for (ItemStack record : records) {
-            if (record.isEmpty()) {
-                continue;
+            if (!record.isEmpty() && trimmed.size() < MAX_RECORDS) {
+                trimmed.add(record);
             }
-            if (i >= MAX_RECORDS) {
-                break;
-            }
-            recordsNbt.add(record.save(new CompoundTag()));
-            i++;
         }
-        nbt.put("Records", recordsNbt);
+        //? if >=1.21 {
+        /*gg.moonflower.etched.common.component.AlbumCoverComponent component = stack.getOrDefault(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER, gg.moonflower.etched.common.component.AlbumCoverComponent.EMPTY);
+        stack.set(gg.moonflower.etched.core.registry.EtchedComponents.ALBUM_COVER, component.withRecords(trimmed));
+        *///?} else {
+        ListTag recordsNbt = new ListTag();
+        for (ItemStack record : trimmed) {
+            recordsNbt.add(record.save(new CompoundTag()));
+        }
+        stack.getOrCreateTag().put("Records", recordsNbt);
+        //?}
     }
 }

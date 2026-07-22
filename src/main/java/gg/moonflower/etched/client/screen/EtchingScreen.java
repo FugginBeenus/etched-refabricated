@@ -84,7 +84,9 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
 
     @Override
     public void containerTick() {
+        //? if <1.21 {
         this.url.tick();
+        //?}
         if (this.urlTicks > 0) {
             this.urlTicks--;
             if (this.urlTicks <= 0 && !Objects.equals(this.oldUrl, this.url.getValue())) {
@@ -156,7 +158,11 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
+        //? if >=1.21 {
+        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
+        *///?} else {
         this.renderBackground(guiGraphics);
+        //?}
 
         guiGraphics.blit(TEXTURE, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
         if ((!this.url.getValue().isEmpty() && !TrackData.isValidURL(this.url.getValue())) || !this.invalidReason.isEmpty() || (this.discStack.getItem() != EtchedItems.ETCHED_MUSIC_DISC.get() && ((!this.discStack.isEmpty() && this.labelStack.isEmpty()) || (this.discStack.isEmpty() && !this.labelStack.isEmpty())))) {

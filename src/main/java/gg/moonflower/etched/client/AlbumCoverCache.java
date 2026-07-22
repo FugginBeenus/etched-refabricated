@@ -77,7 +77,7 @@ public final class AlbumCoverCache {
             } catch (Exception e) {
                 throw new CompletionException(e);
             }
-        }, HttpUtil.DOWNLOAD_EXECUTOR).thenApplyAsync(path -> {
+        }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenApplyAsync(path -> {
             try (FileInputStream is = new FileInputStream(path.toFile())) {
                 return AlbumCover.of(AlbumImageProcessor.apply(NativeImage.read(is), AlbumCoverItemRenderer.getOverlayImage()));
             } catch (Exception e) {

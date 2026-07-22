@@ -28,6 +28,17 @@ public class Etched {
 
     }
 
+    /**
+     * The shared executor for network downloads. 1.21 removed {@code HttpUtil.DOWNLOAD_EXECUTOR}.
+     */
+    public static java.util.concurrent.Executor downloadExecutor() {
+        //? if >=1.21 {
+        /*return net.minecraft.Util.nonCriticalIoPool();
+        *///?} else {
+        return net.minecraft.util.HttpUtil.DOWNLOAD_EXECUTOR;
+        //?}
+    }
+
     public static void init() {
         //i guess following is needed to preload classes before registration or they will
         // not be registered

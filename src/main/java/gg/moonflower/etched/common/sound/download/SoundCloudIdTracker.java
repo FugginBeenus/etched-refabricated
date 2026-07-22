@@ -110,7 +110,7 @@ public final class SoundCloudIdTracker {
                 } catch (Throwable e) {
                     throw new CompletionException(e);
                 }
-            }, HttpUtil.DOWNLOAD_EXECUTOR).thenApplyAsync(clientId -> {
+            }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenApplyAsync(clientId -> {
                 synchronized (LOCK) {
                     return currentId = clientId;
                 }

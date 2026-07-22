@@ -368,7 +368,7 @@ public class EtchingMenu extends AbstractContainerMenu {
                     EtchedMusicDiscItem.setPattern(resultStack, EtchedMusicDiscItem.LabelPattern.values()[this.labelIndex.get()]);
 
                     return resultStack;
-                }, HttpUtil.DOWNLOAD_EXECUTOR).thenAcceptAsync(resultStack -> {
+                }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenAcceptAsync(resultStack -> {
                     if (this.urlId == currentId && !ItemStack.matches(resultStack, this.resultSlot.getItem()) && !ItemStack.matches(resultStack, this.discSlot.getItem())) {
                         this.resultSlot.set(resultStack);
                         this.urlId++;

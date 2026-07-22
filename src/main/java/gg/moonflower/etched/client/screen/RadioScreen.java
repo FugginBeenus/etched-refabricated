@@ -49,12 +49,18 @@ public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
 
     @Override
     public void containerTick() {
+        //? if <1.21 {
         this.url.tick();
+        //?}
     }
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
+        //? if >=1.21 {
+        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
+        *///?} else {
         this.renderBackground(guiGraphics);
+        //?}
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 

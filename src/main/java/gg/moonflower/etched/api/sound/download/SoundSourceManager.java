@@ -63,7 +63,7 @@ public final class SoundSourceManager {
             } catch (Exception e) {
                 throw new CompletionException("Failed to connect to " + source.getApiName() + " API", e);
             }
-        }, HttpUtil.DOWNLOAD_EXECUTOR) : CompletableFuture.completedFuture(Collections.singletonList(new URL(url)));
+        }, gg.moonflower.etched.core.Etched.downloadExecutor()) : CompletableFuture.completedFuture(Collections.singletonList(new URL(url)));
 
         return urlFuture.thenApplyAsync(urls -> {
             try {
@@ -77,7 +77,7 @@ public final class SoundSourceManager {
             } catch (Exception e) {
                 throw new CompletionException(e);
             }
-        }, HttpUtil.DOWNLOAD_EXECUTOR);
+        }, gg.moonflower.etched.core.Etched.downloadExecutor());
     }
 
     /**
@@ -97,7 +97,7 @@ public final class SoundSourceManager {
             } catch (Exception e) {
                 throw new CompletionException(e);
             }
-        }, HttpUtil.DOWNLOAD_EXECUTOR);
+        }, gg.moonflower.etched.core.Etched.downloadExecutor());
     }
 
     /**
@@ -116,7 +116,7 @@ public final class SoundSourceManager {
                 LOGGER.error("Failed to connect to " + source.getApiName() + " API", e);
                 return Optional.empty();
             }
-        }), HttpUtil.DOWNLOAD_EXECUTOR).thenCompose(coverUrl -> coverUrl.map(AlbumCoverCache::requestResource).orElseGet(() -> CompletableFuture.completedFuture(AlbumCover.EMPTY)));
+        }), gg.moonflower.etched.core.Etched.downloadExecutor()).thenCompose(coverUrl -> coverUrl.map(AlbumCoverCache::requestResource).orElseGet(() -> CompletableFuture.completedFuture(AlbumCover.EMPTY)));
     }
 
     /**

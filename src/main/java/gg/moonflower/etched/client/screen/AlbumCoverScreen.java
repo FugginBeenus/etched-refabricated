@@ -20,7 +20,11 @@ public class AlbumCoverScreen extends AbstractContainerScreen<AlbumCoverMenu> {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        //? if >=1.21 {
+        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
+        *///?} else {
         this.renderBackground(guiGraphics);
+        //?}
         super.render(guiGraphics, mouseX, mouseY, partialTick);
         this.renderTooltip(guiGraphics, mouseX, mouseY);
     }

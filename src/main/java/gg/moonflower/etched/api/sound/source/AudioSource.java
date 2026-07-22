@@ -145,7 +145,7 @@ public interface AudioSource {
                 if (!type.isStream()) {
                     throw new IOException("The provided URL is a stream, but that is not supported");
                 }
-                return () -> new AsyncInputStream(url::openStream, 8192, 8, HttpUtil.DOWNLOAD_EXECUTOR);
+                return () -> new AsyncInputStream(url::openStream, 8192, 8, gg.moonflower.etched.core.Etched.downloadExecutor());
             }
 
             // The cached file is still fresh, so only the metadata needs to be updated

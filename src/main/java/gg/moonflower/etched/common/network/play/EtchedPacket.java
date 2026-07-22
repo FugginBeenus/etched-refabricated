@@ -1,10 +1,9 @@
 package gg.moonflower.etched.common.network.play;
 
 import gg.moonflower.etched.common.network.EtchedMessages;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -25,39 +24,59 @@ public interface EtchedPacket {
     /**
      * Writes the raw message data to the data stream.
      *
-     * @param buf The buffer to write to
+     * @param buf The buffer to write to (a RegistryFriendlyByteBuf on 1.21+)
      */
     void writePacketData(FriendlyByteBuf buf) throws IOException;
+
     ResourceLocation getPacketId();
 
-    private FriendlyByteBuf getBuf() {
-        FriendlyByteBuf buf = PacketByteBufs.create();
+    //? if >=1.21 {
+    /*private EtchedPayload etched$makePayload(net.minecraft.core.RegistryAccess access) {
+        net.minecraft.network.RegistryFriendlyByteBuf buf = new net.minecraft.network.RegistryFriendlyByteBuf(io.netty.buffer.Unpooled.buffer(), access);
         try {
             writePacketData(buf);
+        } catch (Exception exception) {
+            EtchedMessages.LOGGER.error("Could not write buf for packet " + getPacketId(), exception);
         }
-        catch (Exception exception) {
-            EtchedMessages.LOGGER.error("Could not write buf for packet "+ getPacketId(), exception);
+        byte[] data = new byte[buf.readableBytes()];
+        buf.readBytes(data);
+        return new EtchedPayload(getPacketId(), data);
+    }
+
+    default void sendToClient(ServerPlayer player) {
+        ServerPlayNetworking.send(player, etched$makePayload(player.level().registryAccess()));
+    }
+
+    default void sendToClients(Collection<ServerPlayer> players) {
+        players.forEach(serverPlayer -> ServerPlayNetworking.send(serverPlayer, etched$makePayload(serverPlayer.level().registryAccess())));
+    }
+
+    @Environment(EnvType.CLIENT)
+    default void sendToServer() {
+        ClientPlayNetworking.send(etched$makePayload(net.minecraft.client.Minecraft.getInstance().getConnection().registryAccess()));
+    }
+    *///?} else {
+    private FriendlyByteBuf getBuf() {
+        FriendlyByteBuf buf = net.fabricmc.fabric.api.networking.v1.PacketByteBufs.create();
+        try {
+            writePacketData(buf);
+        } catch (Exception exception) {
+            EtchedMessages.LOGGER.error("Could not write buf for packet " + getPacketId(), exception);
         }
         return buf;
     }
 
     default void sendToClient(ServerPlayer player) {
-        var buf = getBuf();
-        ServerPlayNetworking.send(player, getPacketId(), buf);
-        EtchedMessages.LOGGER.info(getPacketId()+" (server -> client)");
+        ServerPlayNetworking.send(player, getPacketId(), getBuf());
     }
 
     default void sendToClients(Collection<ServerPlayer> players) {
         var buf = getBuf();
-        players.forEach(serverPlayer -> {
-            ServerPlayNetworking.send(serverPlayer, getPacketId(), buf);
-        });
-        EtchedMessages.LOGGER.info(getPacketId()+" (server -> clients)");
+        players.forEach(serverPlayer -> ServerPlayNetworking.send(serverPlayer, getPacketId(), buf));
     }
 
     default void sendToServer() {
-        var buf = getBuf();
-        ClientPlayNetworking.send(getPacketId(), buf);
-        EtchedMessages.LOGGER.info(getPacketId()+" (client -> server)");
+        ClientPlayNetworking.send(getPacketId(), getBuf());
     }
+    //?}
 }

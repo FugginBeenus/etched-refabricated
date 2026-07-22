@@ -34,7 +34,11 @@ public class ClientboundPlayEntityMusicPacket implements EtchedPacket {
 
     public ClientboundPlayEntityMusicPacket(FriendlyByteBuf buf) {
         this.action = buf.readEnum(Action.class);
+        //? if >=1.21 {
+        /*this.record = this.action == Action.STOP ? ItemStack.EMPTY : net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.decode((net.minecraft.network.RegistryFriendlyByteBuf) buf);
+        *///?} else {
         this.record = this.action == Action.STOP ? ItemStack.EMPTY : buf.readItem();
+        //?}
         this.entityId = buf.readVarInt();
     }
 
@@ -42,7 +46,11 @@ public class ClientboundPlayEntityMusicPacket implements EtchedPacket {
     public void writePacketData(FriendlyByteBuf buf) {
         buf.writeEnum(this.action);
         if (this.action != Action.STOP) {
+            //? if >=1.21 {
+            /*net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode((net.minecraft.network.RegistryFriendlyByteBuf) buf, this.record);
+            *///?} else {
             buf.writeItem(this.record);
+            //?}
         }
         buf.writeVarInt(this.entityId);
     }

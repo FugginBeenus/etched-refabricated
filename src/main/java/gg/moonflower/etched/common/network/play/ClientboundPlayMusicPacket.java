@@ -21,12 +21,20 @@ import org.jetbrains.annotations.ApiStatus;
 public record ClientboundPlayMusicPacket(ItemStack record, BlockPos pos) implements EtchedPacket {
 
     public ClientboundPlayMusicPacket(FriendlyByteBuf buf) {
+        //? if >=1.21 {
+        /*this(net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.decode((net.minecraft.network.RegistryFriendlyByteBuf) buf), buf.readBlockPos());
+        *///?} else {
         this(buf.readItem(), buf.readBlockPos());
+        //?}
     }
 
     @Override
     public void writePacketData(FriendlyByteBuf buf) {
+        //? if >=1.21 {
+        /*net.minecraft.world.item.ItemStack.OPTIONAL_STREAM_CODEC.encode((net.minecraft.network.RegistryFriendlyByteBuf) buf, this.record);
+        *///?} else {
         buf.writeItem(this.record);
+        //?}
         buf.writeBlockPos(this.pos);
     }
 

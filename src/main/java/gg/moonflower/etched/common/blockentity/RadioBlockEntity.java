@@ -53,6 +53,28 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         }
     }
 
+    //? if >=1.21 {
+    /*@Override
+    protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
+        this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
+        if (this.loaded) {
+            SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
+        }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
+        if (this.url != null) {
+            nbt.putString("Url", this.url);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider provider) {
+        return this.saveWithoutMetadata(provider);
+    }
+    *///?} else {
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
@@ -73,6 +95,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     public CompoundTag getUpdateTag() {
         return this.saveWithoutMetadata();
     }
+    //?}
 
     @Nullable
     @Override

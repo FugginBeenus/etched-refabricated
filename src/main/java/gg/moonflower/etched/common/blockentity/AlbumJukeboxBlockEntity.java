@@ -96,6 +96,33 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
     }
 
+    //? if >=1.21 {
+    /*@Override
+    protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
+        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        if (!this.tryLoadLootTable(nbt)) {
+            ContainerHelper.loadAllItems(nbt, this.items, provider);
+        }
+        if (this.loaded) {
+            SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
+        }
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
+        super.saveAdditional(nbt, provider);
+
+        if (!this.trySaveLootTable(nbt)) {
+            ContainerHelper.saveAllItems(nbt, this.items, provider);
+        }
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider provider) {
+        return this.saveWithoutMetadata(provider);
+    }
+    *///?} else {
     @Override
     public void load(CompoundTag nbt) {
         super.load(nbt);
@@ -121,6 +148,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     public CompoundTag getUpdateTag() {
         return this.saveWithoutMetadata();
     }
+    //?}
 
     @Nullable
     @Override

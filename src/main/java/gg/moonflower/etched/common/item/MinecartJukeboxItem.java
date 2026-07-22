@@ -32,12 +32,22 @@ public class MinecartJukeboxItem extends Item {
 
         @Override
         public ItemStack execute(BlockSource source, ItemStack stack) {
+            //? if >=1.21 {
+            /*Direction direction = source.state().getValue(DispenserBlock.FACING);
+            Level level = source.level();
+            net.minecraft.world.phys.Vec3 center = source.center();
+            double d = center.x() + (double) direction.getStepX() * 1.125D;
+            double e = Math.floor(center.y()) + (double) direction.getStepY();
+            double f = center.z() + (double) direction.getStepZ() * 1.125D;
+            BlockPos blockPos = source.pos().relative(direction);
+            *///?} else {
             Direction direction = source.getBlockState().getValue(DispenserBlock.FACING);
             Level level = source.getLevel();
             double d = source.x() + (double) direction.getStepX() * 1.125D;
             double e = Math.floor(source.y()) + (double) direction.getStepY();
             double f = source.z() + (double) direction.getStepZ() * 1.125D;
             BlockPos blockPos = source.getPos().relative(direction);
+            //?}
             BlockState blockState = level.getBlockState(blockPos);
             RailShape railShape = blockState.getBlock() instanceof BaseRailBlock ? blockState.getValue(((BaseRailBlock) blockState.getBlock()).getShapeProperty()) : RailShape.NORTH_SOUTH;
             double k;
@@ -63,9 +73,15 @@ public class MinecartJukeboxItem extends Item {
 
 
             MinecartJukebox jukeboxMinecart = new MinecartJukebox(level, d, e + k, f);
+            //? if >=1.21 {
+            /*if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
+                jukeboxMinecart.setCustomName(stack.getHoverName());
+            }
+            *///?} else {
             if (stack.hasCustomHoverName()) {
                 jukeboxMinecart.setCustomName(stack.getHoverName());
             }
+            //?}
 
             level.addFreshEntity(jukeboxMinecart);
             stack.shrink(1);
@@ -73,7 +89,11 @@ public class MinecartJukeboxItem extends Item {
         }
 
         protected void playSound(BlockSource blockSource) {
+            //? if >=1.21 {
+            /*blockSource.level().levelEvent(1000, blockSource.pos(), 0);
+            *///?} else {
             blockSource.getLevel().levelEvent(1000, blockSource.getPos(), 0);
+            //?}
         }
     };
 
@@ -102,9 +122,15 @@ public class MinecartJukeboxItem extends Item {
             // FIXEDIT
             // also why complicate things with Registrate
             MinecartJukebox jukeboxMinecart = new MinecartJukebox(level, blockPos.getX() + 0.5D, blockPos.getY() + 0.0625D + d, blockPos.getZ() + 0.5D);
+            //? if >=1.21 {
+            /*if (stack.has(net.minecraft.core.component.DataComponents.CUSTOM_NAME)) {
+                jukeboxMinecart.setCustomName(stack.getHoverName());
+            }
+            *///?} else {
             if (stack.hasCustomHoverName()) {
                 jukeboxMinecart.setCustomName(stack.getHoverName());
             }
+            //?}
 
             level.addFreshEntity(jukeboxMinecart);
         }

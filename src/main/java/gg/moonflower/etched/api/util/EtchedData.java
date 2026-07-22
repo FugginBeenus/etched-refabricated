@@ -47,6 +47,15 @@ public final class EtchedData {
     }
 
     /**
+     * @return the named compound sub-tag of the stack's custom NBT, or {@code null} if absent. Read-only
+     * (a copy on 1.21+); use {@link #mutateTag} to write.
+     */
+    public static CompoundTag getTagElement(ItemStack stack, String key) {
+        CompoundTag tag = getTag(stack);
+        return tag != null && tag.contains(key, net.minecraft.nbt.Tag.TAG_COMPOUND) ? tag.getCompound(key) : null;
+    }
+
+    /**
      * Removes {@code key} from the stack's custom NBT, clearing the storage entirely if it becomes empty.
      */
     public static void removeTag(ItemStack stack, String key) {

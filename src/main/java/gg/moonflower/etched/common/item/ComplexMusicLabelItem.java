@@ -1,5 +1,6 @@
 package gg.moonflower.etched.common.item;
 
+import gg.moonflower.etched.api.util.EtchedData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -10,12 +11,12 @@ public class ComplexMusicLabelItem extends SimpleMusicLabelItem {
     }
 
     public static int getPrimaryColor(ItemStack stack) {
-        CompoundTag compoundTag = stack.getTagElement("Label");
+        CompoundTag compoundTag = EtchedData.getTagElement(stack, "Label");
         return compoundTag != null && compoundTag.contains("PrimaryColor", 99) ? compoundTag.getInt("PrimaryColor") : 0xFFFFFF;
     }
 
     public static int getSecondaryColor(ItemStack itemStack) {
-        CompoundTag compoundTag = itemStack.getTagElement("Label");
+        CompoundTag compoundTag = EtchedData.getTagElement(itemStack, "Label");
         return compoundTag != null && compoundTag.contains("SecondaryColor", 99) ? compoundTag.getInt("SecondaryColor") : 0xFFFFFF;
     }
 
@@ -23,9 +24,11 @@ public class ComplexMusicLabelItem extends SimpleMusicLabelItem {
         if (!(stack.getItem() instanceof ComplexMusicLabelItem)) {
             return;
         }
-
-        CompoundTag tag = stack.getOrCreateTagElement("Label");
-        tag.putInt("PrimaryColor", primary);
-        tag.putInt("SecondaryColor", secondary);
+        EtchedData.mutateTag(stack, nbt -> {
+            CompoundTag tag = nbt.getCompound("Label");
+            tag.putInt("PrimaryColor", primary);
+            tag.putInt("SecondaryColor", secondary);
+            nbt.put("Label", tag);
+        });
     }
 }

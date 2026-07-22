@@ -56,6 +56,42 @@ public class RadioBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0).setValue(POWERED, false).setValue(PORTAL, false));
     }
 
+    //? if >=1.21 {
+    /*public static final com.mojang.serialization.MapCodec<RadioBlock> CODEC = simpleCodec(RadioBlock::new);
+
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    protected net.minecraft.world.ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
+        if (stack.getItem() == Items.CAKE && !state.getValue(PORTAL)) {
+            if (level.isClientSide()) {
+                return net.minecraft.world.ItemInteractionResult.SUCCESS;
+            }
+            if (!player.isCreative()) {
+                stack.shrink(1);
+            }
+            level.setBlock(pos, state.setValue(PORTAL, true), 3);
+            return net.minecraft.world.ItemInteractionResult.SUCCESS;
+        }
+        return net.minecraft.world.ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult blockHitResult) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+        player.openMenu(state.getMenuProvider(level, pos)).ifPresent(__ -> {
+            String url = level.getBlockEntity(pos) instanceof RadioBlockEntity be ? be.getUrl() : "";
+            var packet = new ClientboundSetUrlPacket(url);
+            packet.sendToClient((ServerPlayer) player);
+        });
+        return InteractionResult.CONSUME;
+    }
+    *///?} else {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (level.isClientSide()) {
@@ -77,6 +113,7 @@ public class RadioBlock extends BaseEntityBlock {
         });
         return InteractionResult.CONSUME;
     }
+    //?}
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
@@ -160,16 +197,30 @@ public class RadioBlock extends BaseEntityBlock {
         builder.add(ROTATION, POWERED, PORTAL);
     }
 
+    //? if >=1.21 {
+    /*@Override
+    protected boolean isPathfindable(BlockState blockState, PathComputationType pathComputationType) {
+        return false;
+    }
+    *///?} else {
     @Override
     public boolean isPathfindable(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, PathComputationType pathComputationType) {
         return false;
     }
+    //?}
 
+    //? if >=1.21 {
+    /*@Override
+    public ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state) {
+        return new ItemStack(EtchedBlocks.RADIO);
+    }
+    *///?} else {
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         //FIXME
         return new ItemStack(/*state.getValue(PORTAL) ? EtchedBlocks.PORTAL_RADIO_ITEM :*/EtchedBlocks.RADIO);
     }
+    //?}
 
     @Environment(EnvType.CLIENT)
     @Override

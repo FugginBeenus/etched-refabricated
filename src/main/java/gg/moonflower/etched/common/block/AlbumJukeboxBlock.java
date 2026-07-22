@@ -46,6 +46,28 @@ public class AlbumJukeboxBlock extends BaseEntityBlock {
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH).setValue(POWERED, false).setValue(HAS_RECORD, false));
     }
 
+    //? if >=1.21 {
+    /*public static final com.mojang.serialization.MapCodec<AlbumJukeboxBlock> CODEC = simpleCodec(AlbumJukeboxBlock::new);
+
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.BaseEntityBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos pos, Player player, BlockHitResult result) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity instanceof AlbumJukeboxBlockEntity) {
+            player.openMenu((AlbumJukeboxBlockEntity) blockEntity);
+        }
+        // TODO: stats
+        return InteractionResult.CONSUME;
+    }
+    *///?} else {
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult result) {
         if (level.isClientSide()) {
@@ -59,6 +81,7 @@ public class AlbumJukeboxBlock extends BaseEntityBlock {
         // TODO: stats
         return InteractionResult.CONSUME;
     }
+    //?}
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {

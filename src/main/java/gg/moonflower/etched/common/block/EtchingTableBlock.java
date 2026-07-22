@@ -48,6 +48,26 @@ public class EtchingTableBlock extends Block {
         return this.defaultBlockState().setValue(FACING, blockPlaceContext.getHorizontalDirection().getOpposite());
     }
 
+    //? if >=1.21 {
+    /*public static final com.mojang.serialization.MapCodec<EtchingTableBlock> CODEC = simpleCodec(EtchingTableBlock::new);
+
+    @Override
+    protected com.mojang.serialization.MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return CODEC;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState blockState, Level level, BlockPos blockPos, Player player, BlockHitResult blockHitResult) {
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+        var menuProvider = blockState.getMenuProvider(level, blockPos);
+        if (menuProvider!=null)
+            player.openMenu(menuProvider);
+        // TODO: stats
+        return InteractionResult.CONSUME;
+    }
+    *///?} else {
     @Override
     public InteractionResult use(BlockState blockState, Level level, BlockPos blockPos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (level.isClientSide()) {
@@ -59,6 +79,7 @@ public class EtchingTableBlock extends Block {
         // TODO: stats
         return InteractionResult.CONSUME;
     }
+    //?}
 
     @Override
     public MenuProvider getMenuProvider(BlockState blockState, Level level, BlockPos blockPos) {
@@ -90,8 +111,15 @@ public class EtchingTableBlock extends Block {
         builder.add(FACING);
     }
 
+    //? if >=1.21 {
+    /*@Override
+    protected boolean isPathfindable(BlockState blockState, PathComputationType pathComputationType) {
+        return false;
+    }
+    *///?} else {
     @Override
     public boolean isPathfindable(BlockState blockState, BlockGetter blockGetter, BlockPos blockPos, PathComputationType pathComputationType) {
         return false;
     }
+    //?}
 }

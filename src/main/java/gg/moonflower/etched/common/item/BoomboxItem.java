@@ -149,6 +149,23 @@ public class BoomboxItem extends Item implements ContainerItem {
         return false;
     }
 
+    //? if >=1.21 {
+    /*@Override
+    public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
+        tooltipComponents.add(PAUSE);
+        if (hasRecord(stack)) {
+            ItemStack record = getRecord(stack);
+            List<Component> records = new LinkedList<>();
+            record.getItem().appendHoverText(record, context, records, isAdvanced);
+
+            if (!records.isEmpty()) {
+                tooltipComponents.add(Component.empty());
+                tooltipComponents.add(RECORDS);
+                tooltipComponents.addAll(records);
+            }
+        }
+    }
+    *///?} else {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         tooltipComponents.add(PAUSE);
@@ -164,6 +181,7 @@ public class BoomboxItem extends Item implements ContainerItem {
             }
         }
     }
+    //?}
 
     private void playRemoveOneSound(Entity entity) {
         entity.playSound(SoundEvents.BUNDLE_REMOVE_ONE, 0.8F, 0.8F + entity.level().getRandom().nextFloat() * 0.4F);
@@ -203,7 +221,7 @@ public class BoomboxItem extends Item implements ContainerItem {
         if (!(stack.getItem() instanceof BoomboxItem)) {
             return false;
         }
-        CompoundTag compoundTag = stack.getTag();
+        CompoundTag compoundTag = gg.moonflower.etched.api.util.EtchedData.getTag(stack);
         return compoundTag != null && compoundTag.getBoolean("Paused");
     }
 
@@ -211,28 +229,43 @@ public class BoomboxItem extends Item implements ContainerItem {
         if (!(stack.getItem() instanceof BoomboxItem)) {
             return false;
         }
+        //? if >=1.21 {
+        /*return stack.has(gg.moonflower.etched.core.registry.EtchedComponents.BOOMBOX_RECORD);
+        *///?} else {
         CompoundTag compoundTag = stack.getTag();
         return compoundTag != null && compoundTag.contains("Record", Tag.TAG_COMPOUND);
+        //?}
     }
 
     public static ItemStack getRecord(ItemStack stack) {
         if (!(stack.getItem() instanceof BoomboxItem)) {
             return ItemStack.EMPTY;
         }
+        //? if >=1.21 {
+        /*return stack.getOrDefault(gg.moonflower.etched.core.registry.EtchedComponents.BOOMBOX_RECORD, ItemStack.EMPTY);
+        *///?} else {
         CompoundTag compoundTag = stack.getTag();
         return compoundTag != null && compoundTag.contains("Record", Tag.TAG_COMPOUND) ? ItemStack.of(compoundTag.getCompound("Record")) : ItemStack.EMPTY;
+        //?}
     }
 
     public static void setRecord(ItemStack stack, ItemStack record) {
         if (!(stack.getItem() instanceof BoomboxItem)) {
             return;
         }
-
+        //? if >=1.21 {
+        /*if (record.isEmpty()) {
+            stack.remove(gg.moonflower.etched.core.registry.EtchedComponents.BOOMBOX_RECORD);
+        } else {
+            stack.set(gg.moonflower.etched.core.registry.EtchedComponents.BOOMBOX_RECORD, record.copyWithCount(1));
+        }
+        *///?} else {
         if (record.isEmpty()) {
             stack.removeTagKey("Record");
         } else {
             stack.getOrCreateTag().put("Record", record.save(new CompoundTag()));
         }
+        //?}
     }
 
     public static void setPaused(ItemStack stack, boolean paused) {
@@ -241,9 +274,9 @@ public class BoomboxItem extends Item implements ContainerItem {
         }
 
         if (!paused) {
-            stack.removeTagKey("Paused");
+            gg.moonflower.etched.api.util.EtchedData.removeTag(stack, "Paused");
         } else {
-            stack.getOrCreateTag().putBoolean("Paused", true);
+            gg.moonflower.etched.api.util.EtchedData.mutateTag(stack, nbt -> nbt.putBoolean("Paused", true));
         }
     }
 

@@ -22,6 +22,12 @@ public final class EtchedComponents {
                     .networkSynchronized(AlbumCoverComponent.STREAM_CODEC)
                     .build());
 
+    public static final DataComponentType<net.minecraft.world.item.ItemStack> BOOMBOX_RECORD = register("boombox_record",
+            DataComponentType.<net.minecraft.world.item.ItemStack>builder()
+                    .persistent(net.minecraft.world.item.ItemStack.CODEC)
+                    .networkSynchronized(net.minecraft.world.item.ItemStack.STREAM_CODEC)
+                    .build());
+
     private static <T> DataComponentType<T> register(String name, DataComponentType<T> type) {
         return Registry.register(BuiltInRegistries.DATA_COMPONENT_TYPE, ResourceLocation.fromNamespaceAndPath(Etched.MOD_ID, name), type);
     }

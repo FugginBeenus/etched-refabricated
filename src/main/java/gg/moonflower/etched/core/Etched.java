@@ -36,6 +36,9 @@ public class Etched {
         EtchedBlocks.register();
         EtchedEntities.register();
         EtchedItems.register();
+        //? if >=1.21 {
+        /*gg.moonflower.etched.core.registry.EtchedComponents.register();
+        *///?}
         EtchedMenus.register();
         EtchedRecipes.register();
         EtchedSounds.register();

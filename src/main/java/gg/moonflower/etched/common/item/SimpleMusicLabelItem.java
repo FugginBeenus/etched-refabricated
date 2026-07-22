@@ -1,5 +1,6 @@
 package gg.moonflower.etched.common.item;
 
+import gg.moonflower.etched.api.util.EtchedData;
 import gg.moonflower.etched.client.screen.EditMusicLabelScreen;
 import gg.moonflower.etched.core.Etched;
 import net.fabricmc.api.EnvType;
@@ -31,33 +32,40 @@ public class SimpleMusicLabelItem extends Item {
         if (!(stack.getItem() instanceof SimpleMusicLabelItem)) {
             return "";
         }
-        return stack.getOrCreateTagElement("Label").getString("Author");
+        CompoundTag tag = EtchedData.getTag(stack);
+        return tag != null ? tag.getCompound("Label").getString("Author") : "";
     }
 
     public static String getTitle(ItemStack stack) {
         if (!(stack.getItem() instanceof SimpleMusicLabelItem)) {
             return "";
         }
-        return stack.getOrCreateTagElement("Label").getString("Title");
+        CompoundTag tag = EtchedData.getTag(stack);
+        return tag != null ? tag.getCompound("Label").getString("Title") : "";
     }
 
     public static void setAuthor(ItemStack stack, String author) {
         if (!(stack.getItem() instanceof SimpleMusicLabelItem)) {
             return;
         }
-
-        CompoundTag tag = stack.getOrCreateTagElement("Label");
-        tag.putString("Author", author);
+        EtchedData.mutateTag(stack, nbt -> {
+            CompoundTag label = nbt.getCompound("Label");
+            label.putString("Author", author);
+            nbt.put("Label", label);
+        });
     }
 
     public static void setTitle(ItemStack stack, String title) {
         if (!(stack.getItem() instanceof SimpleMusicLabelItem)) {
             return;
         }
-
-        CompoundTag tag = stack.getOrCreateTagElement("Label");
-        tag.putString("Title", title);
+        EtchedData.mutateTag(stack, nbt -> {
+            CompoundTag label = nbt.getCompound("Label");
+            label.putString("Title", title);
+            nbt.put("Label", label);
+        });
     }
+
     @Environment(EnvType.CLIENT)
     private void openMusicLabelEditScreen(Player player, InteractionHand hand, ItemStack stack) {
         Minecraft.getInstance().setScreen(new EditMusicLabelScreen(player, hand, stack));
@@ -84,7 +92,11 @@ public class SimpleMusicLabelItem extends Item {
     }
 
     @Override
+    //? if >=1.21 {
+    /*public void appendHoverText(ItemStack itemStack, net.minecraft.world.item.Item.TooltipContext context, List<Component> list, TooltipFlag tooltipFlag) {
+    *///?} else {
     public void appendHoverText(ItemStack itemStack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
+    //?}
         if (!getAuthor(itemStack).isEmpty() && !getTitle(itemStack).isEmpty()) {
             list.add(Component.translatable("sound_source." + Etched.MOD_ID + ".info", getAuthor(itemStack), getTitle(itemStack)).withStyle(ChatFormatting.GRAY));
         }

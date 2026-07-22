@@ -52,7 +52,11 @@ public abstract class PlayableRecordItem extends Item implements PlayableRecord 
             Player player = context.getPlayer();
             BlockEntity be = level.getBlockEntity(pos);
             if (be instanceof JukeboxBlockEntity jukeboxblockentity) {
+                //? if >=1.21 {
+                /*jukeboxblockentity.setTheItem(stack.copy());
+                *///?} else {
                 jukeboxblockentity.setFirstItem(stack.copy());
+                //?}
                 level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, state));
             }
 
@@ -66,7 +70,11 @@ public abstract class PlayableRecordItem extends Item implements PlayableRecord 
     }
 
     @Override
+    //? if >=1.21 {
+    /*public void appendHoverText(ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, List<Component> list, TooltipFlag tooltipFlag) {
+    *///?} else {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag tooltipFlag) {
+    //?}
         this.getAlbum(stack).ifPresent(track -> {
             boolean album = this.getTrackCount(stack) > 1;
             list.add(track.getDisplayName().copy().withStyle(ChatFormatting.GRAY));

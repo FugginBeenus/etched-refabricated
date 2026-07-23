@@ -48,13 +48,18 @@ import java.util.concurrent.Executor;
 /**
  * @author Ocelot
  */
-public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer implements PreparableReloadListener {
+public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer implements net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener {
+
+    @Override
+    public ResourceLocation getFabricId() {
+        return gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "album_cover_renderer");
+    }
 
     public static final AlbumCoverItemRenderer INSTANCE = new AlbumCoverItemRenderer();
     public static final String FOLDER_NAME = Etched.MOD_ID + "_album_cover";
 
-    private static final ModelResourceLocation BLANK_ALBUM_COVER = new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/blank"), "inventory");
-    private static final ModelResourceLocation DEFAULT_ALBUM_COVER = new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/default"), "inventory");
+    private static final ModelResourceLocation BLANK_ALBUM_COVER = gg.moonflower.etched.api.record.AlbumCover.modelLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/blank"));
+    private static final ModelResourceLocation DEFAULT_ALBUM_COVER = gg.moonflower.etched.api.record.AlbumCover.modelLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/default"));
     private static final ResourceLocation ALBUM_COVER_OVERLAY = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/item/album_cover_overlay.png");
 
     private static final ItemModelGenerator ITEM_MODEL_GENERATOR = new ItemModelGenerator();

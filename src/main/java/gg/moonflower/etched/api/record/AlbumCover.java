@@ -44,6 +44,22 @@ public interface AlbumCover {
      * @return The cover instance
      */
     static AlbumCover of(ResourceLocation location) {
-        return new ModelAlbumCover(new ModelResourceLocation(location, "inventory"));
+        return new ModelAlbumCover(modelLocation(location));
+    }
+
+    /**
+     * Builds the baked-model key for an album cover model. On 1.21 extra models registered through
+     * the Fabric model loading API are keyed under the "item/"-prefixed id with the "fabric_resource"
+     * variant; pre-1.21 uses the plain "inventory" variant.
+     *
+     * @param location The album cover model id (e.g. {@code etched:etched_album_cover/default})
+     * @return The {@link ModelResourceLocation} the baked model is stored under
+     */
+    static ModelResourceLocation modelLocation(ResourceLocation location) {
+        //? if >=1.21 {
+        /*return new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath(location.getNamespace(), "item/" + location.getPath()), "fabric_resource");
+        *///?} else {
+        return new ModelResourceLocation(location, "inventory");
+        //?}
     }
 }

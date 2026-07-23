@@ -78,6 +78,28 @@ public class EtchedClient {
     }
     */
 
+    // The album cover uses a builtin/entity model rendered by AlbumCoverItemRenderer. On Fabric that
+    // needs three things wired up by hand: the item -> renderer binding, a reload listener so the
+    // renderer builds its cover data, and the album cover models registered as extra baked models.
+    //? if >=1.21 {
+    /*public static void registerRenderers() {
+        net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
+                (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
+
+        net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(net.minecraft.server.packs.PackType.CLIENT_RESOURCES)
+                .registerReloadListener(AlbumCoverItemRenderer.INSTANCE);
+
+        net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin.register(pluginContext -> {
+            net.minecraft.server.packs.resources.ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
+            String folder = "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME;
+            for (ResourceLocation loc : resourceManager.listResources(folder, name -> name.getPath().endsWith(".json")).keySet()) {
+                String path = loc.getPath().substring("models/".length(), loc.getPath().length() - ".json".length());
+                pluginContext.addModels(ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), path));
+            }
+        });
+    }
+    *///?}
+
     public static void registerItemColors() {
         ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 || index == 1 ? opaque(MusicLabelItem.getLabelColor(stack)) : -1, EtchedItems.MUSIC_LABEL.get());
         ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 ? opaque(ComplexMusicLabelItem.getPrimaryColor(stack)) : index == 1 ? opaque(ComplexMusicLabelItem.getSecondaryColor(stack)) : -1, EtchedItems.COMPLEX_MUSIC_LABEL.get());

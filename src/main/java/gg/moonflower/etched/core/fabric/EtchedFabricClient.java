@@ -19,7 +19,8 @@ public class EtchedFabricClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
 
-        EtchedMessages.init();
+        // EtchedMessages.init() already ran from the common EtchedFabric main entrypoint
+        // (Etched.init()); calling it again here double-registers the payload type on 1.21.
         EtchedMessages.initClient();
         EtchedClient.registerItemGroups();
 

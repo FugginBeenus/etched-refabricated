@@ -13,7 +13,12 @@ version = project.mod_version + "+" + stonecutter.current.version
 group = project.maven_group
 
 loom {
-    accessWidenerPath = rootProject.file("src/main/resources/etched.accesswidener")
+    // getDropItem() is abstract on AbstractMinecart in <1.21 and on VehicleEntity in >=1.21,
+    // and it is package-private, so overriding it from our package needs a widener on the
+    // right owner. Both files always exist, so this resolves at configuration time.
+    accessWidenerPath = stonecutter.eval(stonecutter.current.version, ">=1.21")
+            ? rootProject.file("src/main/resources/etched-1_21.accesswidener")
+            : rootProject.file("src/main/resources/etched.accesswidener")
 }
 
 if (stonecutter.current.active) {
@@ -97,6 +102,13 @@ processResources {
     inputs.property "archives_base_name", archives_base_name
 
     inputs.property "minecraft_version", minecraft_version
+
+    // Only ship the access widener that matches this version; loom remaps the active one.
+    if (stonecutter.eval(stonecutter.current.version, ">=1.21")) {
+        exclude "etched.accesswidener"
+    } else {
+        exclude "etched-1_21.accesswidener"
+    }
 
 
     filesMatching("fabric.mod.json") {

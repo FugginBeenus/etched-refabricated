@@ -67,11 +67,19 @@ public class MinecartJukebox extends AbstractMinecart implements WorldlyContaine
         }
     }
 
+    //? if >=1.21 {
+    /*@Override
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DATA_ID_HAS_RECORD, false);
+    }
+    *///?} else {
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(DATA_ID_HAS_RECORD, false);
     }
+    //?}
 
     @Override
     public void tick() {
@@ -139,7 +147,11 @@ public class MinecartJukebox extends AbstractMinecart implements WorldlyContaine
         super.addAdditionalSaveData(nbt);
         nbt.putBoolean("HasRecord", this.entityData.get(DATA_ID_HAS_RECORD));
         if (!this.record.isEmpty()) {
+            //? if >=1.21 {
+            /*nbt.put("RecordItem", this.record.save(this.registryAccess()));
+            *///?} else {
             nbt.put("RecordItem", this.record.save(new CompoundTag()));
+            //?}
         }
     }
 
@@ -148,7 +160,11 @@ public class MinecartJukebox extends AbstractMinecart implements WorldlyContaine
         super.readAdditionalSaveData(nbt);
         this.entityData.set(DATA_ID_HAS_RECORD, nbt.getBoolean("HasRecord"));
         if (nbt.contains("RecordItem", 10)) {
+            //? if >=1.21 {
+            /*this.record = net.minecraft.world.item.ItemStack.parse(this.registryAccess(), nbt.getCompound("RecordItem")).orElse(ItemStack.EMPTY);
+            *///?} else {
             this.record = ItemStack.of(nbt.getCompound("RecordItem"));
+            //?}
         }
     }
 
@@ -157,10 +173,20 @@ public class MinecartJukebox extends AbstractMinecart implements WorldlyContaine
         return Blocks.JUKEBOX.defaultBlockState().setValue(JukeboxBlock.HAS_RECORD, this.entityData.get(DATA_ID_HAS_RECORD));
     }
 
+    //? if >=1.21 {
+    /*public net.minecraft.world.item.ItemStack getPickResult() {
+        return new net.minecraft.world.item.ItemStack(this.getDropItem());
+    }
+
+    public Item getDropItem() {
+        return (Item) EtchedItems.JUKEBOX_MINECART.get();
+    }
+    *///?} else {
     @Override
     public Item getDropItem() {
         return EtchedItems.JUKEBOX_MINECART.get();
     }
+    //?}
 
     @Override
     public Type getMinecartType() {

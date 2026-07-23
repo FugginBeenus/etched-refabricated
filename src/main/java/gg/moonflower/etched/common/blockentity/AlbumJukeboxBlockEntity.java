@@ -42,6 +42,9 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     private int track;
     private ItemStack playingStack;
     private boolean loaded;
+    // An album cover parked in the jukebox's cover slot for bulk load/unload. Kept out of the 9
+    // playable slots so it never affects playback; persisted and synced separately.
+    private ItemStack storedCover = ItemStack.EMPTY;
 
     public AlbumJukeboxBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -104,6 +107,9 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         if (!this.tryLoadLootTable(nbt)) {
             ContainerHelper.loadAllItems(nbt, this.items, provider);
         }
+        this.storedCover = nbt.contains("StoredCover")
+                ? ItemStack.parse(provider, nbt.getCompound("StoredCover")).orElse(ItemStack.EMPTY)
+                : ItemStack.EMPTY;
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -115,6 +121,9 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
 
         if (!this.trySaveLootTable(nbt)) {
             ContainerHelper.saveAllItems(nbt, this.items, provider);
+        }
+        if (!this.storedCover.isEmpty()) {
+            nbt.put("StoredCover", this.storedCover.save(provider));
         }
     }
 
@@ -130,6 +139,9 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         if (!this.tryLoadLootTable(nbt)) {
             ContainerHelper.loadAllItems(nbt, this.items);
         }
+        this.storedCover = nbt.contains("StoredCover")
+                ? ItemStack.of(nbt.getCompound("StoredCover"))
+                : ItemStack.EMPTY;
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -141,6 +153,9 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
 
         if (!this.trySaveLootTable(nbt)) {
             ContainerHelper.saveAllItems(nbt, this.items);
+        }
+        if (!this.storedCover.isEmpty()) {
+            nbt.put("StoredCover", this.storedCover.save(new CompoundTag()));
         }
     }
 
@@ -218,6 +233,15 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     @Override
     protected void setItems(NonNullList<ItemStack> nonNullList) {
         this.items = nonNullList;
+    }
+
+    public ItemStack getStoredCover() {
+        return this.storedCover;
+    }
+
+    public void setStoredCover(ItemStack stack) {
+        this.storedCover = stack;
+        this.setChanged();
     }
 
     @Override

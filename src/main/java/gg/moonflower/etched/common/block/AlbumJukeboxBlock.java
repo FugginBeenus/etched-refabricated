@@ -16,6 +16,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -106,6 +107,13 @@ public class AlbumJukeboxBlock extends BaseEntityBlock {
             if (blockEntity instanceof Container) {
                 Containers.dropContents(level, pos, (Container) blockEntity);
                 level.updateNeighbourForOutputSignal(pos, this);
+            }
+            if (blockEntity instanceof gg.moonflower.etched.common.blockentity.AlbumJukeboxBlockEntity albumJukebox) {
+                ItemStack cover = albumJukebox.getStoredCover();
+                if (!cover.isEmpty()) {
+                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), cover);
+                    albumJukebox.setStoredCover(ItemStack.EMPTY);
+                }
             }
             level.levelEvent(1011, pos, 0);
 

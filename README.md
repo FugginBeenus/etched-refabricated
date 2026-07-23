@@ -2,7 +2,7 @@
 
 A Fabric continuation of [Etched](https://github.com/jacksonhardaway/etched), the music mod that lets you turn any audio link into a playable music disc.
 
-Etch a URL (direct audio files, SoundCloud, Bandcamp, and more) onto a blank disc at the Etching Table, give it a custom label and album cover, and play it anywhere vanilla music discs work — plus a few places they don't. The original mod is barely maintained on modern Fabric, so this fork picks it back up, fixes long-standing bugs, and adds new features.
+Etch a URL (direct audio files, SoundCloud, Bandcamp, and more) onto a blank disc at the Etching Table, give it a custom label and album cover, and play it anywhere vanilla music discs work. Plus a few places they don't. The original mod is barely maintained on modern Fabric, so this fork picks it back up, fixes long-standing bugs, and adds new features.
 
 ## Features
 

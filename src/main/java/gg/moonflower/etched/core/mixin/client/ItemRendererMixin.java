@@ -61,10 +61,15 @@ public class ItemRendererMixin {
     /**/
     @ModifyVariable(method = "getModel", ordinal = 0, at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/client/renderer/ItemModelShaper;getItemModel(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/client/resources/model/BakedModel;", shift = At.Shift.AFTER))
     public BakedModel getModel(BakedModel original) {
+        // boombox_in_hand is not registered as a standalone baked model on 1.21 (the Forge
+        // RegisterAdditional hook is gone), and the boombox item model already parents it, so the
+        // resolved original is the correct 3D model there. Only swap on 1.20.1.
+        //? if <1.21 {
         if (this.etched$capturedHandItem == EtchedItems.BOOMBOX.asItem()) {
 
             return this.itemModelShaper.getModelManager().getModel(EtchedClient.BOOMBOX_IN_HAND_MODEL);
         }
+        //?}
         return original;
     }
     /*

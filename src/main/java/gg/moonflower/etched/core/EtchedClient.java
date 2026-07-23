@@ -79,23 +79,29 @@ public class EtchedClient {
     */
 
     public static void registerItemColors() {
-        ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 || index == 1 ? MusicLabelItem.getLabelColor(stack) : -1, EtchedItems.MUSIC_LABEL.get());
-        ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 ? ComplexMusicLabelItem.getPrimaryColor(stack) : index == 1 ? ComplexMusicLabelItem.getSecondaryColor(stack) : -1, EtchedItems.COMPLEX_MUSIC_LABEL.get());
+        ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 || index == 1 ? opaque(MusicLabelItem.getLabelColor(stack)) : -1, EtchedItems.MUSIC_LABEL.get());
+        ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 ? opaque(ComplexMusicLabelItem.getPrimaryColor(stack)) : index == 1 ? opaque(ComplexMusicLabelItem.getSecondaryColor(stack)) : -1, EtchedItems.COMPLEX_MUSIC_LABEL.get());
 
-        ColorProviderRegistry.ITEM.register((stack, index) -> index > 0 ? -1 : ((BlankMusicDiscItem) stack.getItem()).getColor(stack), EtchedItems.BLANK_MUSIC_DISC.get());
+        ColorProviderRegistry.ITEM.register((stack, index) -> index > 0 ? -1 : opaque(((BlankMusicDiscItem) stack.getItem()).getColor(stack)), EtchedItems.BLANK_MUSIC_DISC.get());
         ColorProviderRegistry.ITEM.register((stack, index) -> {
             if (index == 0) {
-                return EtchedMusicDiscItem.getDiscColor(stack);
+                return opaque(EtchedMusicDiscItem.getDiscColor(stack));
             }
             if (EtchedMusicDiscItem.getPattern(stack).isColorable()) {
                 if (index == 1) {
-                    return EtchedMusicDiscItem.getLabelPrimaryColor(stack);
+                    return opaque(EtchedMusicDiscItem.getLabelPrimaryColor(stack));
                 }
                 if (index == 2) {
-                    return EtchedMusicDiscItem.getLabelSecondaryColor(stack);
+                    return opaque(EtchedMusicDiscItem.getLabelSecondaryColor(stack));
                 }
             }
             return -1;
         }, EtchedItems.ETCHED_MUSIC_DISC.get());
+    }
+
+    // 1.21 respects the alpha byte of item tint colors; these providers return 0xRRGGBB (alpha 0),
+    // which renders fully transparent. Force opaque. Harmless on 1.20.1 (tint alpha ignored there).
+    private static int opaque(int color) {
+        return 0xFF000000 | color;
     }
 }

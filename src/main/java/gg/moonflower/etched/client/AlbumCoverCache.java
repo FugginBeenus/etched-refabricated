@@ -19,6 +19,8 @@ import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -78,8 +80,8 @@ public final class AlbumCoverCache {
                 throw new CompletionException(e);
             }
         }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenApplyAsync(path -> {
-            try (FileInputStream is = new FileInputStream(path.toFile())) {
-                return AlbumCover.of(AlbumImageProcessor.apply(NativeImage.read(is), AlbumCoverItemRenderer.getOverlayImage()));
+            try {
+                return AlbumCover.of(AlbumImageProcessor.apply(readAlbumImage(path), AlbumCoverItemRenderer.getOverlayImage()));
             } catch (Exception e) {
                 throw new CompletionException(e);
             }
@@ -94,6 +96,34 @@ public final class AlbumCoverCache {
 
             return result != null ? result : AlbumCover.EMPTY;
         });
+    }
+
+    // NativeImage.read only accepts PNG data, but album art from SoundCloud/Bandcamp is usually JPEG
+    // (served even at .png URLs). Decode via ImageIO, which handles PNG/JPEG/GIF/BMP, then convert to
+    // a NativeImage (ImageIO gives 0xAARRGGBB; NativeImage stores RGBA, so R and B are swapped).
+    private static NativeImage readAlbumImage(Path path) throws IOException {
+        BufferedImage image;
+        try (InputStream is = new FileInputStream(path.toFile())) {
+            image = ImageIO.read(is);
+        }
+        if (image == null) {
+            throw new IOException("Unsupported album cover image format: " + path);
+        }
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+        NativeImage nativeImage = new NativeImage(NativeImage.Format.RGBA, width, height, false);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int argb = image.getRGB(x, y);
+                int a = (argb >> 24) & 0xFF;
+                int r = (argb >> 16) & 0xFF;
+                int g = (argb >> 8) & 0xFF;
+                int b = argb & 0xFF;
+                nativeImage.setPixelRGBA(x, y, (a << 24) | (b << 16) | (g << 8) | r);
+            }
+        }
+        return nativeImage;
     }
 
     private static synchronized void writeMetadata() {

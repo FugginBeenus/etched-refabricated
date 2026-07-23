@@ -162,9 +162,27 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         if (stack.isEmpty()) {
             return;
         }
-        ModelData model = gg.moonflower.etched.api.util.EtchedData.getTagElement(stack, "CoverRecord") == null ? this.data.blank : this.covers.computeIfAbsent(gg.moonflower.etched.api.util.EtchedData.getTagElement(stack, "CoverRecord"), __ -> {
-            ItemStack coverStack = AlbumCoverItem.getCoverStack(stack).orElse(ItemStack.EMPTY);
-            if (!coverStack.isEmpty() && coverStack.getItem() instanceof PlayableRecord) {
+        ModelData model = this.resolveModel(stack);
+
+        poseStack.pushPose();
+        poseStack.translate(0.5D, 0.5D, 0.5D);
+        model.render(stack, displayContext, poseStack, buffer, packedLight, packedOverlay);
+        poseStack.popPose();
+    }
+
+    // The cover disc lives in the AlbumCoverComponent on 1.21 (item NBT on 1.20.1); read it through
+    // AlbumCoverItem.getCoverStack so both backends work. The serialized cover disc is the cache key.
+    private ModelData resolveModel(ItemStack stack) {
+        ItemStack coverStack = AlbumCoverItem.getCoverStack(stack).orElse(ItemStack.EMPTY);
+        if (coverStack.isEmpty()) {
+            return this.data.blank;
+        }
+        CompoundTag key = coverKey(coverStack);
+        if (key == null) {
+            return this.data.defaultCover;
+        }
+        return this.covers.computeIfAbsent(key, __ -> {
+            if (coverStack.getItem() instanceof PlayableRecord) {
                 return ((PlayableRecord) coverStack.getItem()).getAlbumCover(coverStack, Minecraft.getInstance().getProxy(), Minecraft.getInstance().getResourceManager()).thenApply(cover -> ModelData.of(cover).orElse(this.data.defaultCover)).exceptionally(e -> {
                     e.printStackTrace();
                     return this.data.defaultCover;
@@ -172,11 +190,18 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
             }
             return CompletableFuture.completedFuture(this.data.blank);
         }).getNow(this.data.defaultCover);
+    }
 
-        poseStack.pushPose();
-        poseStack.translate(0.5D, 0.5D, 0.5D);
-        model.render(stack, displayContext, poseStack, buffer, packedLight, packedOverlay);
-        poseStack.popPose();
+    private static CompoundTag coverKey(ItemStack coverStack) {
+        //? if >=1.21 {
+        /*net.minecraft.client.multiplayer.ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) {
+            return null;
+        }
+        return (CompoundTag) coverStack.save(level.registryAccess(), new CompoundTag());
+        *///?} else {
+        return coverStack.save(new CompoundTag());
+        //?}
     }
 
     public static class CoverData {

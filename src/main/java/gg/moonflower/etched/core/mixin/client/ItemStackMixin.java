@@ -21,7 +21,11 @@ public abstract class ItemStackMixin {
     public abstract Item getItem();
 
     @Inject(method = "getTooltipLines", at = @At("TAIL"))
+    //? if >=1.21 {
+    /*public void addBoomboxStatus(net.minecraft.world.item.Item.TooltipContext context, Player player, TooltipFlag isAdvanced, CallbackInfoReturnable<List<Component>> cir) {
+    *///?} else {
     public void addBoomboxStatus(Player player, TooltipFlag isAdvanced, CallbackInfoReturnable<List<Component>> cir) {
+    //?}
         if (this.getItem() instanceof BoomboxItem && BoomboxItem.isPaused((ItemStack) (Object) this)) {
             cir.getReturnValue().add(BoomboxItem.PAUSED);
         }

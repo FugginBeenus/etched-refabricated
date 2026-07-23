@@ -10,6 +10,11 @@ import java.util.Map;
 
 @Mixin(LevelRenderer.class)
 public interface LevelRendererAccessor {
+    // Field renamed playingRecords -> playingJukeboxSongs in 1.21.
+    //? if >=1.21 {
+    /*@Accessor("playingJukeboxSongs")
+    *///?} else {
     @Accessor("playingRecords")
+    //?}
     Map<BlockPos, SoundInstance> getPlayingRecords();
 }

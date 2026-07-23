@@ -11,9 +11,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-//? if >=1.21 {
-/*import net.minecraft.core.component.DataComponents;
-*///?} else {
+//? if <1.21 {
 import net.minecraft.world.item.RecordItem;
 //?}
 import net.minecraft.world.level.Level;
@@ -22,7 +20,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.JukeboxBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.ticks.ContainerSingleItem;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -36,6 +33,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(JukeboxBlockEntity.class)
 public abstract class JukeboxBlockEntityMixin extends BlockEntity implements ContainerSingleItem {
 
+    public JukeboxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+        super(type, pos, blockState);
+    }
+
+    // TODO(1.21): Vanilla rewrote the jukebox in 1.21 - JukeboxBlockEntity now delegates playback
+    // to JukeboxSongPlayer and holds a single `item` (not a NonNullList `items`), and the shadowed
+    // members below (startPlaying/isRecordPlaying/shouldSendJukeboxPlayingEvent/spawnMusicParticles/
+    // ticksSinceLastEvent) moved onto JukeboxSongPlayer. The custom-online-disc broadcast and
+    // album-cover handling need to be re-targeted against that new structure and verified in-game.
+    // Left inert on 1.21 so the jar boots; the 1.20.1 behavior below is unchanged.
+    //? if <1.21 {
     @Shadow
     @Final
     private NonNullList<ItemStack> items;
@@ -58,30 +66,16 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
     @Shadow
     protected abstract void spawnMusicParticles(Level level, BlockPos pos);
 
-    public JukeboxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
-        super(type, pos, blockState);
-    }
-
-    // ContainerSingleItem#getFirstItem was renamed to getTheItem in 1.21.
-    //? if >=1.21 {
-    /*private ItemStack etched$record() {
-        return this.getTheItem();
-    }
-    *///?} else {
     private ItemStack etched$record() {
         return this.getFirstItem();
     }
-    //?}
 
     @Inject(method = "startPlaying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(Lnet/minecraft/world/entity/player/Player;ILnet/minecraft/core/BlockPos;I)V", shift = At.Shift.AFTER))
     public void startPlaying(CallbackInfo ci) {
-        EtchedMessages.LOGGER.info("Mixin Works");
-
         if ((this.etched$record().getItem() instanceof PlayableRecord)) {
             BlockPos pos = this.getBlockPos();
             var packet = new ClientboundPlayMusicPacket(this.etched$record().copy(), pos);
             packet.sendToClients(PlayerLookup.around((ServerLevel) level, pos.getCenter().add(0.5, 0.5, 0.5), 64.0));
-            //EtchedMessages.PLAY.send(PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 64, this.level.dimension())), new ClientboundPlayMusicPacket(this.getFirstItem().copy(), pos));
         }
     }
 
@@ -106,11 +100,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
     public void tick(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
         if (this.isRecordPlaying()) {
             Item item = this.etched$record().getItem();
-            //? if >=1.21 {
-            /*if (!this.etched$record().has(DataComponents.JUKEBOX_PLAYABLE) && item instanceof PlayableRecord) {
-            *///?} else {
             if (!(item instanceof RecordItem) && item instanceof PlayableRecord) {
-            //?}
                 ++this.ticksSinceLastEvent;
 
                 // Allow music particles and events to play for custom records
@@ -124,4 +114,5 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
             }
         }
     }
+    //?}
 }

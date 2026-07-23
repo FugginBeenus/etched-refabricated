@@ -22,6 +22,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererMixin {
 
+    // TODO(1.21): playStreamingMusic(SoundEvent, BlockPos) became
+    // playJukeboxSong(Holder<JukeboxSong>, BlockPos) in 1.21, so these injectors no longer resolve.
+    // The "now playing" gating and the StopListeningSound wrapper need to be re-targeted against
+    // playJukeboxSong and verified in-game. Left inert on 1.21 so the jar boots.
+    //? if <1.21 {
     @Unique
     private BlockPos pos;
 
@@ -46,4 +51,5 @@ public abstract class LevelRendererMixin {
     public SoundInstance modifySoundInstance(SoundInstance soundInstance) {
         return StopListeningSound.create(soundInstance, () -> this.notifyNearbyEntities(this.level, this.pos, false));
     }
+    //?}
 }

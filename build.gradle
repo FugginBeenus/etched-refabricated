@@ -103,13 +103,21 @@ processResources {
 
     inputs.property "minecraft_version", minecraft_version
 
+    def is121 = stonecutter.eval(stonecutter.current.version, ">=1.21")
+
     // Only ship the access widener that matches this version; loom remaps the active one.
-    if (stonecutter.eval(stonecutter.current.version, ">=1.21")) {
+    if (is121) {
         exclude "etched.accesswidener"
     } else {
         exclude "etched-1_21.accesswidener"
+        // The 1.21 jukebox mixins target classes that don't exist before 1.21.
+        exclude "etched.jukebox.mixins.json"
     }
 
+    // The 1.21 jukebox rewrite lives in a separate mixin config; 1.20.1 keeps the legacy
+    // JukeboxBlockEntityMixin listed in etched.mixins.json, so it just re-references that.
+    def jukeboxMixins = is121 ? "etched.jukebox.mixins.json" : "etched.mixins.json"
+    inputs.property "jukebox_mixins", jukeboxMixins
 
     filesMatching("fabric.mod.json") {
         expand "mod_version": mod_version,
@@ -117,6 +125,7 @@ processResources {
                 "mod_name": mod_name,
                 "mod_description": mod_description,
                 "archives_base_name": archives_base_name,
+                "jukebox_mixins": jukeboxMixins,
 
                 "minecraft_version": minecraft_version
     }

@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "gg.moonflower.etched.core.mixin.jukebox",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "mixins": [
+    "JukeboxBlockEntityMixin",
+    "JukeboxPlayableMixin",
+    "JukeboxSongPlayerAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

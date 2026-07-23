@@ -24,6 +24,6 @@
   "depends": {
     "fabric": "*"
   },
-  "mixins": ["etched.mixins.json"],
+  "mixins": ["etched.mixins.json", "${jukebox_mixins}"],
   "license": "GPL-3.0-only"
 }

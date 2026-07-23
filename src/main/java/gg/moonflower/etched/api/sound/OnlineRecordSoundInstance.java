@@ -14,6 +14,8 @@ import net.minecraft.world.entity.Entity;
 public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance implements TickableSoundInstance {
 
     private final Entity entity;
+    // For block records: recomputed each tick so the sound can follow speakers as they connect/move.
+    private java.util.function.Supplier<net.minecraft.world.phys.Vec3> positionSupplier;
     private boolean stopped;
 
     public OnlineRecordSoundInstance(String url, Entity entity, float volume, int attenuationDistance, DownloadProgressListener progressListener, AudioSource.AudioFileType type) {
@@ -27,7 +29,7 @@ public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance imple
     }
 
     public OnlineRecordSoundInstance(String url, double x, double y, double z, float volume, int attenuationDistance, DownloadProgressListener progressListener, AudioSource.AudioFileType type) {
-        this(url, null, volume, attenuationDistance, progressListener, type);
+        this(url, (Entity) null, volume, attenuationDistance, progressListener, type);
         this.x = x;
         this.y = y;
         this.z = z;
@@ -37,18 +39,30 @@ public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance imple
         this(url, x, y, z, 4.0F, attenuationDistance, progressListener, type);
     }
 
+    public OnlineRecordSoundInstance(String url, java.util.function.Supplier<net.minecraft.world.phys.Vec3> position, float volume, int attenuationDistance, DownloadProgressListener progressListener, AudioSource.AudioFileType type) {
+        this(url, (Entity) null, volume, attenuationDistance, progressListener, type);
+        this.positionSupplier = position;
+        net.minecraft.world.phys.Vec3 p = position.get();
+        this.x = p.x;
+        this.y = p.y;
+        this.z = p.z;
+    }
+
     @Override
     public void tick() {
-        if (this.entity == null) {
-            return;
-        }
-
-        if (!this.entity.isAlive()) {
-            this.stopped = true;
-        } else {
-            this.x = this.entity.getX();
-            this.y = this.entity.getY();
-            this.z = this.entity.getZ();
+        if (this.entity != null) {
+            if (!this.entity.isAlive()) {
+                this.stopped = true;
+            } else {
+                this.x = this.entity.getX();
+                this.y = this.entity.getY();
+                this.z = this.entity.getZ();
+            }
+        } else if (this.positionSupplier != null) {
+            net.minecraft.world.phys.Vec3 p = this.positionSupplier.get();
+            this.x = p.x;
+            this.y = p.y;
+            this.z = p.z;
         }
     }
 

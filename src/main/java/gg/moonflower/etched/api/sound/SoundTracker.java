@@ -157,7 +157,9 @@ public class SoundTracker {
         boolean hidden = !aboveState.isAir();
 
         Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords();
-        return new OnlineRecordSoundInstance(url, pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F, muffled ? 2.0F : 4.0F, muffled ? attenuationDistance / 2 : attenuationDistance, new MusicDownloadListener(title, () -> pos.getX() + 0.5, () -> pos.getY() + 0.5, () -> pos.getZ() + 0.5) {
+        // Speakers take over: recompute the source each tick so the sound follows speakers as they
+        // connect/disconnect (and the player moves between them), without restarting the disc.
+        return new OnlineRecordSoundInstance(url, () -> recordSoundSource(level, pos), muffled ? 2.0F : 4.0F, muffled ? attenuationDistance / 2 : attenuationDistance, new MusicDownloadListener(title, () -> pos.getX() + 0.5, () -> pos.getY() + 0.5, () -> pos.getZ() + 0.5) {
             @Override
             public void onSuccess() {
                 if (!playingRecords.containsKey(pos)) {
@@ -180,6 +182,29 @@ public class SoundTracker {
 
     public static AbstractOnlineSoundInstance getEtchedRecord(String url, Component title, ClientLevel level, BlockPos pos, AudioSource.AudioFileType type) {
         return getEtchedRecord(url, title, level, pos, 16, type);
+    }
+
+    // The speakers connected to a jukebox: adjacent Speaker blocks for now (wireless via the Stereo
+    // comes later). Deterministic order so the "first" speaker is stable across ticks.
+    private static java.util.List<BlockPos> connectedSpeakers(ClientLevel level, BlockPos jukeboxPos) {
+        java.util.List<BlockPos> speakers = new java.util.ArrayList<>();
+        for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
+            BlockPos p = jukeboxPos.relative(dir);
+            if (level.getBlockState(p).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock) {
+                speakers.add(p.immutable());
+            }
+        }
+        return speakers;
+    }
+
+    // The sound position for a jukebox record: the first connected speaker (so a connected speaker
+    // takes over the audio), or the jukebox itself when none is connected. Recomputed each tick by
+    // the caller's supplier, so it follows speakers being placed/broken. True multi-point ("from every
+    // speaker at once") needs a shared decoded buffer + synchronized start; that's a later rework.
+    private static net.minecraft.world.phys.Vec3 recordSoundSource(ClientLevel level, BlockPos pos) {
+        java.util.List<BlockPos> speakers = connectedSpeakers(level, pos);
+        BlockPos src = speakers.isEmpty() ? pos : speakers.get(0);
+        return new net.minecraft.world.phys.Vec3(src.getX() + 0.5, src.getY() + 0.5, src.getZ() + 0.5);
     }
 
     private static void playRecord(BlockPos pos, SoundInstance sound) {

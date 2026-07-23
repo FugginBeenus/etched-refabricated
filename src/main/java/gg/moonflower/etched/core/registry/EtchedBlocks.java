@@ -77,6 +77,11 @@ public class EtchedBlocks {
                     )
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
+    public static final BlockEntry<gg.moonflower.etched.common.block.SpeakerBlock> SPEAKER =
+            Etched.REGISTRATE.block("speaker", gg.moonflower.etched.common.block.SpeakerBlock::new)
+                    .initialProperties(() -> Blocks.NOTE_BLOCK)
+                    .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
+                    .register();
     //registerWithItem("radio", () -> new RadioBlock(BlockBehaviour.Properties.copy(Blocks.JUKEBOX).noOcclusion()), new Item.Properties());
     /*
     public static final ItemEntry<PortalRadioItem> PORTAL_RADIO_ITEM =

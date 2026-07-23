@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" W ", "INI", " R "],
+  "key": {
+    "W": { "tag": "minecraft:wool" },
+    "I": { "item": "minecraft:iron_ingot" },
+    "N": { "item": "minecraft:note_block" },
+    "R": { "item": "minecraft:redstone" }
+  },
+  "result": { "item": "etched:speaker" }
+}

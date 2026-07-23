@@ -19,15 +19,30 @@ import java.util.List;
 
 public class ComplexMusicLabelRecipe extends CustomRecipe {
 
+    //? if >=1.21 {
+    /*public ComplexMusicLabelRecipe(CraftingBookCategory category) {
+        super(category);
+    }
+    *///?} else {
     public ComplexMusicLabelRecipe(ResourceLocation resourceLocation, CraftingBookCategory category) {
         super(resourceLocation, category);
     }
+    //?}
 
     @Override
+    //? if >=1.21 {
+    /*public boolean matches(net.minecraft.world.item.crafting.CraftingInput inv, Level level) {
+    *///?} else {
     public boolean matches(CraftingContainer inv, Level level) {
+    //?}
         int count = 0;
+        //? if >=1.21 {
+        /*int size = inv.size();
+        *///?} else {
+        int size = inv.getContainerSize();
+        //?}
 
-        for (int i = 0; i < inv.getContainerSize(); ++i) {
+        for (int i = 0; i < size; ++i) {
             ItemStack itemStack = inv.getItem(i);
             if (!itemStack.isEmpty()) {
                 if (!(itemStack.getItem() instanceof MusicLabelItem)) {
@@ -41,9 +56,18 @@ public class ComplexMusicLabelRecipe extends CustomRecipe {
     }
 
     @Override
+    //? if >=1.21 {
+    /*public ItemStack assemble(net.minecraft.world.item.crafting.CraftingInput container, net.minecraft.core.HolderLookup.Provider registryAccess) {
+    *///?} else {
     public ItemStack assemble(CraftingContainer container, RegistryAccess registryAccess) {
+    //?}
         List<ItemStack> labels = new ArrayList<>(2);
-        for (int j = 0; j < container.getContainerSize(); ++j) {
+        //? if >=1.21 {
+        /*int size = container.size();
+        *///?} else {
+        int size = container.getContainerSize();
+        //?}
+        for (int j = 0; j < size; ++j) {
             ItemStack stack = container.getItem(j);
             if (!stack.isEmpty()) {
                 if (stack.getItem() instanceof MusicLabelItem) {
@@ -69,8 +93,12 @@ public class ComplexMusicLabelRecipe extends CustomRecipe {
     }
 
     @Override
+    //? if >=1.21 {
+    /*public ItemStack getResultItem(net.minecraft.core.HolderLookup.Provider registryAccess) {
+    *///?} else {
     public ItemStack getResultItem(RegistryAccess registryAccess) {
-        return new ItemStack(EtchedItems.COMPLEX_MUSIC_LABEL);
+    //?}
+        return new ItemStack(EtchedItems.COMPLEX_MUSIC_LABEL.get());
     }
 
     @Override

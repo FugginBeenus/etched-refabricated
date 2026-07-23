@@ -7,6 +7,7 @@ package gg.moonflower.etched.core.mixin.jukebox;
 // stop bookkeeping. Modeled on the NeoForge 5.1.0 build, adapted to Fabric networking.
 //? if >=1.21 {
 /*import gg.moonflower.etched.api.record.PlayableRecord;
+import gg.moonflower.etched.common.item.AlbumCoverItem;
 import gg.moonflower.etched.common.network.play.ClientboundPlayMusicPacket;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.core.BlockPos;
@@ -53,9 +54,10 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity {
             return;
         }
         BlockPos pos = this.getBlockPos();
-        // Only hijack playback for actual Etched records; vanilla discs (which merely carry the
-        // JUKEBOX_PLAYABLE component) keep playing through vanilla's JukeboxSongPlayer.
-        if (stack.getItem() instanceof PlayableRecord record && record.canPlay(stack)) {
+        // Only hijack playback for actual single Etched records; vanilla discs (which merely carry
+        // the JUKEBOX_PLAYABLE component) keep playing through vanilla's JukeboxSongPlayer, and
+        // album covers only play in the album jukebox, never a regular one.
+        if (stack.getItem() instanceof PlayableRecord record && record.canPlay(stack) && !(stack.getItem() instanceof AlbumCoverItem)) {
             new ClientboundPlayMusicPacket(stack.copy(), pos).sendToClients(PlayerLookup.around(serverLevel, pos.getCenter(), 64.0));
             this.etched$playing = true;
         } else if (this.etched$playing) {
@@ -78,7 +80,7 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity {
     @Inject(method = "canPlaceItem", at = @At("HEAD"), cancellable = true)
     public void etched$canPlace(int slot, ItemStack stack, CallbackInfoReturnable<Boolean> cir) {
         JukeboxBlockEntity self = (JukeboxBlockEntity) (Object) this;
-        if (PlayableRecord.isPlayableRecord(stack) && self.getItem(slot).isEmpty()) {
+        if (PlayableRecord.isPlayableRecord(stack) && !(stack.getItem() instanceof AlbumCoverItem) && self.getItem(slot).isEmpty()) {
             cir.setReturnValue(true);
         }
     }

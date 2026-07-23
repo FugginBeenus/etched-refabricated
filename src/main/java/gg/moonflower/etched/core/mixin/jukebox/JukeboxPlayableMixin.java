@@ -5,6 +5,7 @@ package gg.moonflower.etched.core.mixin.jukebox;
 // tryInsertIntoJukebox; we catch that early return and insert the record ourselves.
 //? if >=1.21 {
 /*import gg.moonflower.etched.api.record.PlayableRecord;
+import gg.moonflower.etched.common.item.AlbumCoverItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.ItemInteractionResult;
@@ -27,7 +28,8 @@ public class JukeboxPlayableMixin {
 
     @Inject(method = "tryInsertIntoJukebox", at = @At(value = "RETURN", ordinal = 0), cancellable = true)
     private static void etched$insertPlayableRecord(Level level, BlockPos pos, ItemStack stack, Player player, CallbackInfoReturnable<ItemInteractionResult> cir) {
-        if (!PlayableRecord.isPlayableRecord(stack)) {
+        // Album covers only play in the album jukebox, not a regular one.
+        if (!PlayableRecord.isPlayableRecord(stack) || stack.getItem() instanceof AlbumCoverItem) {
             return;
         }
         BlockState state = level.getBlockState(pos);

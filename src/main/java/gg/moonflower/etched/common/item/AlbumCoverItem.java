@@ -39,6 +39,13 @@ public class AlbumCoverItem extends PlayableRecordItem implements ContainerItem 
         super(properties);
     }
 
+    // Albums only play in the album jukebox; suppress the inherited PlayableRecordItem.useOn that
+    // would otherwise insert the cover into a regular jukebox.
+    @Override
+    public net.minecraft.world.InteractionResult useOn(net.minecraft.world.item.context.UseOnContext context) {
+        return net.minecraft.world.InteractionResult.PASS;
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);

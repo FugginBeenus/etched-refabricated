@@ -20,6 +20,8 @@ pluginManagement {
 }
 
 plugins {
+    // Lets Gradle auto-provision the Java 21 toolchain the build/daemon needs.
+    id "org.gradle.toolchains.foojay-resolver-convention" version "1.0.0"
     id "dev.kikugie.stonecutter" version "0.9.6"
 }
 

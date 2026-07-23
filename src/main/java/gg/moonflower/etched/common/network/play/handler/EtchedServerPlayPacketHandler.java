@@ -2,12 +2,14 @@ package gg.moonflower.etched.common.network.play.handler;
 
 import gg.moonflower.etched.common.item.SimpleMusicLabelItem;
 import gg.moonflower.etched.common.menu.AlbumJukeboxMenu;
+import gg.moonflower.etched.common.menu.AlbumPrinterMenu;
 import gg.moonflower.etched.common.menu.EtchingMenu;
 import gg.moonflower.etched.common.menu.RadioMenu;
 //import gg.moonflower.etched.common.network.EtchedMessages;
 import gg.moonflower.etched.common.network.play.ServerboundEditMusicLabelPacket;
 import gg.moonflower.etched.common.network.play.ServerboundSetUrlPacket;
 import gg.moonflower.etched.common.network.play.SetAlbumJukeboxTrackPacket;
+import gg.moonflower.etched.common.network.play.SetCoverArtPacket;
 import gg.moonflower.etched.core.registry.EtchedItems;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.server.MinecraftServer;
@@ -52,6 +54,15 @@ public class EtchedServerPlayPacketHandler {
             SimpleMusicLabelItem.setTitle(labelStack, StringUtils.normalizeSpace(pkt.title()));
             SimpleMusicLabelItem.setAuthor(labelStack, StringUtils.normalizeSpace(pkt.author()));
         });
+    }
+
+    public static void handleSetCoverArt(SetCoverArtPacket pkt, MinecraftServer server, ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+        if (player.containerMenu instanceof AlbumPrinterMenu menu) {
+            server.execute(() -> menu.setPendingImage(pkt.image()));
+        }
     }
 
     public static void handleSetAlbumJukeboxTrack(SetAlbumJukeboxTrackPacket pkt, MinecraftServer server, ServerPlayer player) {

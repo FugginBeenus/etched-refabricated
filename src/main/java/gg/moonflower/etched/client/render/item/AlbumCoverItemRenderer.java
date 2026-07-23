@@ -173,6 +173,14 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
     // The cover disc lives in the AlbumCoverComponent on 1.21 (item NBT on 1.20.1); read it through
     // AlbumCoverItem.getCoverStack so both backends work. The serialized cover disc is the cache key.
     private ModelData resolveModel(ItemStack stack) {
+        // Custom Album Printer art (image or pattern) overrides the disc-derived cover.
+        if (gg.moonflower.etched.common.item.CoverArt.has(stack)) {
+            CompoundTag artKey = gg.moonflower.etched.api.util.EtchedData.getTagElement(stack, "CoverArt");
+            if (artKey != null) {
+                return this.covers.computeIfAbsent(artKey, __ -> CompletableFuture.completedFuture(this.buildCustomArt(stack))).getNow(this.data.defaultCover);
+            }
+        }
+
         ItemStack coverStack = AlbumCoverItem.getCoverStack(stack).orElse(ItemStack.EMPTY);
         if (coverStack.isEmpty()) {
             return this.data.blank;
@@ -202,6 +210,21 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         *///?} else {
         return coverStack.save(new CompoundTag());
         //?}
+    }
+
+    // Builds cover art baked onto the stack by the Album Printer: a stored image, or (later) a
+    // procedurally composed pattern. Both feed the same ImageAlbumCover -> DynamicModelData path.
+    private ModelData buildCustomArt(ItemStack stack) {
+        Optional<byte[]> image = gg.moonflower.etched.common.item.CoverArt.getImage(stack);
+        if (image.isPresent()) {
+            try {
+                return ModelData.of(new ImageAlbumCover(CoverImageUtil.decodePng(image.get()))).orElse(this.data.defaultCover);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // TODO: pattern-mode composition
+        return this.data.defaultCover;
     }
 
     public static class CoverData {

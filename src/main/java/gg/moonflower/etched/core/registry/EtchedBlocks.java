@@ -68,6 +68,15 @@ public class EtchedBlocks {
                     .properties(p->p.noOcclusion())
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
+    public static final BlockEntry<gg.moonflower.etched.common.block.AlbumPrinterBlock> ALBUM_PRINTER =
+            Etched.REGISTRATE.block("album_printer", gg.moonflower.etched.common.block.AlbumPrinterBlock::new)
+                    .properties(properties -> properties
+                            .mapColor(MapColor.PODZOL)
+                            .strength(2.5f)
+                            .sound(SoundType.WOOD)
+                    )
+                    .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
+                    .register();
     //registerWithItem("radio", () -> new RadioBlock(BlockBehaviour.Properties.copy(Blocks.JUKEBOX).noOcclusion()), new Item.Properties());
     /*
     public static final ItemEntry<PortalRadioItem> PORTAL_RADIO_ITEM =

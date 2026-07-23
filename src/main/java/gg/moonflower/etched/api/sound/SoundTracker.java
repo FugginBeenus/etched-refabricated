@@ -396,7 +396,11 @@ public class SoundTracker {
         private Language decomposedWith;
 
         public DownloadTextComponent() {
+            //? if >=1.21 {
+            /*this.contents = net.minecraft.network.chat.contents.PlainTextContents.EMPTY;
+            *///?} else {
             this.contents = ComponentContents.EMPTY;
+            //?}
             this.visualOrderText = FormattedCharSequence.EMPTY;
             this.decomposedWith = null;
         }

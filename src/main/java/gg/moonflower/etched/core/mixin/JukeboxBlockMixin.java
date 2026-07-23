@@ -28,7 +28,11 @@ public abstract class JukeboxBlockMixin extends BaseEntityBlock {
     @Inject(method = "getAnalogOutputSignal", at = @At("TAIL"), cancellable = true)
     public void getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, CallbackInfoReturnable<Integer> cir) {
         if (level.getBlockEntity(pos) instanceof JukeboxBlockEntity be) {
+            //? if >=1.21 {
+            /*ItemStack record = be.getTheItem();
+            *///?} else {
             ItemStack record = be.getFirstItem();
+            //?}
             //? if >=1.21 {
             /*if (!record.has(DataComponents.JUKEBOX_PLAYABLE) && record.getItem() instanceof PlayableRecord) {
             *///?} else {

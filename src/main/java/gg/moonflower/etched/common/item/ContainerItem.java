@@ -17,7 +17,11 @@ public interface ContainerItem {
     static int findSlotMatchingItem(Inventory inventory, ItemStack stack) {
         for (int i = 0; i < inventory.items.size(); ++i) {
             ItemStack slotStack = inventory.items.get(i);
+            //? if >=1.21 {
+            /*if (!slotStack.isEmpty() && ItemStack.isSameItemSameComponents(stack, slotStack)) {
+            *///?} else {
             if (!slotStack.isEmpty() && ItemStack.isSameItemSameTags(stack, slotStack)) {
+            //?}
                 return i;
             }
         }

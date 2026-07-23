@@ -41,7 +41,11 @@ public interface AudioSource {
         Map<String, String> map = SoundDownloadSource.getDownloadHeaders();
         User user = Minecraft.getInstance().getUser();
         map.put("X-Minecraft-Username", user.getName());
+        //? if >=1.21 {
+        /*map.put("X-Minecraft-UUID", user.getProfileId().toString());
+        *///?} else {
         map.put("X-Minecraft-UUID", user.getUuid());
+        //?}
         return map;
     }
 

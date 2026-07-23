@@ -16,7 +16,11 @@ public class EntityHook {
 
             //FIXME: was portal radio
             ItemStack newStack = new ItemStack(EtchedBlocks.RADIO, oldStack.getCount());
+            //? if >=1.21 {
+            /*newStack.applyComponents(oldStack.getComponents());
+            *///?} else {
             newStack.setTag(oldStack.getTag());
+            //?}
             entity.setItem(newStack);
         }
     }

@@ -98,7 +98,11 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
     private static void renderQuadList(PoseStack matrixStack, VertexConsumer buffer, List<BakedQuad> quads, int combinedLight, int combinedOverlay) {
         PoseStack.Pose pose = matrixStack.last();
         for (BakedQuad bakedQuad : quads) {
+            //? if >=1.21 {
+            /*buffer.putBulkData(pose, bakedQuad, 1, 1, 1, 1, combinedLight, combinedOverlay);
+            *///?} else {
             buffer.putBulkData(pose, bakedQuad, 1, 1, 1, combinedLight, combinedOverlay);
+            //?}
         }
     }
 
@@ -153,7 +157,7 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         if (stack.isEmpty()) {
             return;
         }
-        ModelData model = stack.getTagElement("CoverRecord") == null ? this.data.blank : this.covers.computeIfAbsent(stack.getTagElement("CoverRecord"), __ -> {
+        ModelData model = gg.moonflower.etched.api.util.EtchedData.getTagElement(stack, "CoverRecord") == null ? this.data.blank : this.covers.computeIfAbsent(gg.moonflower.etched.api.util.EtchedData.getTagElement(stack, "CoverRecord"), __ -> {
             ItemStack coverStack = AlbumCoverItem.getCoverStack(stack).orElse(ItemStack.EMPTY);
             if (!coverStack.isEmpty() && coverStack.getItem() instanceof PlayableRecord) {
                 return ((PlayableRecord) coverStack.getItem()).getAlbumCover(coverStack, Minecraft.getInstance().getProxy(), Minecraft.getInstance().getResourceManager()).thenApply(cover -> ModelData.of(cover).orElse(this.data.defaultCover)).exceptionally(e -> {
@@ -222,7 +226,11 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         private BakedModel model;
 
         private DynamicModelData(NativeImage image) {
+            //? if >=1.21 {
+            /*super(ATLAS, new SpriteContents(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, DigestUtils.md5Hex(UUID.randomUUID().toString())), new FrameSize(image.getWidth(), image.getHeight()), image, net.minecraft.server.packs.resources.ResourceMetadata.EMPTY), image.getWidth(), image.getHeight(), 0, 0);
+            *///?} else {
             super(ATLAS, new SpriteContents(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, DigestUtils.md5Hex(UUID.randomUUID().toString())), new FrameSize(image.getWidth(), image.getHeight()), image, AnimationMetadataSection.EMPTY), image.getWidth(), image.getHeight(), 0, 0);
+            //?}
         }
 
         @Override
@@ -243,7 +251,11 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
             if (this.model == null) {
                 ProfilerFiller profiler = Minecraft.getInstance().getProfiler();
                 profiler.push("buildAlbumCoverModel");
+                //? if >=1.21 {
+                /*this.model = ITEM_MODEL_GENERATOR.generateBlockModel(material -> this, MODEL).bake(null, MODEL, material -> this, BlockModelRotation.X0_Y0, false);
+                *///?} else {
                 this.model = ITEM_MODEL_GENERATOR.generateBlockModel(material -> this, MODEL).bake(null, MODEL, material -> this, BlockModelRotation.X0_Y0, name, false);
+                //?}
                 profiler.pop();
             }
             TextureManager textureManager = Minecraft.getInstance().getTextureManager();

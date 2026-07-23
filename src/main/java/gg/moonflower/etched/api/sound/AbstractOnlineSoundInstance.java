@@ -217,7 +217,11 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
         private final boolean stereo;
 
         public OnlineSound(ResourceLocation location, String url, int attenuationDistance, DownloadProgressListener progressListener, AudioSource.AudioFileType type, boolean stereo) {
+            //? if >=1.21 {
+            /*super(location, ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Type.FILE, true, false, attenuationDistance);
+            *///?} else {
             super(location.toString(), ConstantFloat.of(1.0F), ConstantFloat.of(1.0F), 1, Type.FILE, true, false, attenuationDistance);
+            //?}
             this.url = url;
             this.progressListener = progressListener;
             this.type = type;

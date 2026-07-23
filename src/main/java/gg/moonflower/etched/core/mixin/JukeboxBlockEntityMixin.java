@@ -62,13 +62,24 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
         super(type, pos, blockState);
     }
 
+    // ContainerSingleItem#getFirstItem was renamed to getTheItem in 1.21.
+    //? if >=1.21 {
+    /*private ItemStack etched$record() {
+        return this.getTheItem();
+    }
+    *///?} else {
+    private ItemStack etched$record() {
+        return this.getFirstItem();
+    }
+    //?}
+
     @Inject(method = "startPlaying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(Lnet/minecraft/world/entity/player/Player;ILnet/minecraft/core/BlockPos;I)V", shift = At.Shift.AFTER))
     public void startPlaying(CallbackInfo ci) {
         EtchedMessages.LOGGER.info("Mixin Works");
 
-        if ((this.getFirstItem().getItem() instanceof PlayableRecord)) {
+        if ((this.etched$record().getItem() instanceof PlayableRecord)) {
             BlockPos pos = this.getBlockPos();
-            var packet = new ClientboundPlayMusicPacket(this.getFirstItem().copy(), pos);
+            var packet = new ClientboundPlayMusicPacket(this.etched$record().copy(), pos);
             packet.sendToClients(PlayerLookup.around((ServerLevel) level, pos.getCenter().add(0.5, 0.5, 0.5), 64.0));
             //EtchedMessages.PLAY.send(PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 64, this.level.dimension())), new ClientboundPlayMusicPacket(this.getFirstItem().copy(), pos));
         }
@@ -94,9 +105,9 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick(Level level, BlockPos pos, BlockState state, CallbackInfo ci) {
         if (this.isRecordPlaying()) {
-            Item item = this.getFirstItem().getItem();
+            Item item = this.etched$record().getItem();
             //? if >=1.21 {
-            /*if (!this.getFirstItem().has(DataComponents.JUKEBOX_PLAYABLE) && item instanceof PlayableRecord) {
+            /*if (!this.etched$record().has(DataComponents.JUKEBOX_PLAYABLE) && item instanceof PlayableRecord) {
             *///?} else {
             if (!(item instanceof RecordItem) && item instanceof PlayableRecord) {
             //?}

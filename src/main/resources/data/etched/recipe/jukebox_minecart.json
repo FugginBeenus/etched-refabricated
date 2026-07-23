@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["A", "B"],
+  "key": {
+    "A": { "item": "minecraft:jukebox" },
+    "B": { "item": "minecraft:minecart" }
+  },
+  "result": { "id": "etched:jukebox_minecart", "count": 1 }
+}

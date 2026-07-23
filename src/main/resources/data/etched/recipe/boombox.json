@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" I ", "IRI", "IJI"],
+  "key": {
+    "R": { "tag": "c:dusts/redstone" },
+    "I": { "tag": "c:ingots/iron" },
+    "J": { "item": "minecraft:jukebox" }
+  },
+  "result": { "id": "etched:boombox", "count": 1 }
+}

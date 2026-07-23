@@ -1,0 +1,8 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [" P ", "P P", " P "],
+  "key": {
+    "P": { "item": "minecraft:paper" }
+  },
+  "result": { "id": "etched:music_label", "count": 1 }
+}

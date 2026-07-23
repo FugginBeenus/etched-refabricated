@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["RHR", "RJR", "RCR"],
+  "key": {
+    "R": { "tag": "c:dusts/redstone" },
+    "H": { "item": "minecraft:repeater" },
+    "J": { "item": "minecraft:jukebox" },
+    "C": { "tag": "c:chests/wooden" }
+  },
+  "result": { "id": "etched:album_jukebox", "count": 1 }
+}

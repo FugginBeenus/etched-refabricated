@@ -23,6 +23,8 @@ public class AlbumPrinterMenu extends AbstractContainerMenu {
 
     public static final int MODE_PATTERN = 0;
     public static final int MODE_IMAGE = 1;
+    // Cap layered patterns like banners do (6 patterns over a base).
+    public static final int MAX_LAYERS = 6;
 
     private final ContainerLevelAccess access;
     private final Player player;
@@ -60,13 +62,13 @@ public class AlbumPrinterMenu extends AbstractContainerMenu {
                 return stack.is(EtchedItems.ALBUM_COVER.asItem());
             }
         });
-        this.dyeSlot = this.addSlot(new Slot(this.input, 1, 33, 26) {
+        this.dyeSlot = this.addSlot(new Slot(this.input, 1, 13, 47) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return stack.getItem() instanceof DyeItem;
             }
         });
-        this.resultSlot = this.addSlot(new Slot(this.result, 0, 143, 58) {
+        this.resultSlot = this.addSlot(new Slot(this.result, 0, 150, 35) {
             @Override
             public boolean mayPlace(ItemStack stack) {
                 return false;
@@ -75,6 +77,9 @@ public class AlbumPrinterMenu extends AbstractContainerMenu {
             @Override
             public void onTake(Player player, ItemStack stack) {
                 AlbumPrinterMenu.this.coverSlot.remove(1);
+                if (AlbumPrinterMenu.this.mode.get() == MODE_PATTERN) {
+                    AlbumPrinterMenu.this.dyeSlot.remove(1);
+                }
                 AlbumPrinterMenu.this.setupResultSlot();
                 super.onTake(player, stack);
             }
@@ -115,16 +120,43 @@ public class AlbumPrinterMenu extends AbstractContainerMenu {
         this.setupResultSlot();
     }
 
-    // Rebuilds the result from the current cover + selected design (image now; pattern mode later).
+    // Rebuilds the result from the current cover + selected design (uploaded image or a dye-tinted
+    // procedural pattern).
     private void setupResultSlot() {
         ItemStack cover = this.coverSlot.getItem();
         ItemStack result = ItemStack.EMPTY;
-        if (!cover.isEmpty() && this.mode.get() == MODE_IMAGE && this.pendingImage != null) {
-            result = cover.copyWithCount(1);
-            gg.moonflower.etched.common.item.CoverArt.setImage(result, this.pendingImage);
+        if (!cover.isEmpty()) {
+            if (this.mode.get() == MODE_IMAGE && this.pendingImage != null) {
+                result = cover.copyWithCount(1);
+                gg.moonflower.etched.common.item.CoverArt.setImage(result, this.pendingImage);
+            } else if (this.mode.get() == MODE_PATTERN && this.selectedPattern.get() >= 0 && !this.dyeSlot.getItem().isEmpty()) {
+                // Banner-style layering: keep the cover's existing layers and add one more on top.
+                java.util.Optional<gg.moonflower.etched.common.item.CoverArt.PatternDesign> existing =
+                        gg.moonflower.etched.common.item.CoverArt.getPattern(cover);
+                java.util.List<gg.moonflower.etched.common.item.CoverArt.Layer> layers =
+                        new java.util.ArrayList<>(existing.map(gg.moonflower.etched.common.item.CoverArt.PatternDesign::layers).orElse(java.util.List.of()));
+                if (layers.size() < MAX_LAYERS) {
+                    int base = existing.map(gg.moonflower.etched.common.item.CoverArt.PatternDesign::baseColor).orElse(0xFFFFFF);
+                    layers.add(new gg.moonflower.etched.common.item.CoverArt.Layer(this.selectedPattern.get(), dyeColor(this.dyeSlot.getItem())));
+                    result = cover.copyWithCount(1);
+                    gg.moonflower.etched.common.item.CoverArt.setPattern(result, base, layers);
+                }
+            }
         }
         this.resultSlot.set(result);
         this.broadcastChanges();
+    }
+
+    public static int dyeColor(ItemStack stack) {
+        if (!(stack.getItem() instanceof DyeItem dyeItem)) {
+            return 0xFFFFFF;
+        }
+        //? if >=1.21 {
+        /*return dyeItem.getDyeColor().getTextureDiffuseColor() & 0xFFFFFF;
+        *///?} else {
+        float[] c = dyeItem.getDyeColor().getTextureDiffuseColors();
+        return (Math.round(c[0] * 255) << 16) | (Math.round(c[1] * 255) << 8) | Math.round(c[2] * 255);
+        //?}
     }
 
     @Override
@@ -138,7 +170,8 @@ public class AlbumPrinterMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int id) {
         if (id >= 0 && id < 100) {
-            // ids 0..N select a pattern; encode mode switches above that range later.
+            // ids 0..N select a procedural pattern and switch the printer into pattern mode.
+            this.mode.set(MODE_PATTERN);
             this.selectedPattern.set(id);
             this.setupResultSlot();
             return true;

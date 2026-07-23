@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:loom",
+    "etched:album_cover",
+    "minecraft:cyan_dye",
+    "minecraft:yellow_dye",
+    "minecraft:magenta_dye",
+    "minecraft:black_dye"
+  ],
+  "result": {
+    "id": "etched:album_printer",
+    "count": 1
+  }
+}

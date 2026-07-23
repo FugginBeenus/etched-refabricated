@@ -223,7 +223,14 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
                 e.printStackTrace();
             }
         }
-        // TODO: pattern-mode composition
+        Optional<gg.moonflower.etched.common.item.CoverArt.PatternDesign> pattern = gg.moonflower.etched.common.item.CoverArt.getPattern(stack);
+        if (pattern.isPresent()) {
+            try {
+                return ModelData.of(new ImageAlbumCover(CoverPatterns.compose(pattern.get(), getOverlayImage()))).orElse(this.data.defaultCover);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return this.data.defaultCover;
     }
 

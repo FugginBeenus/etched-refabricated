@@ -112,6 +112,9 @@ processResources {
         exclude "etched-1_21.accesswidener"
         // The 1.21 jukebox mixins target classes that don't exist before 1.21.
         exclude "etched.jukebox.mixins.json"
+        // The #minecraft:dyeable tag only exists on 1.21 (and uses the singular tags/item
+        // folder); on 1.20.1 discs/labels are dyeable via the DyeableLeatherItem interface.
+        exclude "data/minecraft/tags/item/dyeable.json"
     }
 
     // The 1.21 jukebox rewrite lives in a separate mixin config; 1.20.1 keeps the legacy

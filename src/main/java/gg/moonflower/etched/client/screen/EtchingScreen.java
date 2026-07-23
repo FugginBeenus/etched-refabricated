@@ -158,9 +158,9 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTick, int mouseX, int mouseY) {
-        //? if >=1.21 {
-        /*this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        *///?} else {
+        // On 1.21 the vanilla render() loop already calls renderBackground before renderBg
+        // (and renderBackground itself calls renderBg), so calling it here recurses infinitely.
+        //? if <1.21 {
         this.renderBackground(guiGraphics);
         //?}
 

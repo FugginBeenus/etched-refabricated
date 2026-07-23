@@ -371,7 +371,7 @@ public class SoundTracker {
         } else if (disc.getItem() instanceof PlayableRecord) {
         //?}
             Optional<TrackData[]> optional = PlayableRecord.getStackMusic(disc);
-            if (optional.isPresent()) {
+            if (optional.isPresent() && optional.get().length > 0) {
                 TrackData[] tracks = optional.get();
                 TrackData track = jukebox.getTrack() < 0 || jukebox.getTrack() >= tracks.length ? tracks[0] : tracks[jukebox.getTrack()];
                 String url = track.url();

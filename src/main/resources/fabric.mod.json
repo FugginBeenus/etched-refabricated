@@ -22,7 +22,11 @@
     "modmenu": [ "gg.moonflower.etched.core.fabric.EtchedModMenuAPIImpl" ]
   },
   "depends": {
-    "fabric": "*"
+    "fabric": "*",
+    "minecraft": "${minecraft_version}",
+    "fabricloader": ">=${loader_version}",
+    "java": ">=${java_version}",
+    "yet_another_config_lib_v3": "${yacl_dependency}"
   },
   "mixins": ["etched.mixins.json", "${jukebox_mixins}"],
   "license": "GPL-3.0-only"

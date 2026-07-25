@@ -127,6 +127,15 @@ processResources {
     def jukeboxMixins = is121 ? "etched.jukebox.mixins.json" : "etched.legacy.mixins.json"
     inputs.property "jukebox_mixins", jukeboxMixins
 
+    // Without these the jar happily installs on the wrong Minecraft version and crashes, and nothing
+    // tells the user it needs YACL, which the config screen is built on.
+    def javaVersion = is121 ? "21" : "17"
+    // Strip the "+1.21.1-fabric" build metadata so this reads as a plain minimum version.
+    def yaclDependency = ">=" + yacl_version.split("\\+")[0]
+    inputs.property "java_version", javaVersion
+    inputs.property "yacl_dependency", yaclDependency
+    inputs.property "loader_version", loader_version
+
     filesMatching("fabric.mod.json") {
         expand "mod_version": mod_version,
                 "mod_id": mod_id,
@@ -134,6 +143,9 @@ processResources {
                 "mod_description": mod_description,
                 "archives_base_name": archives_base_name,
                 "jukebox_mixins": jukeboxMixins,
+                "loader_version": loader_version,
+                "java_version": javaVersion,
+                "yacl_dependency": yaclDependency,
 
                 "minecraft_version": minecraft_version
     }

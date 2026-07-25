@@ -3,6 +3,7 @@ package gg.moonflower.etched.common.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.Mirror;
@@ -16,7 +17,7 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
  * instead of the jukebox itself (see {@code SoundTracker}). Speakers touching a jukebox are connected
  * automatically; further away they are paired to a {@link StereoBlock} sitting on top of it.
  */
-public class SpeakerBlock extends Block {
+public class SpeakerBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
 
@@ -45,6 +46,25 @@ public class SpeakerBlock extends Block {
         builder.add(FACING);
     }
 
+    @Override
+    public net.minecraft.world.level.block.entity.BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new gg.moonflower.etched.common.blockentity.SpeakerBlockEntity(pos, state);
+    }
+
+    @Override
+    public net.minecraft.world.level.block.RenderShape getRenderShape(BlockState state) {
+        return net.minecraft.world.level.block.RenderShape.MODEL;
+    }
+
+    private net.minecraft.world.InteractionResult openVolume(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        if (level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.SpeakerBlockEntity speaker) {
+            player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                    (id, inventory, p) -> new gg.moonflower.etched.common.menu.SpeakerMenu(id, inventory, speaker),
+                    net.minecraft.network.chat.Component.translatable("container." + gg.moonflower.etched.core.Etched.MOD_ID + ".speaker")));
+        }
+        return net.minecraft.world.InteractionResult.CONSUME;
+    }
+
     // While a player has a stereo in link mode, clicking speakers pairs and unpairs them with it.
     private net.minecraft.world.InteractionResult tryPair(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
         if (level.isClientSide()) {
@@ -53,11 +73,11 @@ public class SpeakerBlock extends Block {
 
         BlockPos stereoPos = StereoBlock.getLinking(player);
         if (stereoPos == null) {
-            return net.minecraft.world.InteractionResult.PASS;
+            return this.openVolume(level, pos, player);
         }
         if (!(level.getBlockEntity(stereoPos) instanceof gg.moonflower.etched.common.blockentity.StereoBlockEntity stereo)) {
             StereoBlock.stopLinking(player);
-            return net.minecraft.world.InteractionResult.PASS;
+            return this.openVolume(level, pos, player);
         }
 
         String key = "block." + gg.moonflower.etched.core.Etched.MOD_ID + ".speaker.";
@@ -88,7 +108,7 @@ public class SpeakerBlock extends Block {
     /*public static final com.mojang.serialization.MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);
 
     @Override
-    protected com.mojang.serialization.MapCodec<? extends Block> codec() {
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
     *///?}

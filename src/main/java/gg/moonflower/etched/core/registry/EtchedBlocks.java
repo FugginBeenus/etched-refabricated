@@ -105,6 +105,10 @@ public class EtchedBlocks {
         (BlockEntityEntry<RadioBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("radio", RadioBlockEntity::new)
                     .validBlocks(RADIO)
                     .register();
+    public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.SpeakerBlockEntity> SPEAKER_BE =
+        (BlockEntityEntry<gg.moonflower.etched.common.blockentity.SpeakerBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("speaker", gg.moonflower.etched.common.blockentity.SpeakerBlockEntity::new)
+                    .validBlocks(SPEAKER)
+                    .register();
     public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity> STEREO_BE =
         (BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("stereo", gg.moonflower.etched.common.blockentity.StereoBlockEntity::new)
                     .validBlocks(STEREO)

@@ -18,7 +18,22 @@ public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance imple
     private java.util.function.Supplier<net.minecraft.world.phys.Vec3> positionSupplier;
     // For extra speaker sounds: stop as soon as the record driving them stops.
     private java.util.function.BooleanSupplier stopCondition;
+    // Re-read each tick so speaker volume changes (and speakers being broken) take effect while a
+    // record is already playing.
+    private java.util.function.DoubleSupplier volumeSupplier;
     private boolean stopped;
+
+    /**
+     * Recalculates this sound's volume every tick from the given supplier.
+     *
+     * @param volume The volume to use
+     * @return This sound, for chaining
+     */
+    public OnlineRecordSoundInstance withVolume(java.util.function.DoubleSupplier volume) {
+        this.volumeSupplier = volume;
+        this.volume = (float) volume.getAsDouble();
+        return this;
+    }
 
     /**
      * Stops this sound as soon as the given condition reports <code>true</code>.
@@ -66,6 +81,9 @@ public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance imple
         if (this.stopCondition != null && this.stopCondition.getAsBoolean()) {
             this.stopped = true;
             return;
+        }
+        if (this.volumeSupplier != null) {
+            this.volume = (float) this.volumeSupplier.getAsDouble();
         }
         if (this.entity != null) {
             if (!this.entity.isAlive()) {

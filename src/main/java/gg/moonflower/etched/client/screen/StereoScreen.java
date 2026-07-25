@@ -3,6 +3,7 @@ package gg.moonflower.etched.client.screen;
 import gg.moonflower.etched.common.blockentity.StereoBlockEntity;
 import gg.moonflower.etched.common.menu.StereoMenu;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -27,7 +28,7 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
     public StereoScreen(StereoMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.titleLabelX = 8;
-        this.titleLabelY = 5;
+        this.titleLabelY = -100;
         this.inventoryLabelX = 8;
         this.inventoryLabelY = this.imageHeight - 94;
     }
@@ -41,6 +42,8 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         this.modeButton = this.addRenderableWidget(Button.builder(this.modeText(), b ->
                         this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_MODE))
                 .bounds(this.leftPos + 92, this.topPos + 56, 76, 18).build());
+        this.addRenderableWidget(new MasterSlider(this.leftPos + 8, this.topPos + 4, 160, 14,
+                this.menu.getVolumePercent() / 100.0));
     }
 
     private Component modeText() {
@@ -93,6 +96,25 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         //?}
         super.render(g, mouseX, mouseY, partialTick);
         this.renderTooltip(g, mouseX, mouseY);
+    }
+
+    private class MasterSlider extends AbstractSliderButton {
+
+        MasterSlider(int x, int y, int width, int height, double value) {
+            super(x, y, width, height, Component.empty(), value);
+            this.updateMessage();
+        }
+
+        @Override
+        protected void updateMessage() {
+            this.setMessage(Component.translatable("container.etched.stereo.volume", Math.round(this.value * 100.0)));
+        }
+
+        @Override
+        protected void applyValue() {
+            StereoScreen.this.minecraft.gameMode.handleInventoryButtonClick(
+                    StereoScreen.this.menu.containerId, (int) Math.round(this.value * 100.0));
+        }
     }
 
     private static void panel(GuiGraphics g, int x, int y, int w, int h) {

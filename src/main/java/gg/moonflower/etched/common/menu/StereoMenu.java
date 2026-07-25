@@ -21,15 +21,17 @@ import net.minecraft.world.item.ItemStack;
 public class StereoMenu extends AbstractContainerMenu {
 
     /** Turns on link mode and closes the screen so speakers can be clicked. */
-    public static final int BUTTON_LINK = 100;
+    public static final int BUTTON_LINK = 200;
     /** Switches between playing from all speakers and only the nearest. */
-    public static final int BUTTON_MODE = 101;
+    public static final int BUTTON_MODE = 201;
+    // Ids 0-100 set the master volume as a percent.
 
     private final Container container;
     private final DataSlot mode = DataSlot.standalone();
     private final DataSlot maxSpeakers = DataSlot.standalone();
     private final DataSlot range = DataSlot.standalone();
     private final DataSlot paired = DataSlot.standalone();
+    private final DataSlot volume = DataSlot.standalone();
 
     public StereoMenu(int id, Inventory inventory) {
         this(id, inventory, new SimpleContainer(StereoBlockEntity.UPGRADE_SLOTS));
@@ -63,6 +65,7 @@ public class StereoMenu extends AbstractContainerMenu {
         this.addDataSlot(this.maxSpeakers);
         this.addDataSlot(this.range);
         this.addDataSlot(this.paired);
+        this.addDataSlot(this.volume);
         this.refreshStats();
     }
 
@@ -79,6 +82,7 @@ public class StereoMenu extends AbstractContainerMenu {
         this.maxSpeakers.set(stereo.getMaxSpeakers());
         this.range.set(stereo.getRange());
         this.paired.set(stereo.getPairedSpeakers().size());
+        this.volume.set(Math.round(stereo.getVolume() * 100.0F));
     }
 
     public int getMode() {
@@ -95,6 +99,13 @@ public class StereoMenu extends AbstractContainerMenu {
 
     public int getPairedCount() {
         return this.paired.get();
+    }
+
+    /**
+     * @return The master volume as a percent
+     */
+    public int getVolumePercent() {
+        return this.volume.get();
     }
 
     /**
@@ -118,6 +129,12 @@ public class StereoMenu extends AbstractContainerMenu {
             return false;
         }
 
+        if (id >= 0 && id <= 100) {
+            stereo.setVolume(id / 100.0F);
+            this.refreshStats();
+            this.broadcastChanges();
+            return true;
+        }
         if (id == BUTTON_MODE) {
             stereo.setMode(stereo.getMode() == StereoBlockEntity.MODE_ALL ? StereoBlockEntity.MODE_NEAREST : StereoBlockEntity.MODE_ALL);
             this.refreshStats();

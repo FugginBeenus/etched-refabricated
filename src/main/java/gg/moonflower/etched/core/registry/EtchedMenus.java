@@ -49,6 +49,8 @@ public class EtchedMenus {
             register("album_printer", gg.moonflower.etched.common.menu.AlbumPrinterMenu::new);
     public static final MenuType<gg.moonflower.etched.common.menu.StereoMenu> STEREO_MENU =
             register("stereo", gg.moonflower.etched.common.menu.StereoMenu::new);
+    public static final MenuType<gg.moonflower.etched.common.menu.SpeakerMenu> SPEAKER_MENU =
+            register("speaker", gg.moonflower.etched.common.menu.SpeakerMenu::new);
     public static void register() {}
 
     public static <T extends AbstractContainerMenu> MenuType<T> register(String name, MenuType.MenuSupplier<T> supplier) {

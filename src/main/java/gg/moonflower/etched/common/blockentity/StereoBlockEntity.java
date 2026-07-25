@@ -44,6 +44,7 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
     private final net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> upgrades =
             net.minecraft.core.NonNullList.withSize(UPGRADE_SLOTS, net.minecraft.world.item.ItemStack.EMPTY);
     private int mode = MODE_ALL;
+    private float volume = 1.0F;
 
     public StereoBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -95,6 +96,25 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
 
     public int getMode() {
         return this.mode;
+    }
+
+    /**
+     * @return The master volume every speaker this stereo drives is scaled by
+     */
+    public float getVolume() {
+        return this.volume;
+    }
+
+    public void setVolume(float volume) {
+        this.volume = net.minecraft.util.Mth.clamp(volume, 0.0F, 1.0F);
+        this.sync();
+    }
+
+    /**
+     * @return The master volume of the stereo above the given block, or full volume if there is none
+     */
+    public static float masterVolumeAt(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos sourcePos) {
+        return level.getBlockEntity(sourcePos.above()) instanceof StereoBlockEntity stereo ? stereo.getVolume() : 1.0F;
     }
 
     public void setMode(int mode) {
@@ -192,6 +212,7 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
             this.speakers.add(BlockPos.of(((LongTag) list.get(i)).getAsLong()));
         }
         this.mode = nbt.getInt("Mode");
+        this.volume = nbt.contains("Volume") ? nbt.getFloat("Volume") : 1.0F;
     }
 
     private void writeCommon(CompoundTag nbt) {
@@ -201,6 +222,7 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         }
         nbt.put("Speakers", list);
         nbt.putInt("Mode", this.mode);
+        nbt.putFloat("Volume", this.volume);
     }
 
     // ---- upgrade container ----

@@ -63,6 +63,16 @@ public class SpeakerSoundInstance extends OnlineRecordSoundInstance {
         this.type = type;
     }
 
+    /**
+     * A speaker sound whose position is recalculated each tick, so it can move back to the jukebox
+     * when the speakers it was playing from are gone.
+     */
+    public SpeakerSoundInstance(String url, java.util.function.Supplier<net.minecraft.world.phys.Vec3> position, float volume, int attenuationDistance, AudioSource.AudioFileType type) {
+        super(url, position, volume, attenuationDistance, NO_PROGRESS, type);
+        this.url = url;
+        this.type = type;
+    }
+
     @Override
     public CompletableFuture<AudioStream> getAudioStream(SoundBufferLibrary loader, ResourceLocation id, boolean repeatInstantly) {
         return SharedAudioBuffer.get(this.url, this.type).thenApply(SharedAudioBuffer::openReader).exceptionally(e -> {

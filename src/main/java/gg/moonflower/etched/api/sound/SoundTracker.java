@@ -58,6 +58,8 @@ public class SoundTracker {
     // The extra speaker sounds playing a jukebox's record, beyond the one that drives playback.
     private static final Map<BlockPos, List<SoundInstance>> SPEAKER_COMPANIONS = new HashMap<>();
     private static final Set<String> FAILED_URLS = new HashSet<>();
+    // The volume vanilla plays records at, before per-speaker and master scaling.
+    private static final float RECORD_VOLUME = 4.0F;
     private static final Component RADIO = Component.translatable("sound_source." + Etched.MOD_ID + ".radio");
 
     static {
@@ -294,17 +296,33 @@ public class SoundTracker {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
 
         // The first speaker's sound is the one tracked for the block: it advances playback and stops
-        // when the disc is removed. Register it before the rest so they see the record as playing.
-        playRecord(pos, StopListeningSound.create(speakerSound(url, speakers.get(0)), onFinished));
+        // when the disc is removed. It can't simply be stopped when its speaker is broken (that would
+        // skip to the next track), so instead it goes silent, and moves back to the jukebox once no
+        // speakers are left at all. Register it before the rest so they see the record as playing.
+        BlockPos primaryPos = speakers.get(0);
+        SpeakerSoundInstance primary = new SpeakerSoundInstance(url,
+                () -> isSpeaker(level, primaryPos) || !connectedSpeakers(level, pos).isEmpty()
+                        ? net.minecraft.world.phys.Vec3.atCenterOf(primaryPos)
+                        : net.minecraft.world.phys.Vec3.atCenterOf(pos),
+                RECORD_VOLUME, 16, AudioSource.AudioFileType.FILE);
+        primary.withVolume(() -> {
+            if (isSpeaker(level, primaryPos)) {
+                return RECORD_VOLUME * speakerVolume(level, pos, primaryPos);
+            }
+            // Silent while other speakers carry the record; audible again from the jukebox once they
+            // are all gone.
+            return connectedSpeakers(level, pos).isEmpty() ? RECORD_VOLUME : 0.0;
+        });
+        playRecord(pos, StopListeningSound.create(primary, onFinished));
 
         List<SoundInstance> companions = new ArrayList<>();
         for (int i = 1; i < speakers.size(); i++) {
             BlockPos speakerPos = speakers.get(i);
             SpeakerSoundInstance companion = speakerSound(url, speakerPos);
+            companion.withVolume(() -> RECORD_VOLUME * speakerVolume(level, pos, speakerPos));
             // Stop with the record, or as soon as this speaker is broken, so no audio is left playing
             // from a block that is no longer there.
-            companion.stopWhen(() -> !playingRecords.containsKey(pos)
-                    || !(level.getBlockState(speakerPos).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock));
+            companion.stopWhen(() -> !playingRecords.containsKey(pos) || !isSpeaker(level, speakerPos));
             soundManager.play(companion);
             companions.add(companion);
         }
@@ -340,7 +358,17 @@ public class SoundTracker {
     }
 
     private static SpeakerSoundInstance speakerSound(String url, BlockPos speaker) {
-        return new SpeakerSoundInstance(url, speaker.getX() + 0.5, speaker.getY() + 0.5, speaker.getZ() + 0.5, 4.0F, 16, AudioSource.AudioFileType.FILE);
+        return new SpeakerSoundInstance(url, speaker.getX() + 0.5, speaker.getY() + 0.5, speaker.getZ() + 0.5, RECORD_VOLUME, 16, AudioSource.AudioFileType.FILE);
+    }
+
+    private static boolean isSpeaker(ClientLevel level, BlockPos pos) {
+        return level.getBlockState(pos).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock;
+    }
+
+    // A speaker's own volume, scaled by the master volume of the stereo driving the jukebox.
+    private static double speakerVolume(ClientLevel level, BlockPos jukeboxPos, BlockPos speakerPos) {
+        return gg.moonflower.etched.common.blockentity.SpeakerBlockEntity.volumeAt(level, speakerPos)
+                * gg.moonflower.etched.common.blockentity.StereoBlockEntity.masterVolumeAt(level, jukeboxPos);
     }
 
     private static void stopCompanions(BlockPos pos) {

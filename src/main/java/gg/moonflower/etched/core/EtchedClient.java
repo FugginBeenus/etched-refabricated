@@ -45,6 +45,7 @@ public class EtchedClient {
         MenuScreens.register(EtchedMenus.ALBUM_COVER_MENU, AlbumCoverScreen::new);
         MenuScreens.register(EtchedMenus.ALBUM_PRINTER_MENU, AlbumPrinterScreen::new);
         MenuScreens.register(EtchedMenus.STEREO_MENU, StereoScreen::new);
+        MenuScreens.register(EtchedMenus.SPEAKER_MENU, SpeakerScreen::new);
         EntityRendererRegistry.register(EtchedEntities.JUKEBOX_MINECART,context -> {
             return new JukeboxMinecartRenderer<>(context);
         });

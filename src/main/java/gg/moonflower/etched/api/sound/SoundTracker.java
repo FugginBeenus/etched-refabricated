@@ -247,40 +247,42 @@ public class SoundTracker {
             playBlockRecord(pos, tracks, track + 1);
             return;
         }
-        // With several speakers connected the record plays from each of them at once, which needs the
-        // track decoded once and shared so they all start together.
-        List<BlockPos> speakers = connectedSpeakers(level, pos);
-        if (speakers.size() > 1) {
-            playSpeakerRecord(level, pos, speakers, url, trackData.getDisplayName(), tracks, track);
-            return;
-        }
-
-        stopCompanions(pos);
-        playRecord(pos, StopListeningSound.create(getEtchedRecord(url, trackData.getDisplayName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> {
+        playBlockAudio(level, pos, url, trackData.getDisplayName(), () -> Minecraft.getInstance().tell(() -> {
             if (!(((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords().containsKey(pos))) {
                 return;
             }
             playBlockRecord(pos, tracks, track + 1);
-        })));
+        }));
     }
 
-    // Plays one track from every connected speaker. All of the sounds read from the same decoded
-    // buffer and are handed their stream by the same future, so they start together and stay in sync.
-    private static void playSpeakerRecord(ClientLevel level, BlockPos pos, List<BlockPos> speakers, String url, Component title, TrackData[] tracks, int track) {
+    /**
+     * Starts a downloaded record for a block, playing it from every connected speaker when more than
+     * one is attached. The speakers all read from one decoded buffer and are handed their streams by
+     * the same future, so they start together and stay in sync.
+     *
+     * @param level      The level the block is in
+     * @param pos        The block playing the record
+     * @param url        The track to play
+     * @param title      The name to announce
+     * @param onFinished Run when the track ends, to advance to the next one
+     */
+    private static void playBlockAudio(ClientLevel level, BlockPos pos, String url, Component title, SoundStopListener onFinished) {
         stopCompanions(pos);
+
+        List<BlockPos> speakers = connectedSpeakers(level, pos);
+        // Sounds bundled with the game are loaded from resource packs rather than downloaded, so they
+        // can't be shared through the buffer; those keep playing from a single speaker.
+        if (speakers.size() <= 1 || TrackData.isLocalSound(url)) {
+            playRecord(pos, StopListeningSound.create(getEtchedRecord(url, title, level, pos, AudioSource.AudioFileType.FILE), onFinished));
+            return;
+        }
 
         Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getPlayingRecords();
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
 
-        // The first speaker's sound is the one tracked for the jukebox: it advances the album and is
-        // what stops when the disc is removed. The rest follow it.
-        BlockPos primaryPos = speakers.get(0);
-        playRecord(pos, StopListeningSound.create(speakerSound(url, primaryPos), () -> Minecraft.getInstance().tell(() -> {
-            if (!playingRecords.containsKey(pos)) {
-                return;
-            }
-            playBlockRecord(pos, tracks, track + 1);
-        })));
+        // The first speaker's sound is the one tracked for the block: it advances playback and stops
+        // when the disc is removed. Register it before the rest so they see the record as playing.
+        playRecord(pos, StopListeningSound.create(speakerSound(url, speakers.get(0)), onFinished));
 
         List<SoundInstance> companions = new ArrayList<>();
         for (int i = 1; i < speakers.size(); i++) {
@@ -453,17 +455,20 @@ public class SoundTracker {
         }
 
         ItemStack disc = jukebox.getItem(jukebox.getPlayingIndex());
-        SoundInstance sound = null;
+        String playUrl = null;
+        Component playTitle = null;
         //? if >=1.21 {
         /*if (disc.has(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE)) {
             Optional<net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong>> etched$song = net.minecraft.world.item.JukeboxSong.fromStack(level.registryAccess(), disc);
             if (etched$song.isPresent()) {
-                sound = StopListeningSound.create(getEtchedRecord(etched$song.get().value().soundEvent().value().getLocation().toString(), disc.getHoverName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
+                playUrl = etched$song.get().value().soundEvent().value().getLocation().toString();
+                playTitle = disc.getHoverName();
             }
         } else if (disc.getItem() instanceof PlayableRecord) {
         *///?} else {
         if (disc.getItem() instanceof RecordItem) {
-            sound = StopListeningSound.create(getEtchedRecord(((RecordItem) disc.getItem()).getSound().getLocation().toString(), ((RecordItem) disc.getItem()).getDisplayName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
+            playUrl = ((RecordItem) disc.getItem()).getSound().getLocation().toString();
+            playTitle = ((RecordItem) disc.getItem()).getDisplayName();
         } else if (disc.getItem() instanceof PlayableRecord) {
         //?}
             Optional<TrackData[]> optional = PlayableRecord.getStackMusic(disc);
@@ -472,16 +477,17 @@ public class SoundTracker {
                 TrackData track = jukebox.getTrack() < 0 || jukebox.getTrack() >= tracks.length ? tracks[0] : tracks[jukebox.getTrack()];
                 String url = track.url();
                 if (TrackData.isValidURL(url) && !FAILED_URLS.contains(url)) {
-                    sound = StopListeningSound.create(getEtchedRecord(url, track.getDisplayName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
+                    playUrl = url;
+                    playTitle = track.getDisplayName();
                 }
             }
         }
 
-        if (sound == null) {
+        if (playUrl == null) {
             return;
         }
 
-        playRecord(pos, sound);
+        playBlockAudio(level, pos, playUrl, playTitle, () -> Minecraft.getInstance().tell(() -> playNextRecord(level, pos)));
         setRecordPlayingNearby(level, pos, true);
     }
 

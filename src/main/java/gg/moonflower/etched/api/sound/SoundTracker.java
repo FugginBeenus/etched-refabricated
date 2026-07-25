@@ -197,7 +197,13 @@ public class SoundTracker {
         gg.moonflower.etched.common.blockentity.StereoBlockEntity stereo =
                 gg.moonflower.etched.common.block.StereoBlock.getStereoFor(level, jukeboxPos);
         if (stereo != null) {
-            return stereo.getActiveSpeakers(level);
+            java.util.List<BlockPos> active = stereo.getActiveSpeakers(level);
+            // In nearest mode only one sound plays, and recordSoundSource keeps it on the speaker
+            // closest to the listener as they move.
+            if (stereo.getMode() == gg.moonflower.etched.common.blockentity.StereoBlockEntity.MODE_NEAREST && active.size() > 1) {
+                return java.util.List.of(nearestTo(active, Minecraft.getInstance().player));
+            }
+            return active;
         }
 
         java.util.List<BlockPos> speakers = new java.util.ArrayList<>();
@@ -315,6 +321,22 @@ public class SoundTracker {
             }
             setRecordPlayingNearby(level, pos, true);
         }, Minecraft.getInstance()).exceptionally(e -> null);
+    }
+
+    private static BlockPos nearestTo(java.util.List<BlockPos> positions, @Nullable Entity listener) {
+        if (listener == null) {
+            return positions.get(0);
+        }
+        BlockPos best = positions.get(0);
+        double bestDist = Double.MAX_VALUE;
+        for (BlockPos pos : positions) {
+            double dist = pos.distToCenterSqr(listener.getX(), listener.getY(), listener.getZ());
+            if (dist < bestDist) {
+                bestDist = dist;
+                best = pos;
+            }
+        }
+        return best;
     }
 
     private static SpeakerSoundInstance speakerSound(String url, BlockPos speaker) {

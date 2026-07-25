@@ -22,8 +22,17 @@ public class EtchedItems {
                 .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .register();
     //register("music_label", () -> new MusicLabelItem(new Item.Properties()));
-    public static final ItemEntry<ComplexMusicLabelItem> COMPLEX_MUSIC_LABEL = 
+    public static final ItemEntry<ComplexMusicLabelItem> COMPLEX_MUSIC_LABEL =
         Etched.REGISTRATE.item("complex_music_label", ComplexMusicLabelItem::new)
+                .register();
+    // Stereo upgrades: preamps drive more wireless speakers, transmitters reach further.
+    public static final ItemEntry<net.minecraft.world.item.Item> PREAMP =
+        Etched.REGISTRATE.item("preamp", net.minecraft.world.item.Item::new)
+                .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
+                .register();
+    public static final ItemEntry<net.minecraft.world.item.Item> TRANSMITTER =
+        Etched.REGISTRATE.item("transmitter", net.minecraft.world.item.Item::new)
+                .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
                 .register();
     //register("complex_music_label", () -> new ComplexMusicLabelItem(new Item.Properties()));
     public static final ItemEntry<BlankMusicDiscItem> BLANK_MUSIC_DISC = 

@@ -66,6 +66,14 @@ public class StereoBlock extends BaseEntityBlock {
     }
 
     /**
+     * Puts a player into link mode so clicking speakers pairs them with the given stereo.
+     */
+    public static void startLinking(Player player, BlockPos stereoPos) {
+        LINKING.put(player.getUUID(), stereoPos.immutable());
+        player.displayClientMessage(Component.translatable("block." + Etched.MOD_ID + ".stereo.link_start"), true);
+    }
+
+    /**
      * @return The stereo sitting on top of the given block, if there is one
      */
     @Nullable
@@ -78,22 +86,14 @@ public class StereoBlock extends BaseEntityBlock {
         return state.is(Blocks.JUKEBOX) || state.getBlock() instanceof AlbumJukeboxBlock;
     }
 
-    private InteractionResult toggleLinkMode(Level level, BlockPos pos, Player player) {
+    private InteractionResult openMenu(Level level, BlockPos pos, Player player) {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
-
-        UUID id = player.getUUID();
-        if (pos.equals(LINKING.get(id))) {
-            LINKING.remove(id);
-            player.displayClientMessage(Component.translatable("block." + Etched.MOD_ID + ".stereo.link_stop"), true);
-        } else {
-            LINKING.put(id, pos.immutable());
-            StereoBlockEntity stereo = level.getBlockEntity(pos) instanceof StereoBlockEntity be ? be : null;
-            int paired = stereo != null ? stereo.getPairedSpeakers().size() : 0;
-            int max = stereo != null ? stereo.getMaxSpeakers() : StereoBlockEntity.BASE_SPEAKERS;
-            int range = stereo != null ? stereo.getRange() : StereoBlockEntity.BASE_RANGE;
-            player.displayClientMessage(Component.translatable("block." + Etched.MOD_ID + ".stereo.link_start", paired, max, range), true);
+        if (level.getBlockEntity(pos) instanceof StereoBlockEntity stereo) {
+            player.openMenu(new net.minecraft.world.SimpleMenuProvider(
+                    (id, inventory, p) -> new gg.moonflower.etched.common.menu.StereoMenu(id, inventory, stereo),
+                    Component.translatable("container." + Etched.MOD_ID + ".stereo")));
         }
         return InteractionResult.CONSUME;
     }
@@ -139,6 +139,17 @@ public class StereoBlock extends BaseEntityBlock {
         return new StereoBlockEntity(pos, state);
     }
 
+    @Override
+    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {
+        if (!state.is(newState.getBlock())) {
+            // Give the installed upgrades back rather than deleting them with the block.
+            if (level.getBlockEntity(pos) instanceof StereoBlockEntity stereo) {
+                net.minecraft.world.Containers.dropContents(level, pos, stereo);
+            }
+            super.onRemove(state, level, pos, newState, moving);
+        }
+    }
+
     //? if >=1.21 {
     /*public static final com.mojang.serialization.MapCodec<StereoBlock> CODEC = simpleCodec(StereoBlock::new);
 
@@ -149,7 +160,7 @@ public class StereoBlock extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        return this.toggleLinkMode(level, pos, player);
+        return this.openMenu(level, pos, player);
     }
 
     @Override
@@ -159,7 +170,7 @@ public class StereoBlock extends BaseEntityBlock {
     *///?} else {
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        return this.toggleLinkMode(level, pos, player);
+        return this.openMenu(level, pos, player);
     }
 
     @Override

@@ -55,12 +55,18 @@ import java.util.function.DoubleSupplier;
 public class SoundTracker {
 
     private static final Int2ObjectArrayMap<SoundInstance> ENTITY_PLAYING_SOUNDS = new Int2ObjectArrayMap<>();
+    // The extra speaker sounds playing a jukebox's record, beyond the one that drives playback.
+    private static final Map<BlockPos, List<SoundInstance>> SPEAKER_COMPANIONS = new HashMap<>();
     private static final Set<String> FAILED_URLS = new HashSet<>();
     private static final Component RADIO = Component.translatable("sound_source." + Etched.MOD_ID + ".radio");
 
     static {
         //MinecraftForge.EVENT_BUS.<ClientPlayerNetworkEvent.LoggingOut>addListener(event -> FAILED_URLS.clear());
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) ->  FAILED_URLS.clear());
+        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> {
+            FAILED_URLS.clear();
+            SPEAKER_COMPANIONS.clear();
+            gg.moonflower.etched.client.sound.SharedAudioBuffer.clear();
+        });
     }
 
     private static synchronized void setRecordPlayingNearby(Level level, BlockPos pos, boolean playing) {
@@ -241,12 +247,77 @@ public class SoundTracker {
             playBlockRecord(pos, tracks, track + 1);
             return;
         }
+        // With several speakers connected the record plays from each of them at once, which needs the
+        // track decoded once and shared so they all start together.
+        List<BlockPos> speakers = connectedSpeakers(level, pos);
+        if (speakers.size() > 1) {
+            playSpeakerRecord(level, pos, speakers, url, trackData.getDisplayName(), tracks, track);
+            return;
+        }
+
+        stopCompanions(pos);
         playRecord(pos, StopListeningSound.create(getEtchedRecord(url, trackData.getDisplayName(), level, pos, AudioSource.AudioFileType.FILE), () -> Minecraft.getInstance().tell(() -> {
             if (!(((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords().containsKey(pos))) {
                 return;
             }
             playBlockRecord(pos, tracks, track + 1);
         })));
+    }
+
+    // Plays one track from every connected speaker. All of the sounds read from the same decoded
+    // buffer and are handed their stream by the same future, so they start together and stay in sync.
+    private static void playSpeakerRecord(ClientLevel level, BlockPos pos, List<BlockPos> speakers, String url, Component title, TrackData[] tracks, int track) {
+        stopCompanions(pos);
+
+        Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getPlayingRecords();
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+
+        // The first speaker's sound is the one tracked for the jukebox: it advances the album and is
+        // what stops when the disc is removed. The rest follow it.
+        BlockPos primaryPos = speakers.get(0);
+        playRecord(pos, StopListeningSound.create(speakerSound(url, primaryPos), () -> Minecraft.getInstance().tell(() -> {
+            if (!playingRecords.containsKey(pos)) {
+                return;
+            }
+            playBlockRecord(pos, tracks, track + 1);
+        })));
+
+        List<SoundInstance> companions = new ArrayList<>();
+        for (int i = 1; i < speakers.size(); i++) {
+            BlockPos speakerPos = speakers.get(i);
+            SpeakerSoundInstance companion = speakerSound(url, speakerPos);
+            // Stop with the record, or as soon as this speaker is broken, so no audio is left playing
+            // from a block that is no longer there.
+            companion.stopWhen(() -> !playingRecords.containsKey(pos)
+                    || !(level.getBlockState(speakerPos).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock));
+            soundManager.play(companion);
+            companions.add(companion);
+        }
+        SPEAKER_COMPANIONS.put(pos.immutable(), companions);
+
+        // The listener that would normally announce the track is bypassed by the shared buffer, so
+        // report it here once the audio is actually ready.
+        gg.moonflower.etched.client.sound.SharedAudioBuffer.get(url, AudioSource.AudioFileType.FILE).thenRunAsync(() -> {
+            if (!playingRecords.containsKey(pos)) {
+                return;
+            }
+            if (PlayableRecord.canShowMessage(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5)) {
+                Minecraft.getInstance().gui.setNowPlaying(title);
+            }
+            setRecordPlayingNearby(level, pos, true);
+        }, Minecraft.getInstance()).exceptionally(e -> null);
+    }
+
+    private static SpeakerSoundInstance speakerSound(String url, BlockPos speaker) {
+        return new SpeakerSoundInstance(url, speaker.getX() + 0.5, speaker.getY() + 0.5, speaker.getZ() + 0.5, 4.0F, 16, AudioSource.AudioFileType.FILE);
+    }
+
+    private static void stopCompanions(BlockPos pos) {
+        List<SoundInstance> companions = SPEAKER_COMPANIONS.remove(pos);
+        if (companions != null) {
+            SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+            companions.forEach(soundManager::stop);
+        }
     }
 
     /**

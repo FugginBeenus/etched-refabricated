@@ -108,6 +108,8 @@ processResources {
     // Only ship the access widener that matches this version; loom remaps the active one.
     if (is121) {
         exclude "etched.accesswidener"
+        // Only <1.21 references the placeholder config.
+        exclude "etched.legacy.mixins.json"
     } else {
         exclude "etched-1_21.accesswidener"
         // The 1.21 jukebox mixins target classes that don't exist before 1.21.
@@ -117,9 +119,12 @@ processResources {
         exclude "data/minecraft/tags/item/dyeable.json"
     }
 
-    // The 1.21 jukebox rewrite lives in a separate mixin config; 1.20.1 keeps the legacy
-    // JukeboxBlockEntityMixin listed in etched.mixins.json, so it just re-references that.
-    def jukeboxMixins = is121 ? "etched.jukebox.mixins.json" : "etched.mixins.json"
+    // The 1.21 jukebox rewrite lives in its own mixin config. 1.20.1 keeps those mixins inside
+    // etched.mixins.json, so it points at an empty placeholder config instead: naming
+    // etched.mixins.json twice makes Fabric Loader refuse to start with "Non-unique Mixin config
+    // name". The name has to stay a plain string here so the template is still valid json for the
+    // tooling that reads it before expansion.
+    def jukeboxMixins = is121 ? "etched.jukebox.mixins.json" : "etched.legacy.mixins.json"
     inputs.property "jukebox_mixins", jukeboxMixins
 
     filesMatching("fabric.mod.json") {

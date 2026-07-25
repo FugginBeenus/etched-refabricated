@@ -190,9 +190,16 @@ public class SoundTracker {
         return getEtchedRecord(url, title, level, pos, 16, type);
     }
 
-    // The speakers connected to a jukebox: adjacent Speaker blocks for now (wireless via the Stereo
-    // comes later). Deterministic order so the "first" speaker is stable across ticks.
+    // The speakers a jukebox plays through. A stereo on top adds the wireless speakers paired to it;
+    // without one, only speakers touching the jukebox are used. Deterministic order so the "first"
+    // speaker is stable across ticks.
     private static java.util.List<BlockPos> connectedSpeakers(ClientLevel level, BlockPos jukeboxPos) {
+        gg.moonflower.etched.common.blockentity.StereoBlockEntity stereo =
+                gg.moonflower.etched.common.block.StereoBlock.getStereoFor(level, jukeboxPos);
+        if (stereo != null) {
+            return stereo.getActiveSpeakers(level);
+        }
+
         java.util.List<BlockPos> speakers = new java.util.ArrayList<>();
         for (net.minecraft.core.Direction dir : net.minecraft.core.Direction.values()) {
             BlockPos p = jukeboxPos.relative(dir);

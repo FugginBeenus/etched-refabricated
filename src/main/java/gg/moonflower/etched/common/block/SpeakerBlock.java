@@ -1,5 +1,6 @@
 package gg.moonflower.etched.common.block;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
@@ -11,9 +12,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
 /**
- * A speaker that takes over a nearby jukebox's audio: when connected, the disc's sound is emitted
- * from the speaker(s) instead of the jukebox (see {@code SoundTracker}). For now it connects simply
- * by being adjacent to the jukebox; wireless pairing via the Stereo comes later.
+ * A speaker that takes over a jukebox's audio: when connected, the record is heard from the speakers
+ * instead of the jukebox itself (see {@code SoundTracker}). Speakers touching a jukebox are connected
+ * automatically; further away they are paired to a {@link StereoBlock} sitting on top of it.
  */
 public class SpeakerBlock extends Block {
 
@@ -43,6 +44,45 @@ public class SpeakerBlock extends Block {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
     }
+
+    // While a player has a stereo in link mode, clicking speakers pairs and unpairs them with it.
+    private net.minecraft.world.InteractionResult tryPair(net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player) {
+        if (level.isClientSide()) {
+            return net.minecraft.world.InteractionResult.SUCCESS;
+        }
+
+        BlockPos stereoPos = StereoBlock.getLinking(player);
+        if (stereoPos == null) {
+            return net.minecraft.world.InteractionResult.PASS;
+        }
+        if (!(level.getBlockEntity(stereoPos) instanceof gg.moonflower.etched.common.blockentity.StereoBlockEntity stereo)) {
+            StereoBlock.stopLinking(player);
+            return net.minecraft.world.InteractionResult.PASS;
+        }
+
+        String key = "block." + gg.moonflower.etched.core.Etched.MOD_ID + ".speaker.";
+        if (!stereo.isPaired(pos) && !stereo.inRange(pos)) {
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable(key + "out_of_range", stereo.getRange()), true);
+            return net.minecraft.world.InteractionResult.CONSUME;
+        }
+
+        boolean paired = stereo.togglePaired(pos);
+        int active = stereo.getPairedSpeakers().size();
+        player.displayClientMessage(net.minecraft.network.chat.Component.translatable(key + (paired ? "paired" : "unpaired"), active, stereo.getMaxSpeakers()), true);
+        return net.minecraft.world.InteractionResult.CONSUME;
+    }
+
+    //? if >=1.21 {
+    /*@Override
+    protected net.minecraft.world.InteractionResult useWithoutItem(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.phys.BlockHitResult hit) {
+        return this.tryPair(level, pos, player);
+    }
+    *///?} else {
+    @Override
+    public net.minecraft.world.InteractionResult use(BlockState state, net.minecraft.world.level.Level level, BlockPos pos, net.minecraft.world.entity.player.Player player, net.minecraft.world.InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+        return this.tryPair(level, pos, player);
+    }
+    //?}
 
     //? if >=1.21 {
     /*public static final com.mojang.serialization.MapCodec<SpeakerBlock> CODEC = simpleCodec(SpeakerBlock::new);

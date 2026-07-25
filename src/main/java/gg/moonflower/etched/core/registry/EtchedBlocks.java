@@ -82,6 +82,12 @@ public class EtchedBlocks {
                     .initialProperties(() -> Blocks.NOTE_BLOCK)
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
+    public static final BlockEntry<gg.moonflower.etched.common.block.StereoBlock> STEREO =
+            Etched.REGISTRATE.block("stereo", gg.moonflower.etched.common.block.StereoBlock::new)
+                    .initialProperties(() -> Blocks.NOTE_BLOCK)
+                    .properties(p -> p.noOcclusion())
+                    .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
+                    .register();
     //registerWithItem("radio", () -> new RadioBlock(BlockBehaviour.Properties.copy(Blocks.JUKEBOX).noOcclusion()), new Item.Properties());
     /*
     public static final ItemEntry<PortalRadioItem> PORTAL_RADIO_ITEM =
@@ -98,6 +104,10 @@ public class EtchedBlocks {
     public static final BlockEntityEntry<RadioBlockEntity> RADIO_BE =
         (BlockEntityEntry<RadioBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("radio", RadioBlockEntity::new)
                     .validBlocks(RADIO)
+                    .register();
+    public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity> STEREO_BE =
+        (BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("stereo", gg.moonflower.etched.common.blockentity.StereoBlockEntity::new)
+                    .validBlocks(STEREO)
                     .register();
             //BLOCK_ENTITIES.register("radio", () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null))
     public static void register() {} // i guess this is a hack?

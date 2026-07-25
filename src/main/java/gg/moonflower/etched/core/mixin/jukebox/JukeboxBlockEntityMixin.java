@@ -44,6 +44,44 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity {
     @Shadow
     public abstract void onSongChanged();
 
+    @Shadow
+    public abstract void setTheItem(ItemStack stack);
+
+    // A stereo sits on the jukebox's lid, so a disc popped straight up would land on top of it.
+    // Push it out of the stereo's front instead, like ejecting a tape, where it stays reachable.
+    @Inject(method = "popOutTheItem", at = @At("HEAD"), cancellable = true)
+    public void etched$popOutForward(CallbackInfo ci) {
+        if (this.level == null || this.level.isClientSide()) {
+            return;
+        }
+
+        BlockPos pos = this.getBlockPos();
+        BlockState above = this.level.getBlockState(pos.above());
+        if (!(above.getBlock() instanceof gg.moonflower.etched.common.block.StereoBlock)) {
+            return;
+        }
+
+        ItemStack stack = this.item;
+        if (stack.isEmpty()) {
+            return;
+        }
+
+        net.minecraft.core.Direction facing = above.getValue(gg.moonflower.etched.common.block.StereoBlock.FACING);
+        ItemStack dropped = stack.copy();
+        // Clearing through setTheItem keeps the vanilla bookkeeping (stopping the song, updating
+        // comparators) and our own stop broadcast.
+        this.setTheItem(ItemStack.EMPTY);
+
+        double x = pos.getX() + 0.5 + facing.getStepX() * 0.75;
+        double y = pos.getY() + 0.55;
+        double z = pos.getZ() + 0.5 + facing.getStepZ() * 0.75;
+        net.minecraft.world.entity.item.ItemEntity itemEntity = new net.minecraft.world.entity.item.ItemEntity(this.level, x, y, z, dropped);
+        itemEntity.setDeltaMovement(facing.getStepX() * 0.12, 0.05, facing.getStepZ() * 0.12);
+        itemEntity.setDefaultPickUpDelay();
+        this.level.addFreshEntity(itemEntity);
+        ci.cancel();
+    }
+
     public JukeboxBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
     }

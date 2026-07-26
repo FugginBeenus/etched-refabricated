@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "particle": "etched:block/speaker_side",
+    "front": "etched:block/speaker_front",
+    "side": "etched:block/speaker_side",
+    "top": "etched:block/speaker_top"
+  }
+}

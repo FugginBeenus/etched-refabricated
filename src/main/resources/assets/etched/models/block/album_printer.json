@@ -1,0 +1,10 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "particle": "etched:block/album_printer_side",
+    "front": "etched:block/album_printer_front",
+    "side": "etched:block/album_printer_side",
+    "top": "etched:block/album_printer_top",
+    "bottom": "etched:block/album_printer_bottom"
+  }
+}

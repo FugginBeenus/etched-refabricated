@@ -24,6 +24,7 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
     private static final int SLOT_FILL = 0xFF8B8B8B;
 
     private Button modeButton;
+    private MasterSlider masterSlider;
 
     public StereoScreen(StereoMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -42,7 +43,7 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         this.modeButton = this.addRenderableWidget(Button.builder(this.modeText(), b ->
                         this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_MODE))
                 .bounds(this.leftPos + 92, this.topPos + 56, 76, 18).build());
-        this.addRenderableWidget(new MasterSlider(this.leftPos + 8, this.topPos + 4, 160, 14,
+        this.masterSlider = this.addRenderableWidget(new MasterSlider(this.leftPos + 8, this.topPos + 4, 160, 14,
                 this.menu.getVolumePercent() / 100.0));
     }
 
@@ -57,6 +58,10 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         super.containerTick();
         if (this.modeButton != null) {
             this.modeButton.setMessage(this.modeText());
+        }
+        // The real master volume arrives a tick after opening; keep the slider in step unless dragged.
+        if (this.masterSlider != null) {
+            this.masterSlider.syncFrom(this.menu.getVolumePercent() / 100.0);
         }
     }
 
@@ -100,9 +105,30 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
 
     private class MasterSlider extends AbstractSliderButton {
 
+        private boolean dragging;
+
         MasterSlider(int x, int y, int width, int height, double value) {
             super(x, y, width, height, Component.empty(), value);
             this.updateMessage();
+        }
+
+        void syncFrom(double value) {
+            if (!this.dragging && Math.abs(this.value - value) > 1.0E-4) {
+                this.value = value;
+                this.updateMessage();
+            }
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            this.dragging = true;
+            super.onClick(mouseX, mouseY);
+        }
+
+        @Override
+        public void onRelease(double mouseX, double mouseY) {
+            super.onRelease(mouseX, mouseY);
+            this.dragging = false;
         }
 
         @Override

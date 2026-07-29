@@ -26,11 +26,24 @@ public class SpeakerScreen extends AbstractContainerScreen<SpeakerMenu> {
         this.titleLabelY = 6;
     }
 
+    private VolumeSlider slider;
+
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(new VolumeSlider(this.leftPos + 8, this.topPos + 26, this.imageWidth - 16, 20,
+        this.slider = this.addRenderableWidget(new VolumeSlider(this.leftPos + 8, this.topPos + 26, this.imageWidth - 16, 20,
                 this.menu.getVolumePercent() / 100.0));
+    }
+
+    @Override
+    protected void containerTick() {
+        super.containerTick();
+        // The real volume arrives a tick after the screen opens (via the data slot), so keep the
+        // slider in step with it whenever the player isn't actively dragging. Without this the slider
+        // always showed 0 on open, and a stray click then set the speaker to 0.
+        if (this.slider != null) {
+            this.slider.syncFrom(this.menu.getVolumePercent() / 100.0);
+        }
     }
 
     @Override
@@ -62,9 +75,31 @@ public class SpeakerScreen extends AbstractContainerScreen<SpeakerMenu> {
 
     private class VolumeSlider extends AbstractSliderButton {
 
+        private boolean dragging;
+
         VolumeSlider(int x, int y, int width, int height, double value) {
             super(x, y, width, height, Component.empty(), value);
             this.updateMessage();
+        }
+
+        // Adopt the synced volume unless the player is currently moving the slider.
+        void syncFrom(double value) {
+            if (!this.dragging && Math.abs(this.value - value) > 1.0E-4) {
+                this.value = value;
+                this.updateMessage();
+            }
+        }
+
+        @Override
+        public void onClick(double mouseX, double mouseY) {
+            this.dragging = true;
+            super.onClick(mouseX, mouseY);
+        }
+
+        @Override
+        public void onRelease(double mouseX, double mouseY) {
+            super.onRelease(mouseX, mouseY);
+            this.dragging = false;
         }
 
         @Override

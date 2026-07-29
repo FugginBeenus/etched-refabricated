@@ -375,7 +375,9 @@ public class SoundTracker {
     // linear volume makes the slider feel dead until the very bottom; squaring spreads the audible
     // change across the whole travel.
     private static double speakerGain(double volume) {
-        return RECORD_VOLUME * volume * volume;
+        // Map straight into 0..1 (squared for a perceptual taper). Multiplying by RECORD_VOLUME (4.0)
+        // saturated the game's near-source volume clamp, so the top half of the slider did nothing.
+        return volume * volume;
     }
 
     // How far a speaker carries at a given 0-1 volume: quieter speakers are heard less far. Floored so

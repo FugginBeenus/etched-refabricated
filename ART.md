@@ -50,8 +50,35 @@ icon follows automatically. `preamp` / `transmitter` are flat `item/generated` s
 ## Rotation
 
 The three blocks are directional and the blockstates already handle it: the model is authored
-**facing north** and rotated with `y` 90/180/270, `uvlock: true`. Author front-facing north and
-rotation takes care of itself.
+**facing north** and rotated with `y` 90/180/270. Author front-facing north and rotation takes care
+of itself.
+
+**`uvlock` is off** on all three (it was removed). Leave it off for custom Blockbench models: uvlock
+counter-rotates the texture on each face to stay "upright" as the block turns, which is meant for
+plain full-cube vanilla blocks and *garbles* a model with hand-authored UVs (the texture looks
+scrambled on the east/south/west variants only). With uvlock off the whole model — geometry and UVs
+together — rotates rigidly, which is what you want.
+
+## Blockbench gotchas (these will crash the model, showing magenta)
+
+Vanilla Java models are stricter than Blockbench's editor. Two things it will happily let you do in
+the editor but can't export to a working model:
+
+1. **Element rotation is limited to -45°..+45° in 22.5° steps** (per element/cube). If you rotate a
+   cube 90° (a knob, a dial, a leg), the export can't represent it and the *whole model* fails to
+   load — everything goes magenta, not just that piece. The log says
+   `Missing axis, expected to find a string`. Fix in Blockbench by modeling the piece in its final
+   orientation instead of rotating it, or keep rotations within ±45°. (This happened with the
+   stereo's two knobs; they were baked into fixed geometry by hand to recover it — but re-exporting
+   from the same Blockbench file will bring the 90° back.)
+2. **Face texture references must match a defined key.** Each face has `"texture": "#0"`; the
+   `textures` block must define that exact key (`"0": "etched:block/..."`). If a face says `#0` but
+   the key is named something else, that face is magenta. Blockbench usually gets this right; only an
+   issue if the JSON was hand-edited.
+
+The whole-model failure also shows in the log as
+`Failed to load model etched:models/block/<name>.json` followed by a `JsonSyntaxException`. Always
+check `run/logs/latest.log` when something is magenta — it names the exact file and reason.
 
 ## Checking your work
 

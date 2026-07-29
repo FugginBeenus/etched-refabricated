@@ -60,6 +60,7 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
 
     private static final ModelResourceLocation BLANK_ALBUM_COVER = gg.moonflower.etched.api.record.AlbumCover.modelLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/blank"));
     private static final ModelResourceLocation DEFAULT_ALBUM_COVER = gg.moonflower.etched.api.record.AlbumCover.modelLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/default"));
+    private static final ModelResourceLocation VANILLA_ALBUM_COVER = gg.moonflower.etched.api.record.AlbumCover.modelLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, FOLDER_NAME + "/vanilla"));
     private static final ResourceLocation ALBUM_COVER_OVERLAY = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/item/album_cover_overlay.png");
 
     private static final ItemModelGenerator ITEM_MODEL_GENERATOR = new ItemModelGenerator();
@@ -196,7 +197,15 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
                     return this.data.defaultCover;
                 });
             }
-            return CompletableFuture.completedFuture(this.data.blank);
+            // A vanilla music disc has no etched cover art, so show the plain "vanilla" cover rather
+            // than a blank one (custom art from the Album Printer already took priority above). On
+            // 1.21 discs are marked by the jukebox-playable component; before that they were RecordItems.
+            //? if >=1.21 {
+            /*boolean vanillaDisc = coverStack.has(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE);
+            *///?} else {
+            boolean vanillaDisc = coverStack.getItem() instanceof net.minecraft.world.item.RecordItem;
+            //?}
+            return CompletableFuture.completedFuture(vanillaDisc ? this.data.vanillaCover : this.data.blank);
         }).getNow(this.data.defaultCover);
     }
 
@@ -239,21 +248,24 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         private final DynamicModelData overlay;
         private final ModelData blank;
         private final ModelData defaultCover;
+        private final ModelData vanillaCover;
 
         private CoverData(NativeImage overlay) {
             this.overlay = new DynamicModelData(overlay);
             this.blank = new BakedModelData(BLANK_ALBUM_COVER);
             this.defaultCover = new BakedModelData(DEFAULT_ALBUM_COVER);
+            this.vanillaCover = new BakedModelData(VANILLA_ALBUM_COVER);
         }
 
         public void close() {
             this.overlay.close();
             this.blank.close();
             this.defaultCover.close();
+            this.vanillaCover.close();
         }
 
         public boolean is(ModelData data) {
-            return this.overlay == data || this.blank == data || this.defaultCover == data;
+            return this.overlay == data || this.blank == data || this.defaultCover == data || this.vanillaCover == data;
         }
     }
 

@@ -74,12 +74,16 @@ public class EtchedBlocks {
                             .mapColor(MapColor.PODZOL)
                             .strength(2.5f)
                             .sound(SoundType.WOOD)
+                            // Custom model isn't a solid full cube, so it mustn't occlude, or vanilla
+                            // culls the touching faces of adjacent blocks and you see through them.
+                            .noOcclusion()
                     )
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
     public static final BlockEntry<gg.moonflower.etched.common.block.SpeakerBlock> SPEAKER =
             Etched.REGISTRATE.block("speaker", gg.moonflower.etched.common.block.SpeakerBlock::new)
                     .initialProperties(() -> Blocks.NOTE_BLOCK)
+                    .properties(p -> p.noOcclusion())
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
     public static final BlockEntry<gg.moonflower.etched.common.block.StereoBlock> STEREO =

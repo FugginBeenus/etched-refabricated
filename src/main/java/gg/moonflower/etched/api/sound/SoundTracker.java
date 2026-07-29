@@ -304,10 +304,10 @@ public class SoundTracker {
                 () -> isSpeaker(level, primaryPos) || !connectedSpeakers(level, pos).isEmpty()
                         ? net.minecraft.world.phys.Vec3.atCenterOf(primaryPos)
                         : net.minecraft.world.phys.Vec3.atCenterOf(pos),
-                RECORD_VOLUME, 16, AudioSource.AudioFileType.FILE);
+                RECORD_VOLUME, speakerAttenuation(speakerVolume(level, pos, primaryPos)), AudioSource.AudioFileType.FILE);
         primary.withVolume(() -> {
             if (isSpeaker(level, primaryPos)) {
-                return RECORD_VOLUME * speakerVolume(level, pos, primaryPos);
+                return speakerGain(speakerVolume(level, pos, primaryPos));
             }
             // Silent while other speakers carry the record; audible again from the jukebox once they
             // are all gone.
@@ -318,8 +318,8 @@ public class SoundTracker {
         List<SoundInstance> companions = new ArrayList<>();
         for (int i = 1; i < speakers.size(); i++) {
             BlockPos speakerPos = speakers.get(i);
-            SpeakerSoundInstance companion = speakerSound(url, speakerPos);
-            companion.withVolume(() -> RECORD_VOLUME * speakerVolume(level, pos, speakerPos));
+            SpeakerSoundInstance companion = speakerSound(url, speakerPos, speakerAttenuation(speakerVolume(level, pos, speakerPos)));
+            companion.withVolume(() -> speakerGain(speakerVolume(level, pos, speakerPos)));
             // Stop with the record, or as soon as this speaker is broken, so no audio is left playing
             // from a block that is no longer there.
             companion.stopWhen(() -> !playingRecords.containsKey(pos) || !isSpeaker(level, speakerPos));
@@ -357,18 +357,32 @@ public class SoundTracker {
         return best;
     }
 
-    private static SpeakerSoundInstance speakerSound(String url, BlockPos speaker) {
-        return new SpeakerSoundInstance(url, speaker.getX() + 0.5, speaker.getY() + 0.5, speaker.getZ() + 0.5, RECORD_VOLUME, 16, AudioSource.AudioFileType.FILE);
+    private static SpeakerSoundInstance speakerSound(String url, BlockPos speaker, int attenuation) {
+        return new SpeakerSoundInstance(url, speaker.getX() + 0.5, speaker.getY() + 0.5, speaker.getZ() + 0.5, RECORD_VOLUME, attenuation, AudioSource.AudioFileType.FILE);
     }
 
     private static boolean isSpeaker(ClientLevel level, BlockPos pos) {
         return level.getBlockState(pos).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock;
     }
 
-    // A speaker's own volume, scaled by the master volume of the stereo driving the jukebox.
+    // A speaker's own volume, scaled by the master volume of the stereo driving the jukebox (0-1).
     private static double speakerVolume(ClientLevel level, BlockPos jukeboxPos, BlockPos speakerPos) {
         return gg.moonflower.etched.common.blockentity.SpeakerBlockEntity.volumeAt(level, speakerPos)
                 * gg.moonflower.etched.common.blockentity.StereoBlockEntity.masterVolumeAt(level, jukeboxPos);
+    }
+
+    // The gain a speaker plays at for a given 0-1 volume. Hearing is roughly logarithmic, so a raw
+    // linear volume makes the slider feel dead until the very bottom; squaring spreads the audible
+    // change across the whole travel.
+    private static double speakerGain(double volume) {
+        return RECORD_VOLUME * volume * volume;
+    }
+
+    // How far a speaker carries at a given 0-1 volume: quieter speakers are heard less far. Floored so
+    // a speaker is never silent at its own block. Baked when the sound starts (a mid-track slider move
+    // changes loudness immediately but its range only on the next track).
+    private static int speakerAttenuation(double volume) {
+        return Math.max(2, (int) Math.round(16 * volume));
     }
 
     private static void stopCompanions(BlockPos pos) {

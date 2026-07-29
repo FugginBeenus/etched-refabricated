@@ -48,6 +48,25 @@ public abstract class LevelRendererMixin {
 
     @Inject(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", shift = At.Shift.BEFORE), remap = false)
     public void etched$wrapSound(net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> song, BlockPos pos, CallbackInfo ci, @com.llamalad7.mixinextras.sugar.Local com.llamalad7.mixinextras.sugar.ref.LocalRef<SoundInstance> sound) {
+        java.util.List<BlockPos> speakers = gg.moonflower.etched.api.sound.SoundTracker.getConnectedSpeakers(this.level, pos);
+        if (!speakers.isEmpty()) {
+            // Route a vanilla disc through the speakers: put the tracked sound on the first speaker so
+            // the jukebox is silent, and play the same disc sound from any others. Vanilla still owns
+            // start/stop of the tracked sound; its stop also clears the companions.
+            net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> soundEvent = song.value().soundEvent();
+            SoundInstance primary = net.minecraft.client.resources.sounds.SimpleSoundInstance.forJukeboxSong(soundEvent.value(), net.minecraft.world.phys.Vec3.atCenterOf(speakers.get(0)));
+            sound.set(StopListeningSound.create(primary, () -> {
+                this.notifyNearbyEntities(this.level, this.pos, false);
+                gg.moonflower.etched.api.sound.SoundTracker.stopSpeakers(pos);
+            }));
+
+            java.util.List<SoundInstance> companions = new java.util.ArrayList<>();
+            for (int i = 1; i < speakers.size(); i++) {
+                companions.add(net.minecraft.client.resources.sounds.SimpleSoundInstance.forJukeboxSong(soundEvent.value(), net.minecraft.world.phys.Vec3.atCenterOf(speakers.get(i))));
+            }
+            gg.moonflower.etched.api.sound.SoundTracker.playSpeakerCompanions(pos, companions);
+            return;
+        }
         sound.set(StopListeningSound.create(sound.get(), () -> this.notifyNearbyEntities(this.level, this.pos, false)));
     }
     *///?} else {

@@ -395,6 +395,35 @@ public class SoundTracker {
         }
     }
 
+    // ---- vanilla-disc speaker routing (driven from LevelRendererMixin, which owns the version-specific
+    // sound construction) ----
+
+    /**
+     * @return The speakers connected to a jukebox, so the vanilla-disc hook can route through them.
+     */
+    public static List<BlockPos> getConnectedSpeakers(ClientLevel level, BlockPos jukeboxPos) {
+        return connectedSpeakers(level, jukeboxPos);
+    }
+
+    /**
+     * Plays and tracks the extra speaker sounds for a vanilla disc. The caller builds the instances
+     * (their construction differs by version); this plays them and keys them to the jukebox so they
+     * stop with it.
+     */
+    public static void playSpeakerCompanions(BlockPos jukeboxPos, List<SoundInstance> companions) {
+        stopCompanions(jukeboxPos);
+        if (companions.isEmpty()) {
+            return;
+        }
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+        companions.forEach(soundManager::play);
+        SPEAKER_COMPANIONS.put(jukeboxPos.immutable(), companions);
+    }
+
+    public static void stopSpeakers(BlockPos jukeboxPos) {
+        stopCompanions(jukeboxPos);
+    }
+
     /**
      * Plays a record stack for an entity.
      *

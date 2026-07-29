@@ -126,6 +126,11 @@ public class EditMusicLabelScreen extends Screen {
         int leftPos = (this.width - this.imageWidth) / 2;
         int topPos = (this.height - this.imageHeight) / 2;
 
+        // Force point sampling so the art stays crisp when the GUI scale magnifies it, instead of the
+        // blurry linear filtering it was picking up.
+        this.minecraft.getTextureManager().getTexture(TEXTURE).setFilter(false, false);
+        this.minecraft.getTextureManager().getTexture(LABEL).setFilter(false, false);
+
         graphics.blit(TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
         graphics.drawString(this.font, TITLE_COMPONENT, leftPos + 7, topPos + 77, 4210752, false);
         graphics.drawString(this.font, AUTHOR_COMPONENT, leftPos + 7, topPos + 77 + 30, 4210752, false);

@@ -69,5 +69,19 @@ public class EtchedItems {
                 .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
         .register();*/
     //register("album_cover", () -> new AlbumCoverItem(new Item.Properties().stacksTo(1)));
-    public static void register() {}
+    // A dedicated creative tab holding every item in the mod (still also grouped under vanilla tabs).
+    public static final net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> TAB =
+            net.minecraft.resources.ResourceKey.create(net.minecraft.core.registries.Registries.CREATIVE_MODE_TAB,
+                    gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, Etched.MOD_ID));
+
+    public static void register() {
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, TAB,
+                net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup.builder()
+                        .title(net.minecraft.network.chat.Component.translatable("itemGroup." + Etched.MOD_ID))
+                        .icon(() -> new net.minecraft.world.item.ItemStack(BOOMBOX.get()))
+                        .displayItems((params, output) -> BuiltInRegistries.ITEM.stream()
+                                .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Etched.MOD_ID))
+                                .forEach(output::accept))
+                        .build());
+    }
 }

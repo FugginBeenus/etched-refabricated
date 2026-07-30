@@ -72,7 +72,13 @@ public abstract class JukeboxBlockEntityMixin extends BlockEntity implements Con
 
     @Inject(method = "startPlaying", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;levelEvent(Lnet/minecraft/world/entity/player/Player;ILnet/minecraft/core/BlockPos;I)V", shift = At.Shift.AFTER))
     public void startPlaying(CallbackInfo ci) {
-        if ((this.etched$record().getItem() instanceof PlayableRecord)) {
+        // Vanilla RecordItems are made PlayableRecord by RecordItemMixin, but they already play through
+        // vanilla's own playStreamingMusic, which the client-side LevelRendererMixin routes to speakers
+        // (multi-speaker and volume-aware, matching 1.21). Broadcasting the etched packet for them too
+        // would replay the disc a second time through the single-sound path, so only broadcast for real
+        // custom records (etched discs, album covers).
+        Item item = this.etched$record().getItem();
+        if (item instanceof PlayableRecord && !(item instanceof RecordItem)) {
             BlockPos pos = this.getBlockPos();
             var packet = new ClientboundPlayMusicPacket(this.etched$record().copy(), pos);
             packet.sendToClients(PlayerLookup.around((ServerLevel) level, pos.getCenter().add(0.5, 0.5, 0.5), 64.0));

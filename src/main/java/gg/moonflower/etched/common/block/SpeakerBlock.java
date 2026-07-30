@@ -75,6 +75,13 @@ public class SpeakerBlock extends BaseEntityBlock {
         if (stereoPos == null) {
             return this.openVolume(level, pos, player);
         }
+        // Sneaking leaves link mode without touching this speaker, so a player can always get back to
+        // the volume screen.
+        if (player.isShiftKeyDown()) {
+            StereoBlock.stopLinking(player);
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("block." + gg.moonflower.etched.core.Etched.MOD_ID + ".stereo.link_stop"), true);
+            return net.minecraft.world.InteractionResult.CONSUME;
+        }
         if (!(level.getBlockEntity(stereoPos) instanceof gg.moonflower.etched.common.blockentity.StereoBlockEntity stereo)) {
             StereoBlock.stopLinking(player);
             return this.openVolume(level, pos, player);

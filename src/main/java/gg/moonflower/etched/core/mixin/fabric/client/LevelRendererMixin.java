@@ -26,9 +26,9 @@ public abstract class LevelRendererMixin {
     private BlockPos pos;
 
     //? if >=1.21 {
-    @Unique
+    /*@Unique
     private net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> etched$song;
-    //?}
+    *///?}
 
     @Shadow
     private ClientLevel level;
@@ -40,7 +40,7 @@ public abstract class LevelRendererMixin {
     // BlockPos); the two behaviors (gate the vanilla-disc "Now Playing" toast when the jukebox is
     // obstructed, and notify nearby mobs when the sound stops) are re-targeted against it.
     //? if >=1.21 {
-    @Inject(method = "playJukeboxSong", at = @At("HEAD"))
+    /*@Inject(method = "playJukeboxSong", at = @At("HEAD"))
     public void etched$capturePos(net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> song, BlockPos pos, CallbackInfo ci) {
         this.pos = pos;
         this.etched$song = song;
@@ -69,8 +69,8 @@ public abstract class LevelRendererMixin {
         net.minecraft.sounds.SoundEvent soundEvent = this.etched$song.value().soundEvent().value();
         return etched$buildSpeakerSound(level, jukebox, soundEvent);
     }
-    //?} else {
-    /*@Unique
+    *///?} else {
+    @Unique
     private SoundEvent etched$soundEvent;
 
     @Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setNowPlaying(Lnet/minecraft/network/chat/Component;)V"))
@@ -97,7 +97,7 @@ public abstract class LevelRendererMixin {
         }
         return etched$buildSpeakerSound(level, jukebox, this.etched$soundEvent);
     }
-    *///?}
+    //?}
 
     // Shared by both versions: builds the primary speaker sound (returned to replace the jukebox sound)
     // and registers a companion on every other speaker. Each companion stops when the record ends or its

@@ -90,6 +90,14 @@ public class StereoBlock extends BaseEntityBlock {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
+        // While this player is pairing speakers, clicking the stereo again finishes link mode instead
+        // of reopening the menu. Without an exit, every later speaker click kept toggling pairing and
+        // the per-speaker volume screen became unreachable.
+        if (getLinking(player) != null) {
+            stopLinking(player);
+            player.displayClientMessage(Component.translatable("block." + Etched.MOD_ID + ".stereo.link_stop"), true);
+            return InteractionResult.CONSUME;
+        }
         if (level.getBlockEntity(pos) instanceof StereoBlockEntity stereo) {
             player.openMenu(new net.minecraft.world.SimpleMenuProvider(
                     (id, inventory, p) -> new gg.moonflower.etched.common.menu.StereoMenu(id, inventory, stereo),

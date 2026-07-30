@@ -5,7 +5,7 @@
   "block.etched.radio": "Radio",
   "block.etched.speaker": "Speaker",
   "block.etched.stereo": "Stereo",
-  "block.etched.stereo.link_start": "Link mode: click speakers to pair",
+  "block.etched.stereo.link_start": "Link mode: click speakers to pair, click the stereo (or sneak) to finish",
   "item.etched.preamp": "Preamp",
   "item.etched.transmitter": "Transmitter",
   "container.etched.stereo": "Stereo",

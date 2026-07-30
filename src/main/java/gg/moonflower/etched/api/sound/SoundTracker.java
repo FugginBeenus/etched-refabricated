@@ -24,18 +24,18 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.Style;
 //? if >=1.21 {
-import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents;
-//?} else {
-/*import net.minecraft.network.chat.contents.LiteralContents;
-*///?}
+/*import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents;
+*///?} else {
+import net.minecraft.network.chat.contents.LiteralContents;
+//?}
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 //? if <1.21 {
-/*import net.minecraft.world.item.RecordItem;
-*///?}
+import net.minecraft.world.item.RecordItem;
+//?}
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -584,19 +584,19 @@ public class SoundTracker {
         String playUrl = null;
         Component playTitle = null;
         //? if >=1.21 {
-        if (disc.has(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE)) {
+        /*if (disc.has(net.minecraft.core.component.DataComponents.JUKEBOX_PLAYABLE)) {
             Optional<net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong>> etched$song = net.minecraft.world.item.JukeboxSong.fromStack(level.registryAccess(), disc);
             if (etched$song.isPresent()) {
                 playUrl = etched$song.get().value().soundEvent().value().getLocation().toString();
                 playTitle = disc.getHoverName();
             }
         } else if (disc.getItem() instanceof PlayableRecord) {
-        //?} else {
-        /*if (disc.getItem() instanceof RecordItem) {
+        *///?} else {
+        if (disc.getItem() instanceof RecordItem) {
             playUrl = ((RecordItem) disc.getItem()).getSound().getLocation().toString();
             playTitle = ((RecordItem) disc.getItem()).getDisplayName();
         } else if (disc.getItem() instanceof PlayableRecord) {
-        *///?}
+        //?}
             Optional<TrackData[]> optional = PlayableRecord.getStackMusic(disc);
             if (optional.isPresent() && optional.get().length > 0) {
                 TrackData[] tracks = optional.get();
@@ -625,10 +625,10 @@ public class SoundTracker {
 
         public DownloadTextComponent() {
             //? if >=1.21 {
-            this.contents = net.minecraft.network.chat.contents.PlainTextContents.EMPTY;
-            //?} else {
-            /*this.contents = ComponentContents.EMPTY;
-            *///?}
+            /*this.contents = net.minecraft.network.chat.contents.PlainTextContents.EMPTY;
+            *///?} else {
+            this.contents = ComponentContents.EMPTY;
+            //?}
             this.visualOrderText = FormattedCharSequence.EMPTY;
             this.decomposedWith = null;
         }

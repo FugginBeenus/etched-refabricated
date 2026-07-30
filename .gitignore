@@ -35,3 +35,6 @@ run/
 # claude code
 
 .claude/
+
+# local art notes, not published
+ART.md

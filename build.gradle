@@ -2,6 +2,7 @@ plugins {
     id "com.gradleup.shadow" version "9.6.0"
     id "maven-publish"
     id 'fabric-loom' version '1.17.16'
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
 base {
@@ -190,6 +191,29 @@ remapJar {
 jar {
     from(rootProject.file('LICENSE')) {
         rename { "${it}_${base.archivesName.get()}" }
+    }
+}
+
+// Each Stonecutter version publishes its own jar, so `gradlew publishMods` from the root uploads
+// every supported Minecraft version in one go. The token is read from the environment and never
+// stored here. Add -PpublishDryRun to rehearse an upload without sending anything.
+publishMods {
+    file = remapJar.archiveFile
+    version = project.version
+    displayName = "${project.mod_name} ${project.mod_version} for ${stonecutter.current.version}"
+    type = project.release_type
+    modLoaders.add("fabric")
+    changelog = rootProject.file("CHANGELOG.md").exists()
+            ? rootProject.file("CHANGELOG.md").text
+            : "No changelog provided."
+    dryRun = providers.gradleProperty("publishDryRun").present
+
+    modrinth {
+        projectId = project.modrinth_id
+        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        minecraftVersions.add(stonecutter.current.version)
+        requires("fabric-api")
+        requires("yacl")
     }
 }
 

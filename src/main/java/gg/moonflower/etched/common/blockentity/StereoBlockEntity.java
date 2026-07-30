@@ -198,6 +198,40 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return active;
     }
 
+    /**
+     * Forgets paired positions whose speaker has been broken, and reports how many real speakers are
+     * still paired. Positions in unloaded chunks are left alone and counted, so wandering away from a
+     * speaker never unpairs it.
+     *
+     * @return The number of paired speakers that still exist
+     */
+    public int pruneAndCountPaired() {
+        if (this.level == null) {
+            return this.speakers.size();
+        }
+
+        int count = 0;
+        boolean changed = false;
+        java.util.Iterator<BlockPos> iterator = this.speakers.iterator();
+        while (iterator.hasNext()) {
+            BlockPos pos = iterator.next();
+            if (!this.level.isLoaded(pos)) {
+                // Out of sight, not gone.
+                count++;
+            } else if (this.level.getBlockState(pos).getBlock() instanceof SpeakerBlock) {
+                count++;
+            } else if (!this.level.isClientSide()) {
+                iterator.remove();
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            this.sync();
+        }
+        return count;
+    }
+
     private void sync() {
         this.setChanged();
         if (this.level != null && !this.level.isClientSide()) {
@@ -261,8 +295,21 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return stack;
     }
 
+    /**
+     * One part per bay. An upgrade is a piece of hardware installed into the unit, so a stack of them in
+     * one slot must not read as several: this is what keeps the speaker and range ceilings real.
+     */
+    @Override
+    public int getMaxStackSize() {
+        return 1;
+    }
+
     @Override
     public void setItem(int slot, net.minecraft.world.item.ItemStack stack) {
+        // Clamped here as well as on the menu slot, so hoppers and other automation can't overfill a bay.
+        if (stack.getCount() > this.getMaxStackSize()) {
+            stack.setCount(this.getMaxStackSize());
+        }
         this.upgrades.set(slot, stack);
         this.sync();
     }

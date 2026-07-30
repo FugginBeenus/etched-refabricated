@@ -30,13 +30,8 @@ import java.nio.file.Path;
  */
 public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu> {
 
-    private static final int PANEL = 0xFFC6C6C6;
-    private static final int PANEL_LIGHT = 0xFFFFFFFF;
-    private static final int PANEL_DARK = 0xFF555555;
-    private static final int SLOT_BORDER = 0xFF373737;
-    private static final int SLOT_FILL = 0xFF8B8B8B;
-    private static final int SELECTED = 0xFFFFFFFF;
-    private static final int HOVER = 0x60FFFFFF;
+    private static final int SELECTED = HiFiPanel.AM_HI;
+    private static final int HOVER = 0x40FFFFFF;
 
     // Left-column input positions (item top-left, relative to the gui origin).
     private static final int COVER_X = 13, COVER_Y = 26;
@@ -54,7 +49,7 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
     private static final int SCROLLBAR_H = GRID_ROWS * CELL;
 
     private static final int PREVIEW_SIZE = 16;
-    private static final int NO_DYE_PREVIEW_COLOR = 0x555555;
+    private static final int NO_DYE_PREVIEW_COLOR = 0x6E5638;
     private final ResourceLocation[] previewIds = new ResourceLocation[CoverPatterns.COUNT];
     private final DynamicTexture[] previews = new DynamicTexture[CoverPatterns.COUNT];
     private int previewColor = Integer.MIN_VALUE;
@@ -62,10 +57,10 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
 
     public AlbumPrinterScreen(AlbumPrinterMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.titleLabelX = 5;
-        this.titleLabelY = 4;
+        this.titleLabelX = 8;
+        this.titleLabelY = 7;
         this.inventoryLabelX = 8;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.inventoryLabelY = 73;
     }
 
     @Override
@@ -231,23 +226,29 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        panel(g, x, y, this.imageWidth, this.imageHeight);
+        HiFiPanel.panel(g, x, y, this.imageWidth, this.imageHeight);
 
-        slot(g, x + COVER_X, y + COVER_Y);
-        slot(g, x + FOLDER_X, y + FOLDER_Y);
+        HiFiPanel.slot(g, x + COVER_X, y + COVER_Y);
+        HiFiPanel.slot(g, x + FOLDER_X, y + FOLDER_Y);
         folderIcon(g, x + FOLDER_X, y + FOLDER_Y);
-        slot(g, x + DYE_X, y + DYE_Y);
-        slot(g, x + RESULT_X, y + RESULT_Y);
+        HiFiPanel.slot(g, x + DYE_X, y + DYE_Y);
+        HiFiPanel.slot(g, x + RESULT_X, y + RESULT_Y);
         arrow(g, x + 136, y + RESULT_Y + 8);
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                slot(g, x + 8 + col * 18, y + 84 + row * 18);
+                HiFiPanel.slot(g, x + 8 + col * 18, y + 84 + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            slot(g, x + 8 + col * 18, y + 142);
+            HiFiPanel.slot(g, x + 8 + col * 18, y + 142);
         }
+    }
+
+    @Override
+    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+        g.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, HiFiPanel.TEXT, false);
+        g.drawString(this.font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, HiFiPanel.DIM, false);
     }
 
     @Override
@@ -278,7 +279,7 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
                 }
                 int cx = this.cellX(col);
                 int cy = this.cellY(row);
-                slot(g, cx + 1, cy + 1);
+                HiFiPanel.slot(g, cx + 1, cy + 1);
                 if (this.previews[index] != null) {
                     g.blit(this.previewIds[index], cx + 1, cy + 1, 0, 0, PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE, PREVIEW_SIZE);
                 }
@@ -294,11 +295,11 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
         if (this.maxScroll() > 0) {
             int trackX = this.leftPos + SCROLLBAR_X;
             int trackY = this.topPos + GRID_Y;
-            g.fill(trackX, trackY, trackX + SCROLLBAR_W, trackY + SCROLLBAR_H, SLOT_BORDER);
+            g.fill(trackX, trackY, trackX + SCROLLBAR_W, trackY + SCROLLBAR_H, HiFiPanel.SLOT_SH);
             int thumbH = Math.max(8, SCROLLBAR_H / (this.maxScroll() + 1));
             int thumbY = trackY + (SCROLLBAR_H - thumbH) * this.scrollRow / this.maxScroll();
             thumbY = Mth.clamp(thumbY, trackY, trackY + SCROLLBAR_H - thumbH);
-            g.fill(trackX + 1, thumbY + 1, trackX + SCROLLBAR_W - 1, thumbY + thumbH - 1, PANEL);
+            g.fill(trackX + 1, thumbY + 1, trackX + SCROLLBAR_W - 1, thumbY + thumbH - 1, HiFiPanel.AM);
         }
     }
 
@@ -310,9 +311,9 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
     }
 
     private static void arrow(GuiGraphics g, int x, int y) {
-        g.fill(x, y - 1, x + 4, y + 1, SLOT_FILL);
+        g.fill(x, y - 1, x + 4, y + 1, HiFiPanel.INK);
         for (int i = 0; i <= 4; i++) {
-            g.fill(x + 4 + i, y - 4 + i, x + 5 + i, y + 5 - i, SLOT_FILL);
+            g.fill(x + 4 + i, y - 4 + i, x + 5 + i, y + 5 - i, HiFiPanel.INK);
         }
     }
 
@@ -321,20 +322,5 @@ public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu
         g.fill(x, y + h - 1, x + w, y + h, color);
         g.fill(x, y, x + 1, y + h, color);
         g.fill(x + w - 1, y, x + w, y + h, color);
-    }
-
-    private static void panel(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, PANEL);
-        g.fill(x, y, x + w - 1, y + 1, PANEL_LIGHT);
-        g.fill(x, y, x + 1, y + h - 1, PANEL_LIGHT);
-        g.fill(x + w - 1, y, x + w, y + h, PANEL_DARK);
-        g.fill(x, y + h - 1, x + w, y + h, PANEL_DARK);
-    }
-
-    // Vanilla-style recessed 18x18 slot; (x,y) is where the item is rendered.
-    private static void slot(GuiGraphics g, int x, int y) {
-        g.fill(x - 1, y - 1, x + 17, y + 17, PANEL_LIGHT);
-        g.fill(x - 1, y - 1, x + 16, y + 16, SLOT_BORDER);
-        g.fill(x, y, x + 16, y + 16, SLOT_FILL);
     }
 }

@@ -4,53 +4,56 @@ import gg.moonflower.etched.common.blockentity.StereoBlockEntity;
 import gg.moonflower.etched.common.menu.StereoMenu;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
+import java.util.List;
+
 /**
- * Settings for a stereo: upgrade slots, which speakers it drives, and how the record is spread across
- * them. Drawn in code like the album printer, until there are textures for it.
+ * A stereo drawn as a piece of equipment being built up: the unit sits in the middle of the panel, the
+ * preamps the player installs appear seated on its top face, the transmitters appear plugged into its
+ * back panel, and the wireless field sweeping out from it widens with every transmitter. Paired speakers
+ * ride that field, hollow if more are paired than the preamps can drive.
+ *
+ * <p>The upgrade slots are placed against the part of the unit they feed, so nothing needs a label. The
+ * numbers behind it all are available on hover.
  *
  * @author Jackson
  */
 public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
 
-    private static final int PANEL = 0xFFC6C6C6;
-    private static final int PANEL_LIGHT = 0xFFFFFFFF;
-    private static final int PANEL_DARK = 0xFF555555;
-    private static final int SLOT_BORDER = 0xFF373737;
-    private static final int SLOT_FILL = 0xFF8B8B8B;
+    // The unit's top-left. StereoMenu.PREAMP_X is UNIT_X + 8 so the bays drawn on the top face sit
+    // directly under the slots feeding them.
+    private static final int UNIT_X = 58;
+    private static final int UNIT_Y = 70;
 
-    private Button modeButton;
+    private HiFiButton modeButton;
     private MasterSlider masterSlider;
 
     public StereoScreen(StereoMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
-        this.titleLabelX = 8;
-        this.titleLabelY = -100;
-        this.inventoryLabelX = 8;
-        this.inventoryLabelY = this.imageHeight - 94;
+        this.imageWidth = 176;
+        this.imageHeight = 198;
     }
 
     @Override
     protected void init() {
         super.init();
-        this.addRenderableWidget(Button.builder(Component.translatable("container.etched.stereo.link"), b ->
-                        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_LINK))
-                .bounds(this.leftPos + 8, this.topPos + 56, 76, 18).build());
-        this.modeButton = this.addRenderableWidget(Button.builder(this.modeText(), b ->
-                        this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_MODE))
-                .bounds(this.leftPos + 92, this.topPos + 56, 76, 18).build());
-        this.masterSlider = this.addRenderableWidget(new MasterSlider(this.leftPos + 8, this.topPos + 4, 160, 14,
+        this.addRenderableWidget(new HiFiButton(this.leftPos + 94, this.topPos + 5, 38, 14,
+                Component.translatable("container.etched.stereo.link.short"), b ->
+                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_LINK)));
+        this.modeButton = this.addRenderableWidget(new HiFiButton(this.leftPos + 136, this.topPos + 5, 32, 14,
+                this.modeText(), b ->
+                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, StereoMenu.BUTTON_MODE)));
+        this.masterSlider = this.addRenderableWidget(new MasterSlider(this.leftPos + 8, this.topPos + 26, 140, 14,
                 this.menu.getVolumePercent() / 100.0));
     }
 
     private Component modeText() {
         return Component.translatable(this.menu.getMode() == StereoBlockEntity.MODE_NEAREST
-                ? "container.etched.stereo.mode.nearest"
-                : "container.etched.stereo.mode.all");
+                ? "container.etched.stereo.mode.nearest.short"
+                : "container.etched.stereo.mode.all.short");
     }
 
     @Override
@@ -65,31 +68,107 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         }
     }
 
+    // Counted straight off the upgrade slots rather than from the synced stats, so pulling a part out
+    // redraws the unit on the same frame instead of a tick later. Counting by item type also keeps the
+    // picture right if a part ends up in the other kind of bay.
+    private int countUpgrade(net.minecraft.world.item.Item upgrade) {
+        int count = 0;
+        for (int i = 0; i < StereoBlockEntity.UPGRADE_SLOTS; i++) {
+            if (this.menu.slots.get(i).getItem().is(upgrade)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int preamps() {
+        return this.countUpgrade(gg.moonflower.etched.core.registry.EtchedItems.PREAMP.asItem());
+    }
+
+    private int transmitters() {
+        return this.countUpgrade(gg.moonflower.etched.core.registry.EtchedItems.TRANSMITTER.asItem());
+    }
+
+    private boolean slotEmpty(int index) {
+        return this.menu.slots.get(index).getItem().isEmpty();
+    }
+
+    // Only the title and the volume readout: the inventory grid needs no caption.
+    @Override
+    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
+        g.drawString(this.font, this.title, 8, 9, HiFiPanel.TEXT, false);
+
+        // Drawn small so the bar can run most of the panel's width; the bar is the control, the number is
+        // just confirmation.
+        double level = this.masterSlider != null ? this.masterSlider.level() : this.menu.getVolumePercent() / 100.0;
+        Component percent = Component.literal(Math.round(level * 100.0) + "%");
+        float scale = 0.75F;
+        g.pose().pushPose();
+        g.pose().scale(scale, scale, 1.0F);
+        int px = Math.round((this.imageWidth - 7 - this.font.width(percent) * scale) / scale);
+        int py = Math.round(31 / scale);
+        g.drawString(this.font, percent, px, py, HiFiPanel.DIM, false);
+        g.pose().popPose();
+    }
+
     @Override
     protected void renderBg(GuiGraphics g, float partialTick, int mouseX, int mouseY) {
         int x = this.leftPos;
         int y = this.topPos;
-        panel(g, x, y, this.imageWidth, this.imageHeight);
+        HiFiPanel.panel(g, x, y, this.imageWidth, this.imageHeight);
 
-        for (int i = 0; i < StereoBlockEntity.UPGRADE_SLOTS; i++) {
-            slot(g, x + 44 + i * 22, y + 34);
+        HiFiPanel.Anchors unit = HiFiPanel.stereoUnit(g, x + UNIT_X, y + UNIT_Y, this.preamps(), this.transmitters());
+
+        // Upgrade slots, with a faint chip in the empty ones and a short leader line to the part of the
+        // unit they feed.
+        for (int i = 0; i < StereoMenu.PREAMP_SLOTS; i++) {
+            int sx = x + StereoMenu.PREAMP_X + i * 22;
+            int sy = y + StereoMenu.PREAMP_Y;
+            HiFiPanel.slot(g, sx, sy);
+            if (this.slotEmpty(i)) {
+                HiFiPanel.ghostChip(g, sx, sy);
+            }
+            HiFiPanel.line(g, sx + 8, sy + 17, sx + 8, y + UNIT_Y + 2, HiFiPanel.SOFT);
         }
+        for (int i = 0; i < StereoMenu.TRANSMITTER_SLOTS; i++) {
+            int sx = x + StereoMenu.TRANSMITTER_X;
+            int sy = y + StereoMenu.TRANSMITTER_Y + i * StereoMenu.TRANSMITTER_SPACING;
+            HiFiPanel.slot(g, sx, sy);
+            if (this.slotEmpty(StereoMenu.PREAMP_SLOTS + i)) {
+                HiFiPanel.ghostChip(g, sx, sy);
+            }
+        }
+        // No leader lines here: the dongles are drawn entering the back panel and the bays sit right
+        // beside them, so a harness only added tangle over the top of the plugs.
+
+        HiFiPanel.wirelessField(g, unit.leftX() - 2, unit.midY() + 4, this.transmitters(),
+                this.menu.getPairedCount(), this.menu.getMaxSpeakers());
+
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
-                slot(g, x + 8 + col * 18, y + 84 + row * 18);
+                HiFiPanel.slot(g, x + 8 + col * 18, y + StereoMenu.INVENTORY_Y + row * 18);
             }
         }
         for (int col = 0; col < 9; col++) {
-            slot(g, x + 8 + col * 18, y + 142);
+            HiFiPanel.slot(g, x + 8 + col * 18, y + StereoMenu.HOTBAR_Y);
         }
     }
 
+    // AbstractContainerScreen consumes drags for item quick-crafting and never passes them to widgets, so
+    // the slider could be clicked but not dragged. While it is held, the drag goes to it first.
     @Override
-    protected void renderLabels(GuiGraphics g, int mouseX, int mouseY) {
-        super.renderLabels(g, mouseX, mouseY);
-        Component stats = Component.translatable("container.etched.stereo.stats",
-                this.menu.getPairedCount(), this.menu.getMaxSpeakers(), this.menu.getRange());
-        g.drawString(this.font, stats, 8, 21, 0x404040, false);
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        if (this.masterSlider != null && this.masterSlider.held()) {
+            return this.masterSlider.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        }
+        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    // The field draws the speakers and their reach; the exact numbers are here for anyone who wants them.
+    private boolean overField(int mouseX, int mouseY) {
+        int fx = this.leftPos + 8;
+        int fy = this.topPos + UNIT_Y;
+        return mouseX >= fx && mouseX < this.leftPos + UNIT_X && mouseY >= fy && mouseY < fy + 42;
     }
 
     @Override
@@ -101,6 +180,14 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         //?}
         super.render(g, mouseX, mouseY, partialTick);
         this.renderTooltip(g, mouseX, mouseY);
+
+        if (this.hoveredSlot == null && this.overField(mouseX, mouseY)) {
+            g.renderComponentTooltip(this.font, List.of(
+                    Component.translatable("container.etched.stereo.speakers",
+                            this.menu.getPairedCount(), this.menu.getMaxSpeakers()),
+                    Component.translatable("container.etched.stereo.range", this.menu.getRange())
+            ), mouseX, mouseY);
+        }
     }
 
     private class MasterSlider extends AbstractSliderButton {
@@ -110,6 +197,14 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         MasterSlider(int x, int y, int width, int height, double value) {
             super(x, y, width, height, Component.empty(), value);
             this.updateMessage();
+        }
+
+        double level() {
+            return this.value;
+        }
+
+        boolean held() {
+            return this.dragging;
         }
 
         void syncFrom(double value) {
@@ -141,19 +236,10 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
             StereoScreen.this.minecraft.gameMode.handleInventoryButtonClick(
                     StereoScreen.this.menu.containerId, (int) Math.round(this.value * 100.0));
         }
-    }
 
-    private static void panel(GuiGraphics g, int x, int y, int w, int h) {
-        g.fill(x, y, x + w, y + h, PANEL);
-        g.fill(x, y, x + w - 1, y + 1, PANEL_LIGHT);
-        g.fill(x, y, x + 1, y + h - 1, PANEL_LIGHT);
-        g.fill(x + w - 1, y, x + w, y + h, PANEL_DARK);
-        g.fill(x, y + h - 1, x + w, y + h, PANEL_DARK);
-    }
-
-    private static void slot(GuiGraphics g, int x, int y) {
-        g.fill(x - 1, y - 1, x + 17, y + 17, PANEL_LIGHT);
-        g.fill(x - 1, y - 1, x + 16, y + 16, SLOT_BORDER);
-        g.fill(x, y, x + 16, y + 16, SLOT_FILL);
+        @Override
+        public void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+            HiFiPanel.slider(g, this.getX(), this.getY(), this.getWidth(), this.getHeight(), this.value);
+        }
     }
 }

@@ -1,7 +1,9 @@
 package gg.moonflower.etched.common.menu;
 
 import gg.moonflower.etched.common.blockentity.StereoBlockEntity;
+import gg.moonflower.etched.core.registry.EtchedItems;
 import gg.moonflower.etched.core.registry.EtchedMenus;
+import net.minecraft.world.item.Item;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -26,6 +28,21 @@ public class StereoMenu extends AbstractContainerMenu {
     public static final int BUTTON_MODE = 201;
     // Ids 0-100 set the master volume as a percent.
 
+    /** Preamps come first in the container, then transmitters. */
+    public static final int PREAMP_SLOTS = 2;
+    public static final int TRANSMITTER_SLOTS = StereoBlockEntity.UPGRADE_SLOTS - PREAMP_SLOTS;
+
+    // Slot positions, shared with the screen so its drawing of the unit lines up with them.
+    // PREAMP_X matches the screen's UNIT_X + 8, so each slot sits directly over the bay it feeds.
+    public static final int PREAMP_X = 66;
+    public static final int PREAMP_Y = 48;
+    // The transmitter bays stack vertically behind the unit, clear of the dongles drawn plugging into it.
+    public static final int TRANSMITTER_X = 134;
+    public static final int TRANSMITTER_Y = 70;
+    public static final int TRANSMITTER_SPACING = 20;
+    public static final int INVENTORY_Y = 118;
+    public static final int HOTBAR_Y = 176;
+
     private final Container container;
     private final DataSlot mode = DataSlot.standalone();
     private final DataSlot maxSpeakers = DataSlot.standalone();
@@ -43,22 +60,25 @@ public class StereoMenu extends AbstractContainerMenu {
         this.container = container;
         container.startOpen(inventory.player);
 
-        for (int i = 0; i < StereoBlockEntity.UPGRADE_SLOTS; i++) {
-            this.addSlot(new Slot(container, i, 44 + i * 22, 34) {
-                @Override
-                public boolean mayPlace(ItemStack stack) {
-                    return StereoBlockEntity.isUpgrade(stack);
-                }
-            });
+        // The upgrade slots sit where the hardware physically goes on the screen's drawing of the unit:
+        // preamps seat on the top face, transmitters plug into the back panel. Each slot only takes its
+        // own kind, so the drawing always matches what is installed.
+        for (int i = 0; i < PREAMP_SLOTS; i++) {
+            this.addSlot(new UpgradeSlot(container, i, PREAMP_X + i * 22, PREAMP_Y,
+                    EtchedItems.PREAMP.asItem()));
+        }
+        for (int i = 0; i < TRANSMITTER_SLOTS; i++) {
+            this.addSlot(new UpgradeSlot(container, PREAMP_SLOTS + i, TRANSMITTER_X, TRANSMITTER_Y + i * TRANSMITTER_SPACING,
+                    EtchedItems.TRANSMITTER.asItem()));
         }
 
         for (int row = 0; row < 3; ++row) {
             for (int col = 0; col < 9; ++col) {
-                this.addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, 84 + row * 18));
+                this.addSlot(new Slot(inventory, col + row * 9 + 9, 8 + col * 18, INVENTORY_Y + row * 18));
             }
         }
         for (int col = 0; col < 9; ++col) {
-            this.addSlot(new Slot(inventory, col, 8 + col * 18, 142));
+            this.addSlot(new Slot(inventory, col, 8 + col * 18, HOTBAR_Y));
         }
 
         this.addDataSlot(this.mode);
@@ -81,8 +101,18 @@ public class StereoMenu extends AbstractContainerMenu {
         this.mode.set(stereo.getMode());
         this.maxSpeakers.set(stereo.getMaxSpeakers());
         this.range.set(stereo.getRange());
-        this.paired.set(stereo.getPairedSpeakers().size());
+        // Only speakers that still exist: the stored pairings outlive the blocks, so counting the raw
+        // set kept climbing as speakers were broken and replaced.
+        this.paired.set(stereo.pruneAndCountPaired());
         this.volume.set(Math.round(stereo.getVolume() * 100.0F));
+    }
+
+    // Keep the stats live while the screen is open, so installing an upgrade or losing a speaker shows up
+    // straight away rather than waiting for the next button press.
+    @Override
+    public void broadcastChanges() {
+        this.refreshStats();
+        super.broadcastChanges();
     }
 
     public int getMode() {
@@ -183,6 +213,33 @@ public class StereoMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return this.container.stillValid(player);
+    }
+
+    /**
+     * A slot that only takes one kind of upgrade, so where a part sits in the menu always matches where
+     * the screen draws it on the unit.
+     */
+    private static class UpgradeSlot extends Slot {
+
+        private final Item upgrade;
+
+        UpgradeSlot(Container container, int slot, int x, int y, Item upgrade) {
+            super(container, slot, x, y);
+            this.upgrade = upgrade;
+        }
+
+        @Override
+        public boolean mayPlace(ItemStack stack) {
+            return stack.is(this.upgrade);
+        }
+
+        // One part per bay: an upgrade is a piece of hardware installed into the unit, so a stack of them
+        // in a single slot shouldn't count as several. This is what makes the speaker and range ceilings
+        // real rather than advisory.
+        @Override
+        public int getMaxStackSize() {
+            return 1;
+        }
     }
 
     @Override

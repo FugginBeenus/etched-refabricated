@@ -17,6 +17,7 @@ import net.minecraft.data.worldgen.ProcessorLists;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -40,14 +41,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
-/**
- * The bard: a villager who works at an etching table and deals in music.
- *
- * <p>Bard houses are appended to the village pools when a server starts rather than shipped as a
- * datapack, because a datapack file <i>replaces</i> a pool and would wipe out whatever another mod had
- * put there. Appending at runtime is additive, so villages keep everything else added to them, and a
- * village overhaul that owns its own pools simply doesn't receive the house.
- */
 public class EtchedVillagers {
 
     private static final String BARD = "bard";
@@ -69,11 +62,6 @@ public class EtchedVillagers {
         return ImmutableSet.copyOf((Collection<BlockState>) block.getStateDefinition().getPossibleStates());
     }
 
-    /**
-     * Registers the bard's trades and hooks village generation. Loading this class is also what registers
-     * the point of interest and the profession, so this has to be called during mod init: with nothing
-     * referencing the class, the static fields above never ran and the bard could never be hired.
-     */
     public static void registers() {
         registerTrades();
         ServerLifecycleEvents.SERVER_STARTING.register(EtchedVillagers::addBardHouses);
@@ -118,9 +106,6 @@ public class EtchedVillagers {
         });
     }
 
-    /**
-     * A trade where the player hands over items and gets emeralds back.
-     */
     private static VillagerTrades.ItemListing buy(ItemLike item, int emeralds, int itemCount, int maxUses, int xp) {
         return new ItemTrade(() -> item, emeralds, itemCount, maxUses, xp, true);
     }
@@ -146,23 +131,34 @@ public class EtchedVillagers {
 
         Registry<StructureTemplatePool> pools = poolRegistry.get();
         Registry<StructureProcessorList> processors = processorRegistry.get();
-        addHouse(pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
-        addHouse(pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
-        addHouse(pools, processors, "savanna", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SAVANNA);
-        addHouse(pools, processors, "snowy", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SNOWY);
-        addHouse(pools, processors, "taiga", 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
+        ResourceManager resources = server.getResourceManager();
+        addHouses(resources, pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
+        addHouses(resources, pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
+        addHouses(resources, pools, processors, "savanna", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SAVANNA);
+        addHouses(resources, pools, processors, "snowy", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SNOWY);
+        addHouses(resources, pools, processors, "taiga", 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
     }
 
-    private static void addHouse(Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
-                                 String village, int weight,
-                                 ResourceKey<StructureProcessorList> processor,
-                                 ResourceKey<StructureProcessorList> zombieProcessor) {
-        ResourceLocation piece = EtchedResourceLocation.of(Etched.MOD_ID,
-                "village/" + village + "/houses/" + village + "_" + BARD + "_house_1");
-        addToPool(pools.get(EtchedResourceLocation.of("village/" + village + "/houses")),
-                piece, processors.getHolder(processor).orElse(null), weight);
-        addToPool(pools.get(EtchedResourceLocation.of("village/" + village + "/zombie/houses")),
-                piece, processors.getHolder(zombieProcessor).orElse(null), weight);
+    private static void addHouses(ResourceManager resources,
+                                  Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
+                                  String village, int weight,
+                                  ResourceKey<StructureProcessorList> processor,
+                                  ResourceKey<StructureProcessorList> zombieProcessor) {
+        StructureTemplatePool housePool = pools.get(EtchedResourceLocation.of("village/" + village + "/houses"));
+        StructureTemplatePool zombiePool = pools.get(EtchedResourceLocation.of("village/" + village + "/zombie/houses"));
+        Holder<StructureProcessorList> normal = processors.getHolder(processor).orElse(null);
+        Holder<StructureProcessorList> zombie = processors.getHolder(zombieProcessor).orElse(null);
+
+        for (int variant = 1; ; variant++) {
+            String path = "village/" + village + "/houses/" + village + "_" + BARD + "_house_" + variant;
+            if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, "structures/" + path + ".nbt")).isEmpty()) {
+                break;
+            }
+
+            ResourceLocation piece = EtchedResourceLocation.of(Etched.MOD_ID, path);
+            addToPool(housePool, piece, normal, weight);
+            addToPool(zombiePool, piece, zombie, weight);
+        }
     }
 
     private static void addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId,
@@ -190,11 +186,6 @@ public class EtchedVillagers {
         }
     }
 
-    /**
-     * A straightforward trade of items for emeralds, or emeralds for items. Vanilla's
-     * {@code EmeraldForItems} only expresses "several items for one emerald", which is the wrong way round
-     * for something like a music disc that should be worth eight.
-     */
     private static class ItemTrade implements VillagerTrades.ItemListing {
 
         private final Supplier<? extends ItemLike> item;

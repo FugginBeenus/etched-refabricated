@@ -42,6 +42,9 @@ public class EtchedConfig {
     @SerialEntry(comment = "Always plays tracks in stereo even when in-world.")
     public boolean forceStereo = false;
 
+    @SerialEntry(comment = "Adds bard houses to villages as they generate. Turn off if a village overhaul mod should own village layout entirely.")
+    public boolean addBardHousesToVillages = true;
+
     public Screen getConfigScreen(Screen screen){
         return YetAnotherConfigLib.createBuilder()
                 .title(Component.literal("Etched"))
@@ -63,6 +66,14 @@ public class EtchedConfig {
                                                 .text(Component.literal("Disables right clicking music discs into album covers and allows the menu to be used by shift right-clicking"))
                                                 .build())
                                         .binding(false,() -> this.useAlbumCoverMenu,aBoolean -> {this.useAlbumCoverMenu = aBoolean;})
+                                        .controller(TickBoxControllerBuilder::create)
+                                        .build())
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Component.literal("Bard Houses In Villages"))
+                                        .description(OptionDescription.createBuilder()
+                                                .text(Component.literal("Adds bard houses to villages as they generate. Turn off if a village overhaul mod should own village layout entirely. Takes effect next time the world loads."))
+                                                .build())
+                                        .binding(true,() -> this.addBardHousesToVillages,aBoolean -> {this.addBardHousesToVillages = aBoolean;})
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
                                 .build())

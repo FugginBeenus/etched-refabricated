@@ -1,15 +1,14 @@
 package gg.moonflower.etched.core.registry;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.datafixers.util.Pair;
+import gg.moonflower.etched.api.util.EtchedResourceLocation;
 import gg.moonflower.etched.core.Etched;
+import gg.moonflower.etched.core.fabric.EtchedConfig;
 import gg.moonflower.etched.core.mixin.StructureTemplatePoolAccessor;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.object.builder.v1.trade.TradeOfferHelper;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.core.Holder;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +16,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.ProcessorLists;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -33,379 +32,203 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorList;
-import org.apache.commons.lang3.Validate;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
-//TODO: FIX
+
+/**
+ * The bard: a villager who works at an etching table and deals in music.
+ *
+ * <p>Bard houses are appended to the village pools when a server starts rather than shipped as a
+ * datapack, because a datapack file <i>replaces</i> a pool and would wipe out whatever another mod had
+ * put there. Appending at runtime is additive, so villages keep everything else added to them, and a
+ * village overhaul that owns its own pools simply doesn't receive the house.
+ */
 public class EtchedVillagers {
-    private static Set<BlockState> getBlockStates(Block block) {
-        return ImmutableSet.copyOf((Collection)block.getStateDefinition().getPossibleStates());
-    }
-    public static final PoiType BARD_POI = PointOfInterestHelper.register(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID,"bard"),1,1,getBlockStates(EtchedBlocks.ETCHING_TABLE.get()));
-        public static final VillagerProfession BARD_PROFESSION = Registry.register(BuiltInRegistries.VILLAGER_PROFESSION, (gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID,"bard")), new VillagerProfession(Etched.MOD_ID + ":bard", poi -> poi.value().equals(BARD_POI), poi -> poi.value().equals(BARD_POI), ImmutableSet.of(), ImmutableSet.of(), null));
 
-    public static void registers(){
-        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,1,itemListings -> {
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.MUSIC_DISC_13,8,4,20));
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.MUSIC_DISC_11,8,4,20));
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.MUSIC_DISC_CAT,8,4,20));
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.MUSIC_DISC_OTHERSIDE,8,4,20));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(Items.NOTE_BLOCK,1, 2, 16, 2));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(EtchedItems.MUSIC_LABEL.get()), 4, 2, 16, 1));
-        });
-        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,2,itemListings -> {
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(EtchedItems.BLANK_MUSIC_DISC.get()), 12, 2, 12, 15));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(EtchedBlocks.ETCHING_TABLE.get()), 12, 2, 12, 15));
-        });
-        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,3,itemListings -> {
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.CLAY), 6, 1, 16, 2));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.HAY_BLOCK), 12, 1, 8, 2));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.WHITE_WOOL), 8, 1, 32, 4));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.BONE_BLOCK), 24, 1, 8, 4));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.PACKED_ICE), 36, 1, 4, 8));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Blocks.GOLD_BLOCK), 48, 1, 2, 10));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(Items.JUKEBOX), 26, 1, 4, 30));
-        });
+    private static final String BARD = "bard";
 
-        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,4,itemListings -> {
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(EtchedItems.JUKEBOX_MINECART.get()), 28, 1, 4, 30));
-            itemListings.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(EtchedBlocks.ALBUM_JUKEBOX.get()), 30, 1, 4, 30));
-        });
-        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION,5,itemListings -> {
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.DIAMOND, 1, 8, 40));
-            itemListings.add(new VillagerTrades.EmeraldForItems(Items.AMETHYST_SHARD,  1, 8, 40));
-        });
+    public static final PoiType BARD_POI = PointOfInterestHelper.register(
+            EtchedResourceLocation.of(Etched.MOD_ID, BARD), 1, 1,
+            blockStates(EtchedBlocks.ETCHING_TABLE.get()));
 
+    public static final VillagerProfession BARD_PROFESSION = Registry.register(
+            BuiltInRegistries.VILLAGER_PROFESSION,
+            EtchedResourceLocation.of(Etched.MOD_ID, BARD),
+            new VillagerProfession(Etched.MOD_ID + ":" + BARD,
+                    poi -> poi.value().equals(BARD_POI),
+                    poi -> poi.value().equals(BARD_POI),
+                    ImmutableSet.of(), ImmutableSet.of(), null));
 
-
+    @SuppressWarnings("unchecked")
+    private static Set<BlockState> blockStates(Block block) {
+        return ImmutableSet.copyOf((Collection<BlockState>) block.getStateDefinition().getPossibleStates());
     }
 
-/*
-    public static final DeferredRegister<PoiType> POI_REGISTRY = DeferredRegister.create(ForgeRegistries.POI_TYPES, Etched.MOD_ID);
-    public static final DeferredRegister<VillagerProfession> PROFESSION_REGISTRY = DeferredRegister.create(ForgeRegistries.VILLAGER_PROFESSIONS, Etched.MOD_ID);
+    /**
+     * Registers the bard's trades and hooks village generation. Loading this class is also what registers
+     * the point of interest and the profession, so this has to be called during mod init: with nothing
+     * referencing the class, the static fields above never ran and the bard could never be hired.
+     */
+    public static void registers() {
+        registerTrades();
+        ServerLifecycleEvents.SERVER_STARTING.register(EtchedVillagers::addBardHouses);
+    }
 
-    public static final RegistryObject<PoiType> BARD_POI = POI_REGISTRY.register("bard", () -> new PoiType(ImmutableSet.<BlockState>builder().addAll(Blocks.NOTE_BLOCK.getStateDefinition().getPossibleStates()).build(), 1, 1));
-    public static final RegistryObject<VillagerProfession> BARD = PROFESSION_REGISTRY.register("bard", () -> new VillagerProfession(Etched.MOD_ID + ":bard", poi -> poi.is(BARD_POI.getId()), poi -> poi.is(BARD_POI.getId()), ImmutableSet.of(), ImmutableSet.of(), null));
+    // ---- trades ----
 
-    @SubscribeEvent
-    public static void onEvent(net.minecraftforge.event.village.VillagerTradesEvent event) {
-        if (event.getType() != EtchedVillagers.BARD.get()) {
+    private static void registerTrades() {
+        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 1, trades -> {
+            trades.add(buy(Items.MUSIC_DISC_13, 8, 1, 4, 20));
+            trades.add(buy(Items.MUSIC_DISC_11, 8, 1, 4, 20));
+            trades.add(buy(Items.MUSIC_DISC_CAT, 8, 1, 4, 20));
+            trades.add(buy(Items.MUSIC_DISC_OTHERSIDE, 8, 1, 4, 20));
+            trades.add(sell(Items.NOTE_BLOCK, 1, 2, 16, 2));
+            trades.add(sell(EtchedItems.MUSIC_LABEL, 4, 2, 16, 1));
+        });
+
+        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 2, trades -> {
+            trades.add(sell(EtchedItems.BLANK_MUSIC_DISC, 28, 2, 12, 15));
+            trades.add(sell(EtchedBlocks.ETCHING_TABLE, 32, 1, 8, 15));
+        });
+
+        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 3, trades -> {
+            trades.add(sell(Blocks.CLAY, 6, 1, 16, 2));
+            trades.add(sell(Blocks.HAY_BLOCK, 12, 1, 8, 2));
+            trades.add(sell(Blocks.WHITE_WOOL, 8, 1, 32, 4));
+            trades.add(sell(Blocks.BONE_BLOCK, 24, 1, 8, 4));
+            trades.add(sell(Blocks.PACKED_ICE, 36, 1, 4, 8));
+            trades.add(sell(Blocks.GOLD_BLOCK, 48, 1, 2, 10));
+            trades.add(sell(Items.JUKEBOX, 26, 1, 4, 30));
+        });
+
+        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 4, trades -> {
+            trades.add(sell(EtchedItems.ALBUM_COVER, 16, 1, 4, 30));
+            trades.add(sell(EtchedItems.JUKEBOX_MINECART, 28, 1, 4, 30));
+            trades.add(sell(EtchedBlocks.ALBUM_JUKEBOX, 30, 1, 4, 30));
+        });
+
+        TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 5, trades -> {
+            trades.add(buy(Items.DIAMOND, 8, 1, 8, 40));
+            trades.add(buy(Items.AMETHYST_SHARD, 1, 8, 10, 40));
+        });
+    }
+
+    /**
+     * A trade where the player hands over items and gets emeralds back.
+     */
+    private static VillagerTrades.ItemListing buy(ItemLike item, int emeralds, int itemCount, int maxUses, int xp) {
+        return new ItemTrade(() -> item, emeralds, itemCount, maxUses, xp, true);
+    }
+
+    // Registrate's entries are themselves ItemLike, so one overload covers both vanilla items and ours.
+    private static VillagerTrades.ItemListing sell(ItemLike item, int emeralds, int itemCount, int maxUses, int xp) {
+        return new ItemTrade(() -> item, emeralds, itemCount, maxUses, xp, false);
+    }
+
+    // ---- village generation ----
+
+    private static void addBardHouses(MinecraftServer server) {
+        if (!EtchedConfig.HANDLER.instance().addBardHousesToVillages) {
             return;
         }
 
-        Int2ObjectMap<TradeRegistry> newTrades = new Int2ObjectOpenHashMap<>();
-        int minTier = event.getTrades().keySet().intStream().min().orElse(1);
-        int maxTier = event.getTrades().keySet().intStream().max().orElse(5);
-        registerTrades(tier -> {
-            Validate.inclusiveBetween(minTier, maxTier, tier, "Tier must be between " + minTier + " and " + maxTier);
-            return newTrades.computeIfAbsent(tier, key -> new TradeRegistry());
-        });
-
-        newTrades.forEach((tier, registry) -> event.getTrades().get(tier.intValue()).addAll(registry));
-    }
-
-    private static void registerTrades(Function<Integer, TradeRegistry> context) {
-        TradeRegistry tier1 = context.apply(1);
-        tier1.add(Items.MUSIC_DISC_13, 8, 1, 4, 20, true);
-        tier1.add(Items.MUSIC_DISC_11, 8, 1, 4, 20, true);
-        tier1.add(Items.MUSIC_DISC_CAT, 8, 1, 4, 20, true);
-        tier1.add(Items.MUSIC_DISC_OTHERSIDE, 8, 1, 4, 20, true);
-        tier1.add(Items.NOTE_BLOCK, 1, 2, 16, 2, true);
-        tier1.add(EtchedItems.MUSIC_LABEL, 4, 2, 16, 1, false);
-
-        TradeRegistry tier2 = context.apply(2);
-        tier2.add(EtchedItems.BLANK_MUSIC_DISC, 28, 2, 12, 15, false);
-        tier2.add(EtchedBlocks.ETCHING_TABLE, 32, 1, 8, 15, false);
-
-        TradeRegistry tier3 = context.apply(3);
-        tier3.add(Blocks.CLAY, 6, 1, 16, 2, false);
-        tier3.add(Blocks.HAY_BLOCK, 12, 1, 8, 2, false);
-        tier3.add(Blocks.WHITE_WOOL, 8, 1, 32, 4, false);
-        tier3.add(Blocks.BONE_BLOCK, 24, 1, 8, 4, false);
-        tier3.add(Blocks.PACKED_ICE, 36, 1, 4, 8, false);
-        tier3.add(Blocks.GOLD_BLOCK, 48, 1, 2, 10, false);
-
-        TradeRegistry tier4 = context.apply(4);
-        tier3.add(Items.JUKEBOX, 26, 1, 4, 30, false);
-        tier4.add(EtchedItems.JUKEBOX_MINECART, 28, 1, 4, 30, false);
-        tier4.add(EtchedBlocks.ALBUM_JUKEBOX, 30, 1, 4, 30, false);
-
-        TradeRegistry tier5 = context.apply(5);
-        tier5.add(Items.DIAMOND, 8, 1, 8, 40, true);
-        tier5.add(Items.AMETHYST_SHARD, 1, 8, 10, 40, true);
-
-        // sucks to suck forge
-        BuiltInRegistries.ITEM.getTag(ItemTags.MUSIC_DISCS).ifPresent(tag -> tag.stream().forEach(item -> tier5.add(item.value(), 10, 1, 4, 40, true)));
-    }
-
-    @SubscribeEvent
-    public static void onEvent(ServerAboutToStartEvent event) {
-        RegistryAccess.Frozen access = event.getServer().registryAccess();
-        Optional<Registry<StructureTemplatePool>> templateRegistryOptional = access.registry(Registries.TEMPLATE_POOL);
-        Optional<Registry<StructureProcessorList>> processorListRegistyOptional = access.registry(Registries.PROCESSOR_LIST);
-
-        if (templateRegistryOptional.isEmpty() || processorListRegistyOptional.isEmpty()) {
+        RegistryAccess access = server.registryAccess();
+        Optional<Registry<StructureTemplatePool>> poolRegistry = access.registry(Registries.TEMPLATE_POOL);
+        Optional<Registry<StructureProcessorList>> processorRegistry = access.registry(Registries.PROCESSOR_LIST);
+        if (poolRegistry.isEmpty() || processorRegistry.isEmpty()) {
             return;
         }
 
-        Registry<StructureTemplatePool> templatePools = templateRegistryOptional.get();
-        Registry<StructureProcessorList> processorLists = processorListRegistyOptional.get();
-        createVillagePiece(templatePools, processorLists, "plains", "bard_house", 1, 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
-        createVillagePiece(templatePools, processorLists, "desert", "bard_house", 1, 2, ProcessorLists.ZOMBIE_DESERT);
-        createVillagePiece(templatePools, processorLists, "savanna", "bard_house", 1, 4, ProcessorLists.ZOMBIE_SAVANNA);
-        createVillagePiece(templatePools, processorLists, "snowy", "bard_house", 1, 4, ProcessorLists.ZOMBIE_SNOWY);
-        createVillagePiece(templatePools, processorLists, "taiga", "bard_house", 1, 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
+        Registry<StructureTemplatePool> pools = poolRegistry.get();
+        Registry<StructureProcessorList> processors = processorRegistry.get();
+        addHouse(pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
+        addHouse(pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
+        addHouse(pools, processors, "savanna", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SAVANNA);
+        addHouse(pools, processors, "snowy", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SNOWY);
+        addHouse(pools, processors, "taiga", 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
     }
 
-    private static void createVillagePiece(Registry<StructureTemplatePool> templatePools, Registry<StructureProcessorList> processorLists, String village, String name, int houseId, int weight, ResourceKey<StructureProcessorList> zombieProcessor) {
-        createVillagePiece(templatePools, processorLists, village, name, houseId, weight, ProcessorLists.EMPTY, zombieProcessor);
+    private static void addHouse(Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
+                                 String village, int weight,
+                                 ResourceKey<StructureProcessorList> processor,
+                                 ResourceKey<StructureProcessorList> zombieProcessor) {
+        ResourceLocation piece = EtchedResourceLocation.of(Etched.MOD_ID,
+                "village/" + village + "/houses/" + village + "_" + BARD + "_house_1");
+        addToPool(pools.get(EtchedResourceLocation.of("village/" + village + "/houses")),
+                piece, processors.getHolder(processor).orElse(null), weight);
+        addToPool(pools.get(EtchedResourceLocation.of("village/" + village + "/zombie/houses")),
+                piece, processors.getHolder(zombieProcessor).orElse(null), weight);
     }
 
-    private static void createVillagePiece(Registry<StructureTemplatePool> templatePools, Registry<StructureProcessorList> processorLists, String village, String name, int houseId, int weight, ResourceKey<StructureProcessorList> normalProcessor, ResourceKey<StructureProcessorList> zombieProcessor) {
-        EtchedVillagers.addToPool(templatePools.get(gg.moonflower.etched.api.util.EtchedResourceLocation.of("village/" + village + "/houses")), gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(normalProcessor).orElse(null), weight);
-        EtchedVillagers.addToPool(templatePools.get(gg.moonflower.etched.api.util.EtchedResourceLocation.of("village/" + village + "/zombie/houses")), gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "village/" + village + "/houses/" + village + "_" + name + "_" + houseId), processorLists.getHolder(zombieProcessor).orElse(null), weight);
-    }
-
-    private static void addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId, @Nullable Holder<StructureProcessorList> processorList, int weight) {
+    private static void addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId,
+                                  @Nullable Holder<StructureProcessorList> processorList, int weight) {
+        // A missing pool means something else owns this village now; leave it alone rather than forcing
+        // our way in.
         if (pool == null || processorList == null) {
             return;
         }
 
-        StructurePoolElement piece = StructurePoolElement.legacy(pieceId.toString(), processorList).apply(StructureTemplatePool.Projection.RIGID);
         List<StructurePoolElement> templates = ((StructureTemplatePoolAccessor) pool).getTemplates();
         if (templates == null) {
             return;
         }
 
-        for (int i = 0; i < weight; i++) {
-            templates.add(piece);
+        StructurePoolElement piece = StructurePoolElement.legacy(pieceId.toString(), processorList)
+                .apply(StructureTemplatePool.Projection.RIGID);
+        try {
+            for (int i = 0; i < weight; i++) {
+                templates.add(piece);
+            }
+        } catch (UnsupportedOperationException e) {
+            // Another mod has frozen the pool. Missing from that village beats failing to load the world.
+            Etched.LOGGER.warn("Could not add {} to a village pool: its template list is not modifiable", pieceId);
         }
     }
 
-    private static class TradeRegistry implements List<VillagerTrades.ItemListing> {
-
-        private final List<VillagerTrades.ItemListing> trades;
-
-        public TradeRegistry() {
-            this.trades = NonNullList.create();
-        }
-
-        @Override
-        public int size() {
-            return this.trades.size();
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return this.trades.isEmpty();
-        }
-
-        @Override
-        public boolean contains(Object o) {
-            return this.trades.contains(o);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<VillagerTrades.ItemListing> iterator() {
-            return this.trades.iterator();
-        }
-
-        @NotNull
-        @Override
-        public Object[] toArray() {
-            return this.trades.toArray();
-        }
-
-        @NotNull
-        @Override
-        public <T> T[] toArray(@NotNull T[] a) {
-            return this.trades.toArray(a);
-        }
-
-        @Override
-        public boolean add(VillagerTrades.ItemListing listing) {
-            return this.trades.add(listing);
-        }
-
-        @Override
-        public boolean remove(Object o) {
-            return this.trades.remove(o);
-        }
-
-        @Override
-        public boolean containsAll(@NotNull Collection<?> c) {
-            return this.trades.containsAll(c);
-        }
-
-        @Override
-        public boolean addAll(@NotNull Collection<? extends VillagerTrades.ItemListing> c) {
-            return this.trades.addAll(c);
-        }
-
-        @Override
-        public boolean addAll(int index, @NotNull Collection<? extends VillagerTrades.ItemListing> c) {
-            return this.trades.addAll(index, c);
-        }
-
-        @Override
-        public boolean removeAll(@NotNull Collection<?> c) {
-            return this.trades.removeAll(c);
-        }
-
-        @Override
-        public boolean retainAll(@NotNull Collection<?> c) {
-            return this.trades.retainAll(c);
-        }
-
-        @Override
-        public void clear() {
-            this.trades.clear();
-        }
-
-        @Override
-        public VillagerTrades.ItemListing get(int index) {
-            return this.trades.get(index);
-        }
-
-        @Override
-        public VillagerTrades.ItemListing set(int index, VillagerTrades.ItemListing element) {
-            return this.trades.set(index, element);
-        }
-
-        @Override
-        public void add(int index, VillagerTrades.ItemListing element) {
-            this.trades.add(index, element);
-        }
-
-        @Override
-        public VillagerTrades.ItemListing remove(int index) {
-            return this.trades.remove(index);
-        }
-
-        @Override
-        public int indexOf(Object o) {
-            return this.trades.indexOf(o);
-        }
-
-        @Override
-        public int lastIndexOf(Object o) {
-            return this.trades.lastIndexOf(o);
-        }
-
-        @NotNull
-        @Override
-        public ListIterator<VillagerTrades.ItemListing> listIterator() {
-            return this.trades.listIterator();
-        }
-
-        @NotNull
-        @Override
-        public ListIterator<VillagerTrades.ItemListing> listIterator(int index) {
-            return this.trades.listIterator(index);
-        }
-
-        @NotNull
-        @Override
-        public List<VillagerTrades.ItemListing> subList(int fromIndex, int toIndex) {
-            return this.trades.subList(fromIndex, toIndex);
-        }
-        */
-        /**
-         * Adds a simple trade for items or emeralds.
-         *
-         * @param item           The item to trade for
-         * @param emeralds       The amount of emeralds to trade
-         * @param itemCount      The amount of the item to trade
-         * @param maxUses        The maximum amount of times this trade can be used before needing to reset
-         * @param xpGain         The amount of experience gained by this exchange
-         * @param sellToVillager Whether the villager is buying or selling the item for emeralds
-         */
-        /*
-        public void add(ItemLike item, int emeralds, int itemCount, int maxUses, int xpGain, boolean sellToVillager) {
-            this.add(new ItemTrade(() -> item, emeralds, itemCount, maxUses, xpGain, 0.05F, sellToVillager));
-        } */
-
-        /**
-         * Adds a simple trade for items or emeralds.
-         *
-         * @param item            The item to trade for
-         * @param emeralds        The amount of emeralds to trade
-         * @param itemCount       The amount of the item to trade
-         * @param maxUses         The maximum amount of times this trade can be used before needing to reset
-         * @param xpGain          The amount of experience gained by this exchange
-         * @param priceMultiplier The multiplier for how much the price deviates
-         * @param sellToVillager  Whether the villager is buying or selling the item for emeralds
-         */
-        /*
-        public void add(ItemLike item, int emeralds, int itemCount, int maxUses, int xpGain, float priceMultiplier, boolean sellToVillager) {
-            this.add(new ItemTrade(() -> item, emeralds, itemCount, maxUses, xpGain, priceMultiplier, sellToVillager));
-        } */
-
-        /**
-         * Adds a simple trade for items or emeralds.
-         *
-         * @param item           The item to trade for as a supplier
-         * @param emeralds       The amount of emeralds to trade
-         * @param itemCount      The amount of the item to trade
-         * @param maxUses        The maximum amount of times this trade can be used before needing to reset
-         * @param xpGain         The amount of experience gained by this exchange
-         * @param sellToVillager Whether the villager is buying or selling the item for emeralds
-         */
-        /*        public void add(Supplier<? extends ItemLike> item, int emeralds, int itemCount, int maxUses, int xpGain, boolean sellToVillager) {
-            this.add(new ItemTrade(item, emeralds, itemCount, maxUses, xpGain, 0.05F, sellToVillager));
-        } */
-
-
-        /**
-         * Adds a simple trade for items or emeralds.
-         *
-         * @param item            The item to trade for as a supplier
-         * @param emeralds        The amount of emeralds to trade
-         * @param itemCount       The amount of the item to trade
-         * @param maxUses         The maximum amount of times this trade can be used before needing to reset
-         * @param xpGain          The amount of experience gained by this exchange
-         * @param priceMultiplier The multiplier for how much the price deviates
-         * @param sellToVillager  Whether the villager is buying or selling the item for emeralds
-         */
-        /*
-        public void add(Supplier<? extends ItemLike> item, int emeralds, int itemCount, int maxUses, int xpGain, float priceMultiplier, boolean sellToVillager) {
-            this.add(new ItemTrade(item, emeralds, itemCount, maxUses, xpGain, priceMultiplier, sellToVillager));
-        } */
-/*
-    }
-
+    /**
+     * A straightforward trade of items for emeralds, or emeralds for items. Vanilla's
+     * {@code EmeraldForItems} only expresses "several items for one emerald", which is the wrong way round
+     * for something like a music disc that should be worth eight.
+     */
     private static class ItemTrade implements VillagerTrades.ItemListing {
 
         private final Supplier<? extends ItemLike> item;
         private final int emeralds;
         private final int itemCount;
         private final int maxUses;
-        private final int xpGain;
-        private final float priceMultiplier;
+        private final int xp;
         private final boolean sellToVillager;
 
-        private ItemTrade(Supplier<? extends ItemLike> Item, int emeralds, int itemCount, int maxUses, int xpGain, float priceMultiplier, boolean sellToVillager) {
-            this.item = Item;
+        ItemTrade(Supplier<? extends ItemLike> item, int emeralds, int itemCount, int maxUses, int xp, boolean sellToVillager) {
+            this.item = item;
             this.emeralds = emeralds;
             this.itemCount = itemCount;
             this.maxUses = maxUses;
-            this.xpGain = xpGain;
-            this.priceMultiplier = priceMultiplier;
+            this.xp = xp;
             this.sellToVillager = sellToVillager;
         }
 
         @Override
         public MerchantOffer getOffer(Entity entity, RandomSource random) {
-            ItemStack emeralds = new ItemStack(Items.EMERALD, this.emeralds);
-            ItemStack item = new ItemStack(this.item.get(), this.itemCount);
+            ItemLike traded = this.item.get();
+            if (this.sellToVillager) {
+                return this.offer(traded, this.itemCount, new ItemStack(Items.EMERALD, this.emeralds));
+            }
+            return this.offer(Items.EMERALD, this.emeralds, new ItemStack(traded, this.itemCount));
+        }
 
-            return new MerchantOffer(this.sellToVillager ? item : emeralds, this.sellToVillager ? emeralds : item, this.maxUses, this.xpGain, this.priceMultiplier);
+        private MerchantOffer offer(ItemLike costItem, int costCount, ItemStack result) {
+            //? if >=1.21 {
+            /*return new MerchantOffer(new net.minecraft.world.item.trading.ItemCost(costItem, costCount),
+                    result, this.maxUses, this.xp, 0.05F);
+            *///?} else {
+            return new MerchantOffer(new ItemStack(costItem, costCount), result, this.maxUses, this.xp, 0.05F);
+            //?}
         }
     }
- */
 }

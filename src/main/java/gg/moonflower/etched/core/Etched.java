@@ -54,11 +54,10 @@ public class Etched {
         EtchedRecipes.register();
         EtchedSounds.register();
 
-        // for some reason POI is broken so I guess I will add Crafting Recipe for the table for now
-        //EtchedVillagers.registers();
-
         REGISTRATE.register();
         EtchedConfig.HANDLER.load();
+        // After the config loads: the bard reads it to decide whether to add its houses to villages.
+        EtchedVillagers.registers();
         SoundSourceManager.registerSource(new SoundCloudSource());
         SoundSourceManager.registerSource(new BandcampSource());
     }

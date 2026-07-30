@@ -16,9 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Locale;
 import java.util.Optional;
 
-/**
- * @author Ocelot
- */
 public class EtchedMusicDiscItem extends PlayableRecordItem {
 
     public EtchedMusicDiscItem(Properties properties) {
@@ -95,12 +92,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         return TrackData.isValid(nbt.getCompound("Music")) ? 1 : 0;
     }
 
-    /**
-     * Retrieves the label pattern from the specified stack.
-     *
-     * @param stack The stack to get the pattern from
-     * @return The pattern for that item
-     */
     public static LabelPattern getPattern(ItemStack stack) {
         CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null || !nbt.contains("Pattern", Tag.TAG_ANY_NUMERIC)) {
@@ -110,12 +101,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         return id < 0 || id >= LabelPattern.values().length ? LabelPattern.FLAT : LabelPattern.values()[id];
     }
 
-    /**
-     * Retrieves the color of the physical disc from the specified stack.
-     *
-     * @param stack The stack to get the color from
-     * @return The color for the physical disc
-     */
     public static int getDiscColor(ItemStack stack) {
         CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
@@ -134,12 +119,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         return nbt.getInt("DiscColor");
     }
 
-    /**
-     * Retrieves the primary color of the label from the specified stack.
-     *
-     * @param stack The stack to get the color from
-     * @return The color for the label
-     */
     public static int getLabelPrimaryColor(ItemStack stack) {
         CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
@@ -158,12 +137,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         return labelTag.contains("Primary", Tag.TAG_ANY_NUMERIC) ? labelTag.getInt("Primary") : 0xFFFFFF;
     }
 
-    /**
-     * Retrieves the secondary color of the label from the specified stack.
-     *
-     * @param stack The stack to get the color from
-     * @return The color for the label
-     */
     public static int getLabelSecondaryColor(ItemStack stack) {
         CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
@@ -182,12 +155,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         return labelTag.contains("Secondary", Tag.TAG_ANY_NUMERIC) ? labelTag.getInt("Secondary") : 0xFFFFFF;
     }
 
-    /**
-     * Sets the URL for the specified stack.
-     *
-     * @param stack  The stack to set NBT for
-     * @param tracks The tracks to apply to the disk. If more than one are provided, the first is treated as the album data
-     */
     public static void setMusic(ItemStack stack, TrackData... tracks) {
         if (tracks.length == 0) {
             EtchedData.removeTag(stack, "Music");
@@ -209,12 +176,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         }
     }
 
-    /**
-     * Sets the pattern for the specified stack.
-     *
-     * @param stack   The stack to set NBT for
-     * @param pattern The pattern to apply to the disk or <code>null</code> to remove and default to {@link LabelPattern#FLAT}
-     */
     public static void setPattern(ItemStack stack, @Nullable LabelPattern pattern) {
         if (pattern == null) {
             EtchedData.removeTag(stack, "Pattern");
@@ -223,13 +184,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         }
     }
 
-    /**
-     * Sets the color for the specified stack.
-     *
-     * @param stack          The stack to set NBT for
-     * @param primaryColor   The color to use for the physical disk
-     * @param secondaryColor The color to use for the label
-     */
     public static void setColor(ItemStack stack, int discColor, int primaryColor, int secondaryColor) {
         EtchedData.mutateTag(stack, tag -> {
             tag.putInt("DiscColor", discColor);
@@ -241,9 +195,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
         });
     }
 
-    /**
-     * @author Jackson
-     */
     public enum LabelPattern {
 
         FLAT, CROSS, EYE, PARALLEL, STAR, GOLD(true);
@@ -265,23 +216,15 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
             );
         }
 
-        /**
-         * @return A pair of {@link ResourceLocation} for a top and bottom texture. If the pattern is simple, both locations are the same.
-         */
+
         public Pair<ResourceLocation, ResourceLocation> getTextures() {
             return this.textures;
         }
 
-        /**
-         * @return Whether the label pattern supports two colors.
-         */
         public boolean isSimple() {
             return this.simple;
         }
 
-        /**
-         * @return Whether this label can be colored
-         */
         public boolean isColorable() {
             return this != GOLD;
         }

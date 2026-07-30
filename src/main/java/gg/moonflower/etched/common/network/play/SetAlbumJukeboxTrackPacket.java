@@ -9,11 +9,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @param playingIndex The playing index to set the jukebox to
- * @param track        The track to set the jukebox to
- * @author Ocelot
- */
 @ApiStatus.Internal
 public record SetAlbumJukeboxTrackPacket(int playingIndex, int track) implements EtchedPacket {
 

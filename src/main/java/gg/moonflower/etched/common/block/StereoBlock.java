@@ -33,12 +33,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * A receiver that sits on top of a jukebox and gives it wireless speakers. Right-clicking it starts
- * link mode, after which right-clicking speakers pairs or unpairs them.
- *
- * @author Jackson
- */
 public class StereoBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
@@ -53,9 +47,6 @@ public class StereoBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH));
     }
 
-    /**
-     * @return The stereo the given player is currently pairing speakers to, if any
-     */
     @Nullable
     public static BlockPos getLinking(Player player) {
         return LINKING.get(player.getUUID());
@@ -65,17 +56,11 @@ public class StereoBlock extends BaseEntityBlock {
         LINKING.remove(player.getUUID());
     }
 
-    /**
-     * Puts a player into link mode so clicking speakers pairs them with the given stereo.
-     */
     public static void startLinking(Player player, BlockPos stereoPos) {
         LINKING.put(player.getUUID(), stereoPos.immutable());
         player.displayClientMessage(Component.translatable("block." + Etched.MOD_ID + ".stereo.link_start"), true);
     }
 
-    /**
-     * @return The stereo sitting on top of the given block, if there is one
-     */
     @Nullable
     public static StereoBlockEntity getStereoFor(BlockGetter level, BlockPos sourcePos) {
         BlockEntity blockEntity = level.getBlockEntity(sourcePos.above());

@@ -5,11 +5,6 @@ import net.minecraft.client.sounds.AudioStream;
 import javax.sound.sampled.AudioFormat;
 import java.nio.ByteBuffer;
 
-/**
- * Hack because Minecraft doesn't properly handle sound exceptions.
- *
- * @author Ocelot
- */
 public enum EmptyAudioStream implements AudioStream {
 
     INSTANCE;

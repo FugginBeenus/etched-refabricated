@@ -6,11 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @param slot   The slot the music label is in
- * @param author The new author
- * @param title  The new title
- */
 @ApiStatus.Internal
 public record ServerboundEditMusicLabelPacket(int slot, String author, String title) implements EtchedPacket {
 

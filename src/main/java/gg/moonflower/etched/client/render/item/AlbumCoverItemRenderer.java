@@ -45,9 +45,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/**
- * @author Ocelot
- */
 public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer implements net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener {
 
     @Override

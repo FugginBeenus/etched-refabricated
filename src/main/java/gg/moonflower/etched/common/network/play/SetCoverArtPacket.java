@@ -5,12 +5,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * Sent client -> server when a player uploads a local image in the Album Printer. Carries the
- * already-processed, cover-sized PNG bytes to bake onto the output album cover.
- *
- * @param image The processed PNG image bytes
- */
 @ApiStatus.Internal
 public record SetCoverArtPacket(byte[] image) implements EtchedPacket {
 

@@ -46,12 +46,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.DoubleSupplier;
 
-/**
- * Tracks entity sounds and all etched playing sounds for the client side.
- *
- * @author Ocelot
- * @since 2.0.0
- */
 public class SoundTracker {
 
     private static final Int2ObjectArrayMap<SoundInstance> ENTITY_PLAYING_SOUNDS = new Int2ObjectArrayMap<>();
@@ -80,23 +74,11 @@ public class SoundTracker {
         }
     }
 
-    /**
-     * Retrieves the sound instance for the specified entity id.
-     *
-     * @param entity The id of the entity to get a sound for
-     * @return The sound for that entity
-     */
     @Nullable
     public static SoundInstance getEntitySound(int entity) {
         return ENTITY_PLAYING_SOUNDS.get(entity);
     }
 
-    /**
-     * Sets the playing sound for the specified entity.
-     *
-     * @param entity   The id of the entity to play a sound for
-     * @param instance The new sound to play or <code>null</code> to stop
-     */
     public static void setEntitySound(int entity, @Nullable SoundInstance instance) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         if (instance == null) {
@@ -113,16 +95,6 @@ public class SoundTracker {
         }
     }
 
-    /**
-     * Creates an online sound for the specified entity.
-     *
-     * @param url                 The url to play
-     * @param title               The title of the record
-     * @param entity              The entity to play for
-     * @param attenuationDistance The attenuation distance of the sound
-     * @param stream              Whether to play a stream or regular file
-     * @return A new sound instance
-     */
     public static AbstractOnlineSoundInstance getEtchedRecord(String url, Component title, Entity entity, int attenuationDistance, boolean stream) {
         return new OnlineRecordSoundInstance(url, entity, attenuationDistance, new MusicDownloadListener(title, entity::getX, entity::getY, entity::getZ) {
             @Override
@@ -148,17 +120,6 @@ public class SoundTracker {
         return SoundTracker.getEtchedRecord(url, title, entity, 16, stream);
     }
 
-    /**
-     * Creates an online sound for the specified position.
-     *
-     * @param url                 The url to play
-     * @param title               The title of the record
-     * @param level               The level to play the record in
-     * @param pos                 The position of the record
-     * @param attenuationDistance The attenuation distance of the sound
-     * @param type                The type of audio to accept
-     * @return A new sound instance
-     */
     public static AbstractOnlineSoundInstance getEtchedRecord(String url, Component title, ClientLevel level, BlockPos pos, int attenuationDistance, AudioSource.AudioFileType type) {
         BlockState aboveState = level.getBlockState(pos.above());
         boolean muffled = aboveState.is(BlockTags.WOOL);
@@ -270,17 +231,6 @@ public class SoundTracker {
         }));
     }
 
-    /**
-     * Starts a downloaded record for a block, playing it from every connected speaker when more than
-     * one is attached. The speakers all read from one decoded buffer and are handed their streams by
-     * the same future, so they start together and stay in sync.
-     *
-     * @param level      The level the block is in
-     * @param pos        The block playing the record
-     * @param url        The track to play
-     * @param title      The name to announce
-     * @param onFinished Run when the track ends, to advance to the next one
-     */
     private static void playBlockAudio(ClientLevel level, BlockPos pos, String url, Component title, SoundStopListener onFinished) {
         stopCompanions(pos);
 
@@ -398,35 +348,18 @@ public class SoundTracker {
     // ---- vanilla-disc speaker routing (driven from LevelRendererMixin, which owns the version-specific
     // sound construction) ----
 
-    /**
-     * @return The speakers connected to a jukebox, so the vanilla-disc hook can route through them.
-     */
     public static List<BlockPos> getConnectedSpeakers(ClientLevel level, BlockPos jukeboxPos) {
         return connectedSpeakers(level, jukeboxPos);
     }
 
-    /**
-     * The gain a vanilla disc should play at from a given speaker: the same per-speaker × master-volume
-     * value, on the same 0-1 perceptual (squared) curve, that custom discs use. Read live each tick by
-     * {@link gg.moonflower.etched.client.sound.SpeakerJukeboxSound} so slider moves take effect at once.
-     */
     public static float speakerVanillaGain(ClientLevel level, BlockPos jukeboxPos, BlockPos speakerPos) {
         return (float) speakerGain(speakerVolume(level, jukeboxPos, speakerPos));
     }
 
-    /**
-     * The volume a vanilla disc plays at from the jukebox itself, once every speaker is gone — full
-     * vanilla record volume, matching a plain jukebox.
-     */
     public static float vanillaJukeboxVolume() {
         return RECORD_VOLUME;
     }
 
-    /**
-     * Plays and tracks the extra speaker sounds for a vanilla disc. The caller builds the instances
-     * (their construction differs by version); this plays them and keys them to the jukebox so they
-     * stop with it.
-     */
     public static void playSpeakerCompanions(BlockPos jukeboxPos, List<SoundInstance> companions) {
         stopCompanions(jukeboxPos);
         if (companions.isEmpty()) {
@@ -441,22 +374,10 @@ public class SoundTracker {
         stopCompanions(jukeboxPos);
     }
 
-    /**
-     * @return Whether a record (the primary sound) is currently tracked as playing at the given block
-     */
     public static boolean isRecordPlaying(BlockPos pos) {
         return ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getPlayingRecords().containsKey(pos);
     }
 
-    /**
-     * Plays a record stack for an entity.
-     *
-     * @param record              The record to play
-     * @param entityId            The id of the entity to play the record at
-     * @param track               The track to play
-     * @param attenuationDistance The attenuation distance of the sound
-     * @param loop                Whether to loop
-     */
     public static void playEntityRecord(ItemStack record, int entityId, int track, int attenuationDistance, boolean loop) {
         ClientLevel level = Minecraft.getInstance().level;
         if (level == null) {
@@ -497,12 +418,6 @@ public class SoundTracker {
         SoundTracker.playEntityRecord(record, entityId, track, 16, loop);
     }
 
-    /**
-     * Plays a record stack for an entity with a boombox.
-     *
-     * @param entityId The id of the entity to play the record at
-     * @param record   The record to play
-     */
     public static void playBoombox(int entityId, ItemStack record) {
         setEntitySound(entityId, null);
         if (!record.isEmpty()) {
@@ -510,14 +425,6 @@ public class SoundTracker {
         }
     }
 
-    /**
-     * Plays the records on an album jukebox in order.
-     *
-     * @param url   The URL of the stream
-     * @param state The block state of the radio
-     * @param level The level to play records in
-     * @param pos   The position of the jukebox
-     */
     public static void playRadio(@Nullable String url, BlockState state, ClientLevel level, BlockPos pos) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords();
@@ -546,14 +453,6 @@ public class SoundTracker {
         }
     }
 
-    /**
-     * Plays the records on an album jukebox in order.
-     *
-     * @param jukebox The jukebox to play records
-     * @param level   The level to play records in
-     * @param pos     The position of the jukebox
-     * @param force   Whether to force the jukebox to play
-     */
     public static void playAlbum(AlbumJukeboxBlockEntity jukebox, BlockState state, ClientLevel level, BlockPos pos, boolean force) {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords();

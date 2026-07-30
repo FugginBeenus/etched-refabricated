@@ -8,10 +8,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @param exception The exception to set in the etching table
- * @author Jackson
- */
 @ApiStatus.Internal
 public record ClientboundInvalidEtchUrlPacket(String exception) implements EtchedPacket {
 

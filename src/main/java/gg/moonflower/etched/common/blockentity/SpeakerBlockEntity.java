@@ -11,12 +11,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Holds how loud an individual speaker plays. Records are scaled by this and by the stereo's master
- * volume, so one speaker can be quiet without turning the rest down.
- *
- * @author Jackson
- */
 public class SpeakerBlockEntity extends BlockEntity {
 
     private float volume = 1.0F;
@@ -41,9 +35,6 @@ public class SpeakerBlockEntity extends BlockEntity {
         }
     }
 
-    /**
-     * @return The volume of the speaker at the given position, or full volume if it has no data yet
-     */
     public static float volumeAt(BlockGetter level, BlockPos pos) {
         return level.getBlockEntity(pos) instanceof SpeakerBlockEntity speaker ? speaker.getVolume() : 1.0F;
     }

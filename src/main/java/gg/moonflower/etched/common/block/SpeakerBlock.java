@@ -12,11 +12,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 
-/**
- * A speaker that takes over a jukebox's audio: when connected, the record is heard from the speakers
- * instead of the jukebox itself (see {@code SoundTracker}). Speakers touching a jukebox are connected
- * automatically; further away they are paired to a {@link StereoBlock} sitting on top of it.
- */
 public class SpeakerBlock extends BaseEntityBlock {
 
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;

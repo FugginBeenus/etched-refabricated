@@ -12,16 +12,6 @@ import net.minecraft.world.phys.Vec3;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
-/**
- * A vanilla jukebox disc sound played from a speaker. It is built exactly like the vanilla jukebox
- * sound ({@link SimpleSoundInstance#forJukeboxSong}) so it can replace it in place, but it also ticks:
- * each tick it re-reads where it should play from and how loud. That lets it follow speakers as they
- * are placed or broken, honour the per-speaker and master volume sliders live (the same 0-1 squared
- * curve custom discs use), and stop entirely when its source supplier returns {@code null} (its speaker
- * was broken, or the record was removed).
- *
- * @author Jackson
- */
 @Environment(EnvType.CLIENT)
 public class SpeakerJukeboxSound extends SimpleSoundInstance implements TickableSoundInstance {
 

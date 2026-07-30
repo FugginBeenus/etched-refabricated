@@ -6,10 +6,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @param url The URL to set in the etching table
- * @author Jackson
- */
 @ApiStatus.Internal
 public record ServerboundSetUrlPacket(String url) implements EtchedPacket {
 

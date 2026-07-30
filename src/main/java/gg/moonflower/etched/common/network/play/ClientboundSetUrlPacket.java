@@ -8,10 +8,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @param url The URL to set in the etching table
- * @author Ocelot
- */
 @ApiStatus.Internal
 public record ClientboundSetUrlPacket(String url) implements EtchedPacket {
 

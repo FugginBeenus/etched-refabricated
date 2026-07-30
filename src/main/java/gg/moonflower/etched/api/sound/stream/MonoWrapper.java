@@ -7,11 +7,6 @@ import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-/**
- * Skips the second track of a stereo track to read as mono.
- *
- * @author Ocelot
- */
 public class MonoWrapper implements AudioStream {
 
     private final AudioStream source;

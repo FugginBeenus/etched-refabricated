@@ -12,9 +12,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * @author Ocelot
- */
 public class AlbumCoverMenu extends AbstractContainerMenu {
 
     private final Inventory inventory;

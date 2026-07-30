@@ -23,11 +23,6 @@ import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.nio.file.Path;
 
-/**
- * Album Printer screen, drawn procedurally (no texture; block/GUI art comes later). Inputs on the
- * left (cover, image-upload, dye), a scrollable procedural-pattern picker in the middle, result on
- * the right.
- */
 public class AlbumPrinterScreen extends AbstractContainerScreen<AlbumPrinterMenu> {
 
     private static final int SELECTED = HiFiPanel.AM_HI;

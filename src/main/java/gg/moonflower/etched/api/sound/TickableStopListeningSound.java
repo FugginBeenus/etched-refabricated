@@ -3,11 +3,6 @@ package gg.moonflower.etched.api.sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.resources.sounds.TickableSoundInstance;
 
-/**
- * Wrapper for {@link SoundInstance} that respects {@link SoundStopListener} and {@link TickableSoundInstance}.
- *
- * @author Ocelot
- */
 public class TickableStopListeningSound extends StopListeningSound implements TickableSoundInstance {
 
     private final TickableSoundInstance tickableSource;

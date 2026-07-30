@@ -28,9 +28,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * @author Ocelot
- */
 public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu> {
 
     private static final ResourceLocation CONTAINER_LOCATION = gg.moonflower.etched.api.util.EtchedResourceLocation.of("textures/gui/container/dispenser.png");

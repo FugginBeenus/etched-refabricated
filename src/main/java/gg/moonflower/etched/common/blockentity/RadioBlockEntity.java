@@ -21,9 +21,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author Ocelot
- */
 public class RadioBlockEntity extends BlockEntity implements Clearable {
 
     private String url;

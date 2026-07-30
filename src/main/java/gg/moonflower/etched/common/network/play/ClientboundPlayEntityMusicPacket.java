@@ -10,9 +10,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @author Ocelot
- */
 @ApiStatus.Internal
 public class ClientboundPlayEntityMusicPacket implements EtchedPacket {
 
@@ -55,30 +52,18 @@ public class ClientboundPlayEntityMusicPacket implements EtchedPacket {
         buf.writeVarInt(this.entityId);
     }
 
-    /**
-     * @return The action to be performed on the client
-     */
     public Action getAction() {
         return this.action;
     }
 
-    /**
-     * @return The id of the record item
-     */
     public ItemStack getRecord() {
         return this.record;
     }
 
-    /**
-     * @return The id of the minecart entity
-     */
     public int getEntityId() {
         return this.entityId;
     }
 
-    /**
-     * @author Ocelot
-     */
     public enum Action {
         START, STOP, RESTART
     }

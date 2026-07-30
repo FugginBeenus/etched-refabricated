@@ -31,9 +31,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * @author Jackson
- */
 public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implements ContainerListener {
 
     private static final ResourceLocation TEXTURE = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/gui/container/etching_table.png");

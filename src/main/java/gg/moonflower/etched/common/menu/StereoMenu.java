@@ -14,21 +14,13 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Upgrade slots and settings for a {@link StereoBlockEntity}. The stereo's stats are sent through data
- * slots so the screen can show what the installed upgrades bought.
- *
- * @author Jackson
- */
 public class StereoMenu extends AbstractContainerMenu {
 
-    /** Turns on link mode and closes the screen so speakers can be clicked. */
     public static final int BUTTON_LINK = 200;
-    /** Switches between playing from all speakers and only the nearest. */
+
     public static final int BUTTON_MODE = 201;
     // Ids 0-100 set the master volume as a percent.
 
-    /** Preamps come first in the container, then transmitters. */
     public static final int PREAMP_SLOTS = 2;
     public static final int TRANSMITTER_SLOTS = StereoBlockEntity.UPGRADE_SLOTS - PREAMP_SLOTS;
 
@@ -131,16 +123,10 @@ public class StereoMenu extends AbstractContainerMenu {
         return this.paired.get();
     }
 
-    /**
-     * @return The master volume as a percent
-     */
     public int getVolumePercent() {
         return this.volume.get();
     }
 
-    /**
-     * @return The stereo's position, for the screen to start link mode against
-     */
     public BlockPos getPos() {
         StereoBlockEntity stereo = this.stereo();
         return stereo != null ? stereo.getBlockPos() : BlockPos.ZERO;
@@ -215,10 +201,6 @@ public class StereoMenu extends AbstractContainerMenu {
         return this.container.stillValid(player);
     }
 
-    /**
-     * A slot that only takes one kind of upgrade, so where a part sits in the menu always matches where
-     * the screen draws it on the unit.
-     */
     private static class UpgradeSlot extends Slot {
 
         private final Item upgrade;

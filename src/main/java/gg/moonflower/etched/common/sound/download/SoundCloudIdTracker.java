@@ -17,9 +17,6 @@ import java.util.concurrent.CompletionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author Ocelot
- */
 public final class SoundCloudIdTracker {
 
     private static final Object LOCK = new Object();
@@ -119,21 +116,12 @@ public final class SoundCloudIdTracker {
         currentRequest.join();
     }
 
-    /**
-     * Invalidates the previously found client id.
-     */
     public static void invalidate() {
         synchronized (LOCK) {
             currentId = null;
         }
     }
 
-    /**
-     * Retrieves the client id from sound cloud using the provided proxy.
-     *
-     * @param proxy The proxy to use
-     * @return The client id from sound cloud
-     */
     public static String fetch(Proxy proxy) {
         if (currentId == null) {
             findIdFromSite(proxy);

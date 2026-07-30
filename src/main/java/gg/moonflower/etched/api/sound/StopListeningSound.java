@@ -13,11 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Wrapper for {@link SoundInstance} that respects {@link SoundStopListener}.
- *
- * @author Ocelot
- */
 public class StopListeningSound implements SoundInstance, SoundStopListener, WrappedSoundInstance {
 
     private final SoundInstance source;

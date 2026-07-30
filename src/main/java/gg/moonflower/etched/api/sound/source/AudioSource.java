@@ -24,11 +24,6 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-/**
- * Sources of raw audio data to be played.
- *
- * @author Ocelot
- */
 public interface AudioSource {
 
     Logger LOGGER = LogManager.getLogger();
@@ -194,9 +189,6 @@ public interface AudioSource {
         return () -> Files.newInputStream(path);
     }
 
-    /**
-     * @return A future to a resource that will exist at some point in the future
-     */
     CompletableFuture<InputStream> openStream();
 
     enum AudioFileType {

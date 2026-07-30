@@ -6,9 +6,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 
-/**
- * @author Ocelot
- */
 public class EntityRecordSoundInstance extends AbstractTickableSoundInstance {
 
     private final Entity entity;

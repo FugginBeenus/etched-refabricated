@@ -13,9 +13,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * @author Ocelot
- */
 public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
 
     private static final ResourceLocation TEXTURE = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/gui/radio.png");

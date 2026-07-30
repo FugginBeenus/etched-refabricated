@@ -30,9 +30,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author Ocelot
- */
 public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity implements WorldlyContainer {
 
     private static final int[] SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -267,13 +264,6 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         return this.track;
     }
 
-    /**
-     * Sets the playing disc and track.
-     *
-     * @param playingIndex The new index to play
-     * @param track        The track to play on the disc
-     * @return Whether a change was made in the index
-     */
     public boolean setPlayingIndex(int playingIndex, int track) {
         this.playingIndex = playingIndex;
         this.track = track;
@@ -289,18 +279,12 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         return false;
     }
 
-    /**
-     * Stops playing the current track and resets to the start.
-     */
     public void stopPlaying() {
         this.playingIndex = -1;
         this.track = 0;
         this.playingStack = ItemStack.EMPTY;
     }
 
-    /**
-     * Cycles to the previous index to begin playing.
-     */
     public void previous() {
         if (this.track > 0) {
             this.track--;
@@ -315,9 +299,6 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         }
     }
 
-    /**
-     * Cycles to the next index to begin playing.
-     */
     public void next() {
         int tracks = this.playingIndex < 0 || this.playingIndex >= this.getContainerSize() ? 1 : PlayableRecord.getStackTrackCount(this.getItem(this.playingIndex));
         if (this.track < tracks - 1) {
@@ -331,9 +312,6 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         }
     }
 
-    /**
-     * Starts playing the next valid song in the album.
-     */
     public void nextPlayingIndex(boolean reverse) {
         boolean wrap = false;
         this.playingIndex = Mth.clamp(this.playingIndex, 0, this.getContainerSize() - 1);
@@ -367,11 +345,6 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         this.playingStack = this.getItem(this.playingIndex).copy();
     }
 
-    /**
-     * Changes the current playing index to the next valid disc.
-     *
-     * @return Whether a change was made
-     */
     public boolean recalculatePlayingIndex(boolean reverse) {
         if (this.isEmpty()) {
             if (this.playingIndex == -1) {

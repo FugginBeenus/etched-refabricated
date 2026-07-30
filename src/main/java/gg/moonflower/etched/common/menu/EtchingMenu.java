@@ -41,9 +41,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-/**
- * @author Ocelot, Jackson
- */
 public class EtchingMenu extends AbstractContainerMenu {
 
     public static final ResourceLocation EMPTY_SLOT_MUSIC_DISC = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "item/empty_etching_table_slot_music_disc");
@@ -387,11 +384,6 @@ public class EtchingMenu extends AbstractContainerMenu {
         return this.labelIndex.get();
     }
 
-    /**
-     * Sets the URL for the resulting stack to the specified value.
-     *
-     * @param string The new URL
-     */
     public void setUrl(String string) {
         if (!Objects.equals(this.url, string)) {
             this.url = string;

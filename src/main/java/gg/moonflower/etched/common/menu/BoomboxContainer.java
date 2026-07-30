@@ -8,9 +8,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * @author Ocelot
- */
 public class BoomboxContainer implements Container {
 
     private final Inventory inventory;

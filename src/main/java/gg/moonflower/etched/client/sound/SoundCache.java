@@ -29,10 +29,6 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * @author Ocelot
- * @see AudioSource#downloadTo(URL, boolean, DownloadProgressListener, AudioSource.AudioFileType)
- */
 @ApiStatus.Internal
 public final class SoundCache {
 
@@ -128,12 +124,6 @@ public final class SoundCache {
         }
     }
 
-    /**
-     * Downloads an audio stream from the specified URL and stores it in a local cache.
-     *
-     * @param url The url to download the sound from
-     * @return An input stream to the locally downloaded file
-     */
     public static CompletableFuture<AudioSource> getAudioStream(String url, @Nullable DownloadProgressListener listener, AudioSource.AudioFileType type) {
         if (DOWNLOADING.containsKey(url)) {
             CompletableFuture<AudioSource> future = DOWNLOADING.get(url);
@@ -226,11 +216,6 @@ public final class SoundCache {
         return CACHE_FOLDER.resolve(key);
     }
 
-    /**
-     * @param expiration   The date this object will expire at
-     * @param noCache      Whether the cache must validate the response with the server before reusing the cache
-     * @param staleIfError Whether a stale response can be used if the server returns an error
-     */
     public record CacheMetadata(long expiration,
                                 boolean noCache,
                                 boolean staleIfError) {

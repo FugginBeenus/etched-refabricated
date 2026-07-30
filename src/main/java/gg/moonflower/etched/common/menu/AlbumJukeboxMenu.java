@@ -21,9 +21,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Ocelot
- */
 public class AlbumJukeboxMenu extends AbstractContainerMenu {
 
     public static final int BUTTON_TOGGLE_ALBUM = 0;

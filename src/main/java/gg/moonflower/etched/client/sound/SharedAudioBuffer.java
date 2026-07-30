@@ -18,16 +18,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * A track decoded once into a single in-memory PCM buffer that any number of sounds can play from.
- * <p>
- * Playing the same record from several speakers used to give each sound its own download and decode,
- * so they finished at different times and started seconds apart. Here the work happens once per URL
- * and every speaker takes a lightweight reader over the same samples. Because they all wait on the
- * same future, they are released together and stay in sync as OpenAL plays each at real time.
- *
- * @author Jackson
- */
 @Environment(EnvType.CLIENT)
 public final class SharedAudioBuffer {
 
@@ -45,14 +35,6 @@ public final class SharedAudioBuffer {
         this.samples = samples;
     }
 
-    /**
-     * Retrieves the decoded buffer for a track, decoding it if this is the first request. Concurrent
-     * requests for the same url share a single decode.
-     *
-     * @param url  The track to decode
-     * @param type The type of audio to accept
-     * @return A future to the shared buffer
-     */
     public static CompletableFuture<SharedAudioBuffer> get(String url, AudioSource.AudioFileType type) {
         return CACHE.computeIfAbsent(url, key -> SoundCache.getAudioStream(key, null, type)
                 .thenCompose(AudioSource::openStream)
@@ -81,16 +63,10 @@ public final class SharedAudioBuffer {
         return out.toByteArray();
     }
 
-    /**
-     * @return A new stream over these samples, starting from the beginning
-     */
     public AudioStream openReader() {
         return new Reader();
     }
 
-    /**
-     * Drops every cached track. Called when leaving a world so buffers are not held forever.
-     */
     public static void clear() {
         CACHE.clear();
     }

@@ -45,9 +45,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Supplier;
 
-/**
- * @author Ocelot
- */
 public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
 
     private static final Logger LOGGER = LogManager.getLogger();
@@ -73,14 +70,6 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
         return sound instanceof SoundStreamModifier ? ((SoundStreamModifier) sound).modifyStream(stream) : new MonoWrapper(stream);
     }
 
-    /**
-     * Decodes raw downloaded audio, trying OGG, WAV, MP3 then AAC in turn. Shared by the regular
-     * online-sound path and the speaker shared-buffer path.
-     *
-     * @param stream          The raw audio data
-     * @param repeatInstantly Whether the resulting stream should loop
-     * @return The decoded audio stream, before any channel (mono) conversion
-     */
     public static AudioStream decodeAudio(InputStream stream, boolean repeatInstantly) throws Exception {
         InputStream rawStream = new BufferedInputStream(stream);
 

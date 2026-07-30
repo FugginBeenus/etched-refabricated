@@ -28,9 +28,6 @@ public class Etched {
 
     }
 
-    /**
-     * The shared executor for network downloads. 1.21 removed {@code HttpUtil.DOWNLOAD_EXECUTOR}.
-     */
     public static java.util.concurrent.Executor downloadExecutor() {
         //? if >=1.21 {
         /*return net.minecraft.Util.nonCriticalIoPool();

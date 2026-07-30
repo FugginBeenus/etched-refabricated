@@ -8,9 +8,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * @author Ocelot
- */
 public class BoomboxScreen extends AbstractContainerScreen<BoomboxMenu> {
 
     private static final ResourceLocation BOOMBOX_LOCATION = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/gui/container/boombox.png");

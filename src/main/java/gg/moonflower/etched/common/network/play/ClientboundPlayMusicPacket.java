@@ -12,11 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * @param record The record to play
- * @param pos    The position the music disk is playing at
- * @author Ocelot
- */
 @ApiStatus.Internal
 public record ClientboundPlayMusicPacket(ItemStack record, BlockPos pos) implements EtchedPacket {
 
@@ -38,9 +33,6 @@ public record ClientboundPlayMusicPacket(ItemStack record, BlockPos pos) impleme
         buf.writeBlockPos(this.pos);
     }
 
-    /**
-     * @return The tracks to play in sequence
-     */
     public TrackData[] tracks() {
         return PlayableRecord.getStackMusic(this.record).orElseGet(() -> new TrackData[0]);
     }

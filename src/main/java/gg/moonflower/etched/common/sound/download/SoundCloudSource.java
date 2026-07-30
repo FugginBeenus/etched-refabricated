@@ -25,9 +25,6 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-/**
- * @author Ocelot
- */
 public class SoundCloudSource implements SoundDownloadSource {
 
     static final Logger LOGGER = LogManager.getLogger();

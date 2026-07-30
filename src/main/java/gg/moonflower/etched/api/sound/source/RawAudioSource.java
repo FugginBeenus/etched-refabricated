@@ -12,9 +12,6 @@ import java.net.URL;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-/**
- * @author Ocelot
- */
 public class RawAudioSource implements AudioSource {
 
     private final CompletableFuture<AsyncInputStream.InputStreamSupplier> locationFuture;

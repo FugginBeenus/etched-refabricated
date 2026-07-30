@@ -9,12 +9,6 @@ import net.minecraft.world.inventory.DataSlot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Volume control for a single speaker. Has no slots; the volume is sent as a percent through the
- * menu's button channel so it stays in sync without a dedicated packet.
- *
- * @author Jackson
- */
 public class SpeakerMenu extends AbstractContainerMenu {
 
     private final SpeakerBlockEntity speaker;
@@ -33,9 +27,6 @@ public class SpeakerMenu extends AbstractContainerMenu {
         }
     }
 
-    /**
-     * @return The speaker's volume as a percent
-     */
     public int getVolumePercent() {
         return this.volume.get();
     }

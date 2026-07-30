@@ -8,9 +8,6 @@ import net.minecraft.client.resources.sounds.TickableSoundInstance;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 
-/**
- * @author Ocelot
- */
 public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance implements TickableSoundInstance {
 
     private final Entity entity;
@@ -23,24 +20,12 @@ public class OnlineRecordSoundInstance extends AbstractOnlineSoundInstance imple
     private java.util.function.DoubleSupplier volumeSupplier;
     private boolean stopped;
 
-    /**
-     * Recalculates this sound's volume every tick from the given supplier.
-     *
-     * @param volume The volume to use
-     * @return This sound, for chaining
-     */
     public OnlineRecordSoundInstance withVolume(java.util.function.DoubleSupplier volume) {
         this.volumeSupplier = volume;
         this.volume = (float) volume.getAsDouble();
         return this;
     }
 
-    /**
-     * Stops this sound as soon as the given condition reports <code>true</code>.
-     *
-     * @param condition The condition to test each tick
-     * @return This sound, for chaining
-     */
     public OnlineRecordSoundInstance stopWhen(java.util.function.BooleanSupplier condition) {
         this.stopCondition = condition;
         return this;

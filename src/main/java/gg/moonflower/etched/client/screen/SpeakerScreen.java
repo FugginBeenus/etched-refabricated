@@ -7,13 +7,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * A speaker's volume, shown as a waveform: turning the slider up opens the waveform behind the glass, so
- * the control reads as level rather than needing to be described. The only text is the title and the
- * percentage.
- *
- * @author Jackson
- */
 public class SpeakerScreen extends AbstractContainerScreen<SpeakerMenu> {
 
     private static final int DISPLAY_X = 8;
@@ -46,10 +39,6 @@ public class SpeakerScreen extends AbstractContainerScreen<SpeakerMenu> {
         }
     }
 
-    /**
-     * @return The level the display should show: the slider's own value, so the waveform tracks a drag
-     *         immediately instead of waiting for the server to echo it back
-     */
     private double level() {
         return this.slider != null ? this.slider.level() : this.menu.getVolumePercent() / 100.0;
     }

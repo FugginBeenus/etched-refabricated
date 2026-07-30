@@ -9,9 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 
-/**
- * @author Ocelot
- */
 public class RawAudioStream implements AudioStream {
 
     private final AudioFormat format;

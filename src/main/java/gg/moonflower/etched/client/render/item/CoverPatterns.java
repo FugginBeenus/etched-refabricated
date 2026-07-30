@@ -3,11 +3,6 @@ package gg.moonflower.etched.client.render.item;
 import com.mojang.blaze3d.platform.NativeImage;
 import gg.moonflower.etched.common.item.CoverArt;
 
-/**
- * Procedurally-generated album-cover patterns (no texture assets). Each pattern is drawn onto a
- * cover-sized canvas in a chosen color, over a base color, then multiplied by the cover overlay so it
- * matches the styling of image covers. Pattern indices are stored in {@link CoverArt} and are stable.
- */
 public final class CoverPatterns {
 
     public static final String[] NAMES = {

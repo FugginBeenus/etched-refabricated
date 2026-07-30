@@ -195,12 +195,6 @@ public class BoomboxItem extends Item implements ContainerItem {
         entity.playSound(SoundEvents.BUNDLE_DROP_CONTENTS, 0.8F, 0.8F + entity.level().getRandom().nextFloat() * 0.4F);
     }
 
-    /**
-     * Retrieves the current hand boombox sounds are coming from for the specified entity.
-     *
-     * @param entity The entity to check
-     * @return The hand the entity is using or <code>null</code> if no boombox is playing
-     */
     @Nullable
     public static InteractionHand getPlayingHand(LivingEntity entity) {
         if (!PLAYING_RECORDS.containsKey(entity.getId())) {

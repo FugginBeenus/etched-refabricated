@@ -15,10 +15,6 @@ import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 
-/**
- * Loom-style menu for the Album Printer: an album cover (+ dye) in, a decorated album cover out.
- * Art design (image or procedural pattern) is applied to the result; see {@code setupResultSlot}.
- */
 public class AlbumPrinterMenu extends AbstractContainerMenu {
 
     public static final int MODE_PATTERN = 0;

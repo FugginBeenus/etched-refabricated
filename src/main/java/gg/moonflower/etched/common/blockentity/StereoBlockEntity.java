@@ -20,13 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Sits on top of a jukebox and drives the speakers that play its records. Speakers touching the
- * jukebox are always connected; the stereo adds wireless ones the player has paired to it, up to a
- * count and range that its upgrades raise.
- *
- * @author Jackson
- */
 public class StereoBlockEntity extends BlockEntity implements net.minecraft.world.Container {
 
     public static final int BASE_SPEAKERS = 2;
@@ -35,9 +28,9 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
     public static final int RANGE_PER_TRANSMITTER = 16;
 
     public static final int UPGRADE_SLOTS = 4;
-    /** Every speaker plays the record at once. */
+
     public static final int MODE_ALL = 0;
-    /** Only the speaker nearest the listener plays, and it follows them. */
+
     public static final int MODE_NEAREST = 1;
 
     private final Set<BlockPos> speakers = new LinkedHashSet<>();
@@ -54,9 +47,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         this(EtchedBlocks.STEREO_BE.get(), pos, state);
     }
 
-    /**
-     * @return The jukebox this stereo is sitting on
-     */
     public BlockPos getSourcePos() {
         return this.worldPosition.below();
     }
@@ -87,9 +77,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return count;
     }
 
-    /**
-     * @return The slots upgrades are installed in
-     */
     public net.minecraft.core.NonNullList<net.minecraft.world.item.ItemStack> getUpgrades() {
         return this.upgrades;
     }
@@ -98,9 +85,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return this.mode;
     }
 
-    /**
-     * @return The master volume every speaker this stereo drives is scaled by
-     */
     public float getVolume() {
         return this.volume;
     }
@@ -110,9 +94,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         this.sync();
     }
 
-    /**
-     * @return The master volume of the stereo above the given block, or full volume if there is none
-     */
     public static float masterVolumeAt(net.minecraft.world.level.BlockGetter level, net.minecraft.core.BlockPos sourcePos) {
         return level.getBlockEntity(sourcePos.above()) instanceof StereoBlockEntity stereo ? stereo.getVolume() : 1.0F;
     }
@@ -127,9 +108,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
                 || stack.is(gg.moonflower.etched.core.registry.EtchedItems.TRANSMITTER.asItem());
     }
 
-    /**
-     * @return Every paired speaker position, whether or not it is still valid
-     */
     public Set<BlockPos> getPairedSpeakers() {
         return this.speakers;
     }
@@ -138,12 +116,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return this.speakers.contains(pos.immutable());
     }
 
-    /**
-     * Pairs a speaker, or unpairs it if it already was.
-     *
-     * @param pos The speaker to toggle
-     * @return The state of the speaker after toggling
-     */
     public boolean togglePaired(BlockPos pos) {
         BlockPos key = pos.immutable();
         boolean paired;
@@ -162,13 +134,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return pos.distSqr(this.worldPosition) <= (double) range * range;
     }
 
-    /**
-     * The speakers a record should currently play from: everything touching the jukebox, plus paired
-     * speakers that are still present and in range, capped by the installed preamps.
-     *
-     * @param level The level to look up blocks in
-     * @return The speaker positions to play from
-     */
     public List<BlockPos> getActiveSpeakers(BlockGetter level) {
         List<BlockPos> active = new ArrayList<>();
         BlockPos source = this.getSourcePos();
@@ -198,13 +163,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return active;
     }
 
-    /**
-     * Forgets paired positions whose speaker has been broken, and reports how many real speakers are
-     * still paired. Positions in unloaded chunks are left alone and counted, so wandering away from a
-     * speaker never unpairs it.
-     *
-     * @return The number of paired speakers that still exist
-     */
     public int pruneAndCountPaired() {
         if (this.level == null) {
             return this.speakers.size();
@@ -295,10 +253,6 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         return stack;
     }
 
-    /**
-     * One part per bay. An upgrade is a piece of hardware installed into the unit, so a stack of them in
-     * one slot must not read as several: this is what keeps the speaker and range ceilings real.
-     */
     @Override
     public int getMaxStackSize() {
         return 1;

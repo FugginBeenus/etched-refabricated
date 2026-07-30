@@ -11,11 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 
-/**
- * Conversions between Minecraft's {@link NativeImage} and AWT/PNG, for the Album Printer image path.
- * NativeImage stores pixels as RGBA (little-endian int {@code 0xAABBGGRR}); AWT uses {@code 0xAARRGGBB},
- * so red and blue are swapped in both directions.
- */
 public final class CoverImageUtil {
 
     private CoverImageUtil() {

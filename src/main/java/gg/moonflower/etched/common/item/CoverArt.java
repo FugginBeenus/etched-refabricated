@@ -11,12 +11,6 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Custom album-cover art produced by the Album Printer, stored in the stack's custom NBT (via
- * {@link EtchedData}, so it works and syncs on both 1.20.1 and 1.21). When present it overrides the
- * disc-derived cover art. Two mutually exclusive modes: a baked image (Base64 PNG of the already
- * processed, cover-sized picture) or a procedural pattern design (base color + tinted layers).
- */
 public final class CoverArt {
 
     private static final String KEY = "CoverArt";

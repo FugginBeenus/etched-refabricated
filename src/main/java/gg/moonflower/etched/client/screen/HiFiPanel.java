@@ -4,20 +4,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
-/**
- * Shared coded (texture-free) drawing for the mod's block screens.
- *
- * <p>The chrome stays close to vanilla — same bevels, same proportions, a faintly warm grey — so the
- * screens never feel jarring. The mod's character comes from what is drawn <i>inside</i> them: a
- * waveform that grows with a speaker's volume, a line-art stereo whose installed upgrades appear as
- * physical hardware, a wireless field that widens with each transmitter. Information is shown as
- * graphics rather than written out, so the panels carry almost no text.
- *
- * <p>Everything is solid fills, so it needs no assets and works at any GUI scale. Line art is drawn
- * pixel by pixel ({@link #line}, {@link #arc}) to stay crisp instead of relying on smoothing.
- *
- * @author Jackson
- */
 public final class HiFiPanel {
 
     // Panel chrome: vanilla's structure, warmed very slightly.
@@ -70,9 +56,6 @@ public final class HiFiPanel {
         g.fill(x, y, x + 1, y + 1, color);
     }
 
-    /**
-     * A 1px line, plotted with Bresenham so diagonals stay crisp at every GUI scale.
-     */
     public static void line(GuiGraphics g, int x0, int y0, int x1, int y1, int color) {
         int dx = Math.abs(x1 - x0);
         int dy = Math.abs(y1 - y0);
@@ -96,10 +79,6 @@ public final class HiFiPanel {
         }
     }
 
-    /**
-     * A 1px arc from {@code a0} to {@code a1} radians. The step is scaled by radius so the arc stays
-     * unbroken without wasting fills.
-     */
     public static void arc(GuiGraphics g, int cx, int cy, int r, double a0, double a1, int color) {
         double step = Math.max(0.004, 0.55 / Math.max(1, r));
         for (double t = a0; t <= a1; t += step) {
@@ -111,9 +90,6 @@ public final class HiFiPanel {
         arc(g, cx, cy, r, 0.0, Math.PI * 2.0, color);
     }
 
-    /**
-     * An outlined rectangle, 1px.
-     */
     public static void box(GuiGraphics g, int x, int y, int x2, int y2, int color) {
         line(g, x, y, x2, y, color);
         line(g, x, y2, x2, y2, color);
@@ -123,9 +99,6 @@ public final class HiFiPanel {
 
     // ---- chrome ----
 
-    /**
-     * The container background: vanilla's bevelled panel in a faintly warm grey.
-     */
     public static void panel(GuiGraphics g, int x, int y, int w, int h) {
         int x2 = x + w;
         int y2 = y + h;
@@ -137,28 +110,18 @@ public final class HiFiPanel {
         g.fill(x + 2, y2 - 2, x2 - 1, y2 - 1, LO);
     }
 
-    /**
-     * A recessed slot. {@code (x, y)} is the top-left of the 16x16 item area, matching the menus.
-     */
     public static void slot(GuiGraphics g, int x, int y) {
         g.fill(x - 1, y - 1, x + 17, y + 17, HI);
         g.fill(x - 1, y - 1, x + 16, y + 16, SLOT_SH);
         g.fill(x, y, x + 16, y + 16, SLOT);
     }
 
-    /**
-     * A recessed dark display window, for anything that reads as lit instrumentation.
-     */
     public static void glass(GuiGraphics g, int x, int y, int w, int h) {
         g.fill(x, y, x + w, y + h, SLOT_SH);
         g.fill(x + 1, y + 1, x + w, y + h, HI);
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, GLASS);
     }
 
-    /**
-     * A slider track with an amber level fill and a raised knob. Deliberately unlabelled: the screens
-     * show the value with a readout or a display instead of printing it across the control.
-     */
     public static void slider(GuiGraphics g, int x, int y, int w, int h, double value) {
         double v = clamp01(value);
         g.fill(x, y, x + w, y + h, SLOT_SH);
@@ -182,10 +145,6 @@ public final class HiFiPanel {
         g.fill(kx + 1, y + h - 2, kx + knobW - 1, y + h - 1, LO);
     }
 
-    /**
-     * A button face in the panel's own palette, so screens don't mix vanilla's grey buttons with themed
-     * chrome.
-     */
     public static void button(GuiGraphics g, Font font, int x, int y, int w, int h, Component label, boolean hovered, boolean active) {
         g.fill(x, y, x + w, y + h, EDGE);
         g.fill(x + 1, y + 1, x + w - 1, y + h - 1, hovered && active ? HI : FACE_BTN);
@@ -199,10 +158,6 @@ public final class HiFiPanel {
 
     // ---- instrumentation ----
 
-    /**
-     * A waveform behind glass whose amplitude tracks {@code level} (0-1). This is a speaker's volume
-     * readout: turning it up visibly opens the waveform, so the control explains itself.
-     */
     public static void waveform(GuiGraphics g, int x, int y, int w, int h, double level) {
         double v = clamp01(level);
         glass(g, x, y, w, h);
@@ -226,9 +181,6 @@ public final class HiFiPanel {
         }
     }
 
-    /**
-     * A faint chip outline, drawn in an empty upgrade slot so its purpose is clear without a label.
-     */
     public static void ghostChip(GuiGraphics g, int x, int y) {
         box(g, x + 3, y + 6, x + 13, y + 11, SOFT);
         for (int i = 0; i < 3; i++) {
@@ -237,14 +189,6 @@ public final class HiFiPanel {
         }
     }
 
-    /**
-     * The stereo unit in three-quarter view, with the hardware that is actually installed drawn onto it:
-     * a preamp module seated on the top face for each preamp, and a transmitter dongle plugged into the
-     * back panel for each transmitter. Returns the anchor points screens use to place leader lines.
-     *
-     * @param preamps      How many preamp modules to seat on top (0-2)
-     * @param transmitters How many dongles to plug into the back (0-2)
-     */
     public static Anchors stereoUnit(GuiGraphics g, int ox, int oy, int preamps, int transmitters) {
         int depth = 8;
         int fx = ox;
@@ -328,11 +272,6 @@ public final class HiFiPanel {
         return new Anchors(fx, midY, fx2 + depth);
     }
 
-    /**
-     * The stereo's wireless field: arcs sweeping out from the unit, one more for each transmitter, with a
-     * speaker glyph for every paired speaker. Speakers past the preamp cap are drawn hollow, so it is
-     * visible when more are paired than can be driven.
-     */
     public static void wirelessField(GuiGraphics g, int cx, int cy, int transmitters, int paired, int maxSpeakers) {
         double from = 2.55;
         double to = 3.75;
@@ -364,13 +303,6 @@ public final class HiFiPanel {
         return v < 0.0 ? 0.0 : Math.min(v, 1.0);
     }
 
-    /**
-     * Anchor points on the drawn stereo unit, for attaching leader lines from the upgrade slots.
-     *
-     * @param leftX The left edge of the front face, where the wireless field originates
-     * @param midY  The vertical middle of the front face
-     * @param backX The outer edge of the back panel, where dongles plug in
-     */
     public record Anchors(int leftX, int midY, int backX) {
     }
 }

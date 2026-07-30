@@ -10,17 +10,6 @@ import net.minecraft.world.entity.player.Inventory;
 
 import java.util.List;
 
-/**
- * A stereo drawn as a piece of equipment being built up: the unit sits in the middle of the panel, the
- * preamps the player installs appear seated on its top face, the transmitters appear plugged into its
- * back panel, and the wireless field sweeping out from it widens with every transmitter. Paired speakers
- * ride that field, hollow if more are paired than the preamps can drive.
- *
- * <p>The upgrade slots are placed against the part of the unit they feed, so nothing needs a label. The
- * numbers behind it all are available on hover.
- *
- * @author Jackson
- */
 public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
 
     // The unit's top-left. StereoMenu.PREAMP_X is UNIT_X + 8 so the bays drawn on the top face sit

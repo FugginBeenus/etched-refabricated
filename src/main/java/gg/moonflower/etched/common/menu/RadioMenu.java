@@ -10,9 +10,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 
-/**
- * @author Ocelot
- */
 public class RadioMenu extends AbstractContainerMenu {
 
     private final ContainerLevelAccess access;
@@ -40,11 +37,6 @@ public class RadioMenu extends AbstractContainerMenu {
         return stillValid(this.access, player, EtchedBlocks.RADIO.get());
     }
 
-    /**
-     * Sets the URL for the resulting stack to the specified value.
-     *
-     * @param url The new URL
-     */
     public void setUrl(String url) {
         this.urlConsumer.accept(url);
     }

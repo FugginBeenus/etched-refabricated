@@ -14,9 +14,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.IntStream;
 
-/**
- * @author Ocelot
- */
 public class StreamingAudioSource implements AudioSource {
 
     private final URL[] urls;

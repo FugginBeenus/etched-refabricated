@@ -10,9 +10,6 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-/**
- * @author Ocelot
- */
 public class AlbumCoverContainer implements Container {
 
     private final Inventory inventory;

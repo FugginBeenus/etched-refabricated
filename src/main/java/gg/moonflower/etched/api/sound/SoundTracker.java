@@ -425,6 +425,13 @@ public class SoundTracker {
     }
 
     /**
+     * @return Whether a record (the primary sound) is currently tracked as playing at the given block
+     */
+    public static boolean isRecordPlaying(BlockPos pos) {
+        return ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getPlayingRecords().containsKey(pos);
+    }
+
+    /**
      * Plays a record stack for an entity.
      *
      * @param record              The record to play

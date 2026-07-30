@@ -25,6 +25,11 @@ public abstract class LevelRendererMixin {
     @Unique
     private BlockPos pos;
 
+    //? if >=1.21 {
+    /*@Unique
+    private net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> etched$song;
+    *///?}
+
     @Shadow
     private ClientLevel level;
 
@@ -38,6 +43,7 @@ public abstract class LevelRendererMixin {
     /*@Inject(method = "playJukeboxSong", at = @At("HEAD"))
     public void etched$capturePos(net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> song, BlockPos pos, CallbackInfo ci) {
         this.pos = pos;
+        this.etched$song = song;
     }
 
     @Redirect(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setNowPlaying(Lnet/minecraft/network/chat/Component;)V"))
@@ -46,28 +52,41 @@ public abstract class LevelRendererMixin {
             gui.setNowPlaying(component);
     }
 
-    @Inject(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", shift = At.Shift.BEFORE), remap = false)
-    public void etched$wrapSound(net.minecraft.core.Holder<net.minecraft.world.item.JukeboxSong> song, BlockPos pos, CallbackInfo ci, @com.llamalad7.mixinextras.sugar.Local com.llamalad7.mixinextras.sugar.ref.LocalRef<SoundInstance> sound) {
-        java.util.List<BlockPos> speakers = gg.moonflower.etched.api.sound.SoundTracker.getConnectedSpeakers(this.level, pos);
-        if (!speakers.isEmpty()) {
-            // Route a vanilla disc through the speakers: put the tracked sound on the first speaker so
-            // the jukebox is silent, and play the same disc sound from any others. Vanilla still owns
-            // start/stop of the tracked sound; its stop also clears the companions.
-            net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent> soundEvent = song.value().soundEvent();
-            SoundInstance primary = net.minecraft.client.resources.sounds.SimpleSoundInstance.forJukeboxSong(soundEvent.value(), net.minecraft.world.phys.Vec3.atCenterOf(speakers.get(0)));
-            sound.set(StopListeningSound.create(primary, () -> {
-                this.notifyNearbyEntities(this.level, this.pos, false);
-                gg.moonflower.etched.api.sound.SoundTracker.stopSpeakers(pos);
-            }));
-
-            java.util.List<SoundInstance> companions = new java.util.ArrayList<>();
-            for (int i = 1; i < speakers.size(); i++) {
-                companions.add(net.minecraft.client.resources.sounds.SimpleSoundInstance.forJukeboxSong(soundEvent.value(), net.minecraft.world.phys.Vec3.atCenterOf(speakers.get(i))));
-            }
-            gg.moonflower.etched.api.sound.SoundTracker.playSpeakerCompanions(pos, companions);
-            return;
+    // Replace the disc's sound the moment it's created so the change flows into both the tracking map
+    // and the play() call. Must return a SimpleSoundInstance (the expression's type), so the speaker
+    // sound is a SimpleSoundInstance subclass that also ticks. When speakers are connected, the tracked
+    // sound follows the first speaker (falling back to the jukebox if all are removed) and the same disc
+    // sound plays from the rest; each of those stops when its own speaker is broken or the record ends.
+    @com.llamalad7.mixinextras.injector.ModifyExpressionValue(method = "playJukeboxSong", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;forJukeboxSong(Lnet/minecraft/sounds/SoundEvent;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/client/resources/sounds/SimpleSoundInstance;"))
+    public net.minecraft.client.resources.sounds.SimpleSoundInstance etched$routeJukeboxToSpeakers(net.minecraft.client.resources.sounds.SimpleSoundInstance original) {
+        net.minecraft.client.multiplayer.ClientLevel level = this.level;
+        BlockPos jukebox = this.pos;
+        if (gg.moonflower.etched.api.sound.SoundTracker.getConnectedSpeakers(level, jukebox).isEmpty()) {
+            return original;
         }
-        sound.set(StopListeningSound.create(sound.get(), () -> this.notifyNearbyEntities(this.level, this.pos, false)));
+
+        net.minecraft.sounds.SoundEvent soundEvent = this.etched$song.value().soundEvent().value();
+        java.util.List<BlockPos> speakers = gg.moonflower.etched.api.sound.SoundTracker.getConnectedSpeakers(level, jukebox);
+
+        // Companions on every speaker beyond the first; each stops when the record ends or its speaker
+        // is broken.
+        java.util.List<SoundInstance> companions = new java.util.ArrayList<>();
+        for (int i = 1; i < speakers.size(); i++) {
+            BlockPos speaker = speakers.get(i);
+            companions.add(new gg.moonflower.etched.client.sound.SpeakerJukeboxSound(soundEvent, () ->
+                    gg.moonflower.etched.api.sound.SoundTracker.isRecordPlaying(jukebox)
+                            && level.getBlockState(speaker).getBlock() instanceof gg.moonflower.etched.common.block.SpeakerBlock
+                            ? net.minecraft.world.phys.Vec3.atCenterOf(speaker)
+                            : null));
+        }
+        gg.moonflower.etched.api.sound.SoundTracker.playSpeakerCompanions(jukebox, companions);
+
+        // Primary: the tracked sound. Follows the first connected speaker, falling back to the jukebox
+        // when none remain (vanilla stops it when the record is removed).
+        return new gg.moonflower.etched.client.sound.SpeakerJukeboxSound(soundEvent, () -> {
+            java.util.List<BlockPos> current = gg.moonflower.etched.api.sound.SoundTracker.getConnectedSpeakers(level, jukebox);
+            return net.minecraft.world.phys.Vec3.atCenterOf(current.isEmpty() ? jukebox : current.get(0));
+        });
     }
     *///?} else {
     @Redirect(method = "playStreamingMusic", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/Gui;setNowPlaying(Lnet/minecraft/network/chat/Component;)V"))

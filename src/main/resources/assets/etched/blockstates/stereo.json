@@ -1,8 +1,8 @@
 {
   "variants": {
-    "facing=north": { "model": "etched:block/stereo", "uvlock": true },
-    "facing=east":  { "model": "etched:block/stereo", "y": 90,  "uvlock": true },
-    "facing=south": { "model": "etched:block/stereo", "y": 180, "uvlock": true },
-    "facing=west":  { "model": "etched:block/stereo", "y": 270, "uvlock": true }
+    "facing=north": { "model": "etched:block/stereo" },
+    "facing=east":  { "model": "etched:block/stereo", "y": 90 },
+    "facing=south": { "model": "etched:block/stereo", "y": 180 },
+    "facing=west":  { "model": "etched:block/stereo", "y": 270 }
   }
 }

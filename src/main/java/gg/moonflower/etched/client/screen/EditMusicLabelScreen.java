@@ -117,19 +117,20 @@ public class EditMusicLabelScreen extends Screen {
         //?}
     }
 
-    protected void renderBg(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        //? if >=1.21 {
-        /*this.renderBackground(graphics, mouseX, mouseY, partialTick);
-        *///?} else {
-        this.renderBackground(graphics);
-        //?}
+    // Draw the label textures in renderBackground, which Screen.render calls exactly once. The old code
+    // drew them in a separate pass and then let super.render call renderBackground again, applying the
+    // 1.21 background blur over the GUI — that was the "blurry label", not the textures themselves.
+    //? if >=1.21 {
+    /*@Override
+    public void renderBackground(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+        super.renderBackground(graphics, mouseX, mouseY, partialTick);
+    *///?} else {
+    @Override
+    public void renderBackground(GuiGraphics graphics) {
+        super.renderBackground(graphics);
+    //?}
         int leftPos = (this.width - this.imageWidth) / 2;
         int topPos = (this.height - this.imageHeight) / 2;
-
-        // Force point sampling so the art stays crisp when the GUI scale magnifies it, instead of the
-        // blurry linear filtering it was picking up.
-        this.minecraft.getTextureManager().getTexture(TEXTURE).setFilter(false, false);
-        this.minecraft.getTextureManager().getTexture(LABEL).setFilter(false, false);
 
         graphics.blit(TEXTURE, leftPos, topPos, 0, 0, this.imageWidth, this.imageHeight);
         graphics.drawString(this.font, TITLE_COMPONENT, leftPos + 7, topPos + 77, 4210752, false);
@@ -150,13 +151,20 @@ public class EditMusicLabelScreen extends Screen {
 
         RenderSystem.setShaderColor((float) (secondaryLabelColor >> 16 & 255) / 255.0F, (float) (secondaryLabelColor >> 8 & 255) / 255.0F, (float) (secondaryLabelColor & 255) / 255.0F, 1.0F);
         graphics.blit(LABEL, leftPos, topPos, 0, 70, this.imageWidth, 70);
+
+        // Reset so the label tint doesn't bleed onto the edit boxes and button drawn afterward.
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
     }
 
+    // On 1.21 Screen.render calls renderBackground itself, so overriding it (above) is enough. Before
+    // 1.21 it does not, so drive it here.
+    //? if <1.21 {
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBg(graphics, mouseX, mouseY, partialTicks);
+        this.renderBackground(graphics);
         super.render(graphics, mouseX, mouseY, partialTicks);
     }
+    //?}
 
     private void saveChanges() {
         String author = this.author.getValue().trim();

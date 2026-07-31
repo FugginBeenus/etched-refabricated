@@ -153,16 +153,7 @@ public class EtchedVillagers {
             Etched.LOGGER.info("Added bard houses to {} village house pools", filled);
         }
     }
-
-    /**
-     * Adds every bard house that exists for a village type to every house pool belonging to that type.
-     *
-     * <p>The pools are searched for rather than named outright. Vanilla's are
-     * {@code minecraft:village/<type>/houses} and its zombie twin, but a village overhaul usually ships
-     * pools under its own ids, and naming only vanilla's is why bards never turned up in those packs.
-     *
-     * @return How many pools received houses
-     */
+    
     private static int addHouses(ResourceManager resources,
                                  Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
                                  String village, int weight,
@@ -202,10 +193,6 @@ public class EtchedVillagers {
         return filled;
     }
 
-    /**
-     * Deliberately loose, so it catches an overhaul's own naming as well as vanilla's. The village type
-     * still has to match, so a plains bard house never lands in a desert village.
-     */
     private static boolean isVillageHousePool(String path, String village) {
         return path.contains("village") && path.contains(village) && path.contains("houses");
     }

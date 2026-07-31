@@ -218,7 +218,9 @@ public class RadioBlock extends BaseEntityBlock {
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         //FIXME
-        return new ItemStack(/*state.getValue(PORTAL) ? EtchedBlocks.PORTAL_RADIO_ITEM :*/EtchedBlocks.RADIO);
+        return state.getValue(PORTAL)
+                ? new ItemStack(gg.moonflower.etched.core.registry.EtchedItems.PORTAL_RADIO_ITEM.get())
+                : new ItemStack(EtchedBlocks.RADIO);
     }
     //?}
 

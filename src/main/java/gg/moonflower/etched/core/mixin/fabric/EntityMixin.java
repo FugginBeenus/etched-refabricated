@@ -12,13 +12,20 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Entity.class)
 public class EntityMixin {
 
-    // TODO(1.21): Entity.changeDimension(ServerLevel) became changeDimension(DimensionTransition)
-    // in 1.21, so this injector's captured argument no longer matches and mixin apply fails. This
-    // is the (still half-built, disabled) portal-radio Easter egg - re-target it against
-    // DimensionTransition when that feature is finished. Left inert on 1.21 so the jar boots.
-    //? if <1.21 {
+    // A radio carried into the Nether comes out the other side as a portal radio. changeDimension takes
+    // a ServerLevel before 1.21 and a DimensionTransition after, so the two branches differ only in how
+    // they get hold of the destination.
+    //? if >=1.21 {
+    /*@SuppressWarnings("ConstantConditions")
+    @Inject(method = "changeDimension", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
+    public void createPortalRadio(net.minecraft.world.level.portal.DimensionTransition transition, CallbackInfoReturnable<Entity> cir) {
+        if ((Object) this instanceof ItemEntity item) {
+            EntityHook.warpRadio(transition.newLevel(), item);
+        }
+    }
+    *///?} else {
     @SuppressWarnings("ConstantConditions")
-    @Inject(method = "changeDimension", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
+    @Inject(method = "changeDimension", require = 0, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/EntityType;create(Lnet/minecraft/world/level/Level;)Lnet/minecraft/world/entity/Entity;"))
     public void createPortalRadio(ServerLevel server, CallbackInfoReturnable<Entity> cir) {
         if ((Object) this instanceof ItemEntity) {
             EntityHook.warpRadio(server, (ItemEntity) (Object) this);

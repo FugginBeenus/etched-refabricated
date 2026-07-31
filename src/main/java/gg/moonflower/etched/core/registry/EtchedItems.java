@@ -15,6 +15,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 
 public class EtchedItems {
 
+
     //public static final DeferredRegister<Item> REGISTRY = DeferredRegister.create(ForgeRegistries.ITEMS, Etched.MOD_ID);
 
     public static final ItemEntry<MusicLabelItem> MUSIC_LABEL = 
@@ -62,12 +63,16 @@ public class EtchedItems {
         .properties(p->p.stacksTo(1))
                 .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
         .register();
-    /*
-    public static final ItemEntry<PortalRadioItem> PORTAL_RADIO_ITEM =
-        Etched.REGISTRATE.item("portal_radio", PortalRadioItem::new)
-        .properties(p->p.st(1))
-                .tab(CreativeModeTabs.TOOLS_AND_UTILITIES)
-        .register();*/
+    /**
+     * The radio's Easter egg form. It places the same radio block with its portal state set, so it is a
+     * second block item for that block rather than a block of its own, and it is deliberately left out
+     * of the creative tabs: it is meant to be discovered.
+     */
+    public static final ItemEntry<gg.moonflower.etched.common.item.PortalRadioItem> PORTAL_RADIO_ITEM =
+        Etched.REGISTRATE.item("portal_radio",
+                        p -> new gg.moonflower.etched.common.item.PortalRadioItem(EtchedBlocks.RADIO.get(), p))
+        .properties(p -> p.stacksTo(1))
+        .register();
     //register("album_cover", () -> new AlbumCoverItem(new Item.Properties().stacksTo(1)));
     // A dedicated creative tab holding every item in the mod (still also grouped under vanilla tabs).
     public static final net.minecraft.resources.ResourceKey<net.minecraft.world.item.CreativeModeTab> TAB =
@@ -81,6 +86,9 @@ public class EtchedItems {
                         .icon(() -> new net.minecraft.world.item.ItemStack(BOOMBOX.get()))
                         .displayItems((params, output) -> BuiltInRegistries.ITEM.stream()
                                 .filter(item -> BuiltInRegistries.ITEM.getKey(item).getNamespace().equals(Etched.MOD_ID))
+                                // The portal radio is an Easter egg, so it stays out of the tab that
+                                // otherwise sweeps in everything in the namespace.
+                                .filter(item -> item != PORTAL_RADIO_ITEM.get())
                                 .forEach(output::accept))
                         .build());
     }

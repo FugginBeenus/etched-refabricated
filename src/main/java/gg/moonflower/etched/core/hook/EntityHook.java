@@ -14,8 +14,8 @@ public class EntityHook {
             if (oldStack.getItem() != EtchedBlocks.RADIO.asItem())
                 return;
 
-            //FIXME: was portal radio
-            ItemStack newStack = new ItemStack(EtchedBlocks.RADIO, oldStack.getCount());
+            ItemStack newStack = new ItemStack(gg.moonflower.etched.core.registry.EtchedItems.PORTAL_RADIO_ITEM.get(),
+                    oldStack.getCount());
             //? if >=1.21 {
             /*newStack.applyComponents(oldStack.getComponents());
             *///?} else {

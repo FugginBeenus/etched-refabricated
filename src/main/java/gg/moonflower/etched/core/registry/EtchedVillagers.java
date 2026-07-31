@@ -138,46 +138,89 @@ public class EtchedVillagers {
         Registry<StructureTemplatePool> pools = poolRegistry.get();
         Registry<StructureProcessorList> processors = processorRegistry.get();
         ResourceManager resources = server.getResourceManager();
-        addHouses(resources, pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
-        addHouses(resources, pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
-        addHouses(resources, pools, processors, "savanna", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SAVANNA);
-        addHouses(resources, pools, processors, "snowy", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SNOWY);
-        addHouses(resources, pools, processors, "taiga", 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
+        int filled = 0;
+        filled += addHouses(resources, pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
+        filled += addHouses(resources, pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
+        filled += addHouses(resources, pools, processors, "savanna", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SAVANNA);
+        filled += addHouses(resources, pools, processors, "snowy", 4, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_SNOWY);
+        filled += addHouses(resources, pools, processors, "taiga", 4, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_TAIGA);
+
+        // Logged so a pack that never spawns a bard can be diagnosed from the log rather than guessed at.
+        if (filled == 0) {
+            Etched.LOGGER.warn("Found no village house pools to add bard houses to. Bards will only appear "
+                    + "where an etching table is placed by hand.");
+        } else {
+            Etched.LOGGER.info("Added bard houses to {} village house pools", filled);
+        }
     }
 
-    private static void addHouses(ResourceManager resources,
-                                  Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
-                                  String village, int weight,
-                                  ResourceKey<StructureProcessorList> processor,
-                                  ResourceKey<StructureProcessorList> zombieProcessor) {
-        StructureTemplatePool housePool = pools.get(EtchedResourceLocation.of("village/" + village + "/houses"));
-        StructureTemplatePool zombiePool = pools.get(EtchedResourceLocation.of("village/" + village + "/zombie/houses"));
-        Holder<StructureProcessorList> normal = processors.getHolder(processor).orElse(null);
-        Holder<StructureProcessorList> zombie = processors.getHolder(zombieProcessor).orElse(null);
-
+    /**
+     * Adds every bard house that exists for a village type to every house pool belonging to that type.
+     *
+     * <p>The pools are searched for rather than named outright. Vanilla's are
+     * {@code minecraft:village/<type>/houses} and its zombie twin, but a village overhaul usually ships
+     * pools under its own ids, and naming only vanilla's is why bards never turned up in those packs.
+     *
+     * @return How many pools received houses
+     */
+    private static int addHouses(ResourceManager resources,
+                                 Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
+                                 String village, int weight,
+                                 ResourceKey<StructureProcessorList> processor,
+                                 ResourceKey<StructureProcessorList> zombieProcessor) {
+        List<ResourceLocation> pieces = new java.util.ArrayList<>();
         for (int variant = 1; ; variant++) {
             String path = "village/" + village + "/houses/" + village + "_" + BARD + "_house_" + variant;
             if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, "structures/" + path + ".nbt")).isEmpty()) {
                 break;
             }
-
-            ResourceLocation piece = EtchedResourceLocation.of(Etched.MOD_ID, path);
-            addToPool(housePool, piece, normal, weight);
-            addToPool(zombiePool, piece, zombie, weight);
+            pieces.add(EtchedResourceLocation.of(Etched.MOD_ID, path));
         }
+        if (pieces.isEmpty()) {
+            return 0;
+        }
+
+        Holder<StructureProcessorList> normal = processors.getHolder(processor).orElse(null);
+        Holder<StructureProcessorList> zombie = processors.getHolder(zombieProcessor).orElse(null);
+
+        int filled = 0;
+        for (java.util.Map.Entry<ResourceKey<StructureTemplatePool>, StructureTemplatePool> entry : pools.entrySet()) {
+            String path = entry.getKey().location().getPath();
+            if (!isVillageHousePool(path, village)) {
+                continue;
+            }
+
+            Holder<StructureProcessorList> list = path.contains("zombie") ? zombie : normal;
+            boolean added = false;
+            for (ResourceLocation piece : pieces) {
+                added |= addToPool(entry.getValue(), piece, list, weight);
+            }
+            if (added) {
+                filled++;
+            }
+        }
+        return filled;
     }
 
-    private static void addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId,
-                                  @Nullable Holder<StructureProcessorList> processorList, int weight) {
+    /**
+     * Deliberately loose, so it catches an overhaul's own naming as well as vanilla's. The village type
+     * still has to match, so a plains bard house never lands in a desert village.
+     */
+    private static boolean isVillageHousePool(String path, String village) {
+        return path.contains("village") && path.contains(village) && path.contains("houses");
+    }
+
+    private static boolean addToPool(@Nullable StructureTemplatePool pool, ResourceLocation pieceId,
+                                     @Nullable Holder<StructureProcessorList> processorList, int weight) {
         // A missing pool means something else owns this village now; leave it alone rather than forcing
         // our way in.
         if (pool == null || processorList == null) {
-            return;
+            return false;
         }
 
         List<StructurePoolElement> templates = ((StructureTemplatePoolAccessor) pool).getTemplates();
         if (templates == null) {
-            return;
+            return false;
         }
 
         StructurePoolElement piece = StructurePoolElement.legacy(pieceId.toString(), processorList)
@@ -186,9 +229,11 @@ public class EtchedVillagers {
             for (int i = 0; i < weight; i++) {
                 templates.add(piece);
             }
+            return true;
         } catch (UnsupportedOperationException e) {
             // Another mod has frozen the pool. Missing from that village beats failing to load the world.
             Etched.LOGGER.warn("Could not add {} to a village pool: its template list is not modifiable", pieceId);
+            return false;
         }
     }
 

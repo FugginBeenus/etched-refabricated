@@ -2,9 +2,6 @@ package gg.moonflower.etched.api.util;
 
 import net.minecraft.network.chat.Component;
 
-/**
- * @author Ocelot
- */
 public class AccumulatingDownloadProgressListener implements DownloadProgressListener {
 
     private final DownloadProgressListener parent;

@@ -18,7 +18,6 @@ public class AlbumDisplayRenderer implements BlockEntityRenderer<AlbumDisplayBlo
 
     private static final float TILT = 30.0F;
     private static final float SCALE = 0.72F;
-    /** Where the album's bottom edge sits, just behind the stand's front lip. */
     private static final float REST_Z = 0.28F;
     private static final float REST_Y = 0.0625F;
 

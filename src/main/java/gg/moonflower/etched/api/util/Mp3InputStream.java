@@ -8,11 +8,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * Dynamically converts mp3 data to raw audio as the stream is read.
- *
- * @author Ocelot
- */
 public class Mp3InputStream extends InputStream {
 
     private final Bitstream stream;
@@ -30,12 +25,6 @@ public class Mp3InputStream extends InputStream {
         }
     }
 
-    /**
-     * Refills the buffer from the mp3 decoder.
-     *
-     * @return Whether the stream has reached EOF (no more headers to read)
-     * @throws IOException If any error occurs while decoding mp3 data
-     */
     private boolean fillBuffer() throws IOException {
         this.buffer.clear();
 

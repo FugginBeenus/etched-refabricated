@@ -10,12 +10,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * Asynchronously reads data from one stream into a buffer for another thread to read from.
- *
- * @author Ocelot
- * @since 1.2.0
- */
 public class AsyncInputStream extends InputStream {
 
     private static final int MAX_DATA = 32768; // A maximum of 32KB can be loaded into memory
@@ -97,9 +91,6 @@ public class AsyncInputStream extends InputStream {
         }
     }
 
-    /**
-     * @return <code>true</code> if EOF has been reached
-     */
     private boolean nextBuffer() {
         try {
             this.lock.lock();
@@ -190,19 +181,9 @@ public class AsyncInputStream extends InputStream {
         this.readFuture.join();
     }
 
-    /**
-     * Provides an {@link AsyncInputStream} with a new stream on the correct thread.
-     *
-     * @author Ocelot
-     * @since 1.2.0
-     */
     @FunctionalInterface
     public interface InputStreamSupplier {
 
-        /**
-         * @return A newly opened stream
-         * @throws IOException If any error occurs
-         */
         InputStream get() throws IOException;
     }
 }

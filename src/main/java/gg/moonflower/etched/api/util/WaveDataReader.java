@@ -9,13 +9,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Based on Java's Wave File Reader.
- *
- * @author Kara Kytle
- * @author Jan Borgersen
- * @author Florian Bomers
- */
 public class WaveDataReader {
 
     private static final int RIFF_MAGIC = 1380533830;

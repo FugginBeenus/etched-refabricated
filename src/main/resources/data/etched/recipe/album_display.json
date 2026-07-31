@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "T T",
+    " S "
+  ],
+  "key": {
+    "T": {
+      "item": "minecraft:spruce_trapdoor"
+    },
+    "S": {
+      "item": "minecraft:spruce_stairs"
+    }
+  },
+  "result": {
+    "id": "etched:album_display",
+    "count": 1
+  }
+}

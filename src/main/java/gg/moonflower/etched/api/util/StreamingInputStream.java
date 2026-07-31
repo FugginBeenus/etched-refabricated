@@ -8,11 +8,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntFunction;
 
-/**
- * Utilizes multiple input stream futures to act as a single data stream.
- *
- * @author Ocelot
- */
 public class StreamingInputStream extends InputStream {
 
     private final URL[] urls;

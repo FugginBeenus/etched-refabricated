@@ -16,10 +16,6 @@ import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * A crate of albums. Extends the randomisable container so it comes with a name that survives being
- * broken and replaced, which is what lets a shop label its crates.
- */
 public class AlbumCrateBlockEntity extends RandomizableContainerBlockEntity {
 
     public static final int SLOTS = 12;

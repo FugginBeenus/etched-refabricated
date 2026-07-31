@@ -6,11 +6,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Tracks download progress for any input stream.
- *
- * @author Ocelot
- */
 public class ProgressTrackingInputStream extends InputStream {
 
     private final InputStream parent;

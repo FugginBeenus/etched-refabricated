@@ -29,9 +29,6 @@ public interface AudioSource {
     Logger LOGGER = LogManager.getLogger();
     long MAX_SIZE = 100 * 1024 * 1024; // 100MB
 
-    /**
-     * @return The vanilla Minecraft client download headers
-     */
     static Map<String, String> getDownloadHeaders() {
         Map<String, String> map = SoundDownloadSource.getDownloadHeaders();
         User user = Minecraft.getInstance().getUser();

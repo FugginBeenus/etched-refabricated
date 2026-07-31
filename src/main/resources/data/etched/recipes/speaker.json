@@ -1,11 +1,28 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": [" W ", "INI", " R "],
+  "pattern": [
+    " W ",
+    "INI",
+    "LRL"
+  ],
   "key": {
-    "W": { "tag": "minecraft:wool" },
-    "I": { "item": "minecraft:iron_ingot" },
-    "N": { "item": "minecraft:note_block" },
-    "R": { "item": "minecraft:redstone" }
+    "W": {
+      "tag": "minecraft:wool"
+    },
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "N": {
+      "item": "minecraft:note_block"
+    },
+    "L": {
+      "item": "minecraft:oak_log"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
   },
-  "result": { "item": "etched:speaker" }
+  "result": {
+    "item": "etched:speaker"
+  }
 }

@@ -9,9 +9,6 @@ import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * Dynamically converts FLAC data to raw audio as the stream is read.
- */
 public class FlacInputStream extends InputStream {
 
     private final FLACDecoder decoder;
@@ -40,11 +37,6 @@ public class FlacInputStream extends InputStream {
         this.format = new AudioFormat(info.getSampleRate(), info.getBitsPerSample(), info.getChannels(), true, false);
     }
 
-    /**
-     * Decodes the next frame into the block buffer.
-     *
-     * @return Whether the stream has reached the end
-     */
     private boolean fillBuffer() throws IOException {
         if (this.finished) {
             return true;

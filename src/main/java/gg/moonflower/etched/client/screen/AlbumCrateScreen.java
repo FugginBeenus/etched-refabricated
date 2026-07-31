@@ -7,9 +7,6 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
-/**
- * A crate's row of albums. The crate's name is the title, so a shop can label its crates.
- */
 public class AlbumCrateScreen extends AbstractContainerScreen<AlbumCrateMenu> {
 
     public AlbumCrateScreen(AlbumCrateMenu menu, Inventory inventory, Component title) {

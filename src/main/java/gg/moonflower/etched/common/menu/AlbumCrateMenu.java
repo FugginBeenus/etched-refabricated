@@ -11,12 +11,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * The single row of albums a crate holds.
- */
 public class AlbumCrateMenu extends AbstractContainerMenu {
 
-    /** Two rows of six, centred, so a full crate reads at a glance. */
     public static final int SLOT_X = 34;
     public static final int SLOT_Y = 20;
     public static final int INVENTORY_X = 8;

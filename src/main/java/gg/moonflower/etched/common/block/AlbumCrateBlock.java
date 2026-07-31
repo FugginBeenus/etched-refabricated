@@ -18,13 +18,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 
-/**
- * A crate that holds a row of albums and shows their artwork fanned out, the way a record shop bin
- * does. Renaming the crate item names the crate, so shops can label them.
- */
 public class AlbumCrateBlock extends BaseEntityBlock {
 
-    /** Sixteen steps, matching the display stand, so crates can be angled. */
     public static final IntegerProperty ROTATION = BlockStateProperties.ROTATION_16;
 
     public AlbumCrateBlock(Properties properties) {

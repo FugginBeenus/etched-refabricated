@@ -14,26 +14,15 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Files a crate's albums the way a record shop bin does: stood upright with only a slight lean back,
- * packed close together front to back, and tall enough to stand proud of the rim so the sleeves can be
- * flipped through by eye.
- */
 @Environment(EnvType.CLIENT)
 public class AlbumCrateRenderer implements BlockEntityRenderer<AlbumCrateBlockEntity> {
 
-    /** Barely off vertical: these are filed upright to be flipped through, not laid down. */
     private static final float TILT = 12.0F;
-    /** Matches the display stand, so an album is the same size wherever it is shown. */
     private static final float SCALE = 0.72F;
-    /** Filled from the back forward, far enough back that the first album leans onto the back wall. */
     private static final float BACK_Z = 0.82F;
     private static final float STEP_Z = 0.0594F;
-    /** The stepped interior: further back stands higher, so every sleeve top clears the one in front. */
     private static final float BACK_Y = 0.625F;
     private static final float STEP_Y = 0.0114F;
-
-    /** A pixel or two of sideways drift per slot, so a full box doesn't look machine stacked. */
     private static final float[] DRIFT = {0.0F, 1.0F, -1.0F, 2.0F, 0.0F, -2.0F,
                                           1.0F, -1.0F, 0.0F, 2.0F, -1.0F, 1.0F};
 

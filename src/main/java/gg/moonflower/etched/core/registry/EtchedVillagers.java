@@ -28,7 +28,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.pools.StructurePoolElement;
 import net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool;
@@ -79,30 +78,37 @@ public class EtchedVillagers {
             trades.add(sell(EtchedItems.MUSIC_LABEL, 4, 2, 16, 1));
         });
 
+        // Getting started: the parts needed to etch a disc at all.
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 2, trades -> {
             trades.add(sell(EtchedItems.BLANK_MUSIC_DISC, 28, 2, 12, 15));
             trades.add(sell(EtchedBlocks.ETCHING_TABLE, 32, 1, 8, 15));
+            trades.add(sell(Items.PAPER, 1, 8, 16, 5));
         });
 
+        // Furnishing a listening room.
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 3, trades -> {
-            trades.add(sell(Blocks.CLAY, 6, 1, 16, 2));
-            trades.add(sell(Blocks.HAY_BLOCK, 12, 1, 8, 2));
-            trades.add(sell(Blocks.WHITE_WOOL, 8, 1, 32, 4));
-            trades.add(sell(Blocks.BONE_BLOCK, 24, 1, 8, 4));
-            trades.add(sell(Blocks.PACKED_ICE, 36, 1, 4, 8));
-            trades.add(sell(Blocks.GOLD_BLOCK, 48, 1, 2, 10));
+            trades.add(sell(EtchedBlocks.SPEAKER, 18, 1, 8, 10));
+            trades.add(sell(EtchedBlocks.ALBUM_DISPLAY, 8, 1, 12, 5));
+            trades.add(sell(EtchedBlocks.ALBUM_CRATE, 12, 1, 12, 5));
+            trades.add(sell(Items.COPPER_INGOT, 1, 2, 16, 5));
             trades.add(sell(Items.JUKEBOX, 26, 1, 4, 30));
         });
 
+        // The bigger machines.
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 4, trades -> {
             trades.add(sell(EtchedItems.ALBUM_COVER, 16, 1, 4, 30));
+            trades.add(sell(EtchedBlocks.RADIO, 24, 1, 4, 30));
             trades.add(sell(EtchedItems.JUKEBOX_MINECART, 28, 1, 4, 30));
             trades.add(sell(EtchedBlocks.ALBUM_JUKEBOX, 30, 1, 4, 30));
+            trades.add(sell(EtchedBlocks.ALBUM_PRINTER, 34, 1, 4, 30));
         });
 
+        // The stereo and the upgrades that drive it.
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 5, trades -> {
             trades.add(buy(Items.DIAMOND, 8, 1, 8, 40));
-            trades.add(buy(Items.AMETHYST_SHARD, 1, 8, 10, 40));
+            trades.add(sell(EtchedItems.PREAMP, 22, 1, 6, 40));
+            trades.add(sell(EtchedItems.TRANSMITTER, 26, 1, 6, 40));
+            trades.add(sell(EtchedBlocks.STEREO, 36, 1, 4, 40));
         });
     }
 

@@ -2,10 +2,6 @@ package gg.moonflower.etched.api.util;
 
 import net.minecraft.resources.ResourceLocation;
 
-/**
- * Version-compat factory for {@link ResourceLocation}. The public constructors were made private in
- * 1.21 in favour of static factory methods, so all mod code routes through here.
- */
 public final class EtchedResourceLocation {
 
     private EtchedResourceLocation() {

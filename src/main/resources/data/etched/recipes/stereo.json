@@ -1,10 +1,25 @@
 {
   "type": "minecraft:crafting_shaped",
-  "pattern": ["III", "RNR", "III"],
+  "pattern": [
+    "ICI",
+    "RNR",
+    "ICI"
+  ],
   "key": {
-    "I": { "item": "minecraft:iron_ingot" },
-    "R": { "item": "minecraft:redstone" },
-    "N": { "item": "minecraft:note_block" }
+    "I": {
+      "item": "minecraft:iron_ingot"
+    },
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "N": {
+      "item": "minecraft:note_block"
+    }
   },
-  "result": { "item": "etched:stereo" }
+  "result": {
+    "item": "etched:stereo"
+  }
 }

@@ -10,6 +10,7 @@ import gg.moonflower.etched.api.sound.source.AudioSource;
 import gg.moonflower.etched.api.sound.stream.MonoWrapper;
 import gg.moonflower.etched.api.sound.stream.RawAudioStream;
 import gg.moonflower.etched.api.util.DownloadProgressListener;
+import gg.moonflower.etched.api.util.FlacInputStream;
 import gg.moonflower.etched.api.util.Mp3InputStream;
 import gg.moonflower.etched.api.util.WaveDataReader;
 import gg.moonflower.etched.client.sound.EmptyAudioStream;
@@ -112,6 +113,16 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
                 return repeatInstantly ? new LoopingAudioStream(input -> new RawAudioStream(format, input), ais) : new RawAudioStream(format, ais);
             } catch (Exception e1) {
                 LOGGER.debug("Failed to load as WAV", e1);
+
+                // Try loading as FLAC. This goes before MP3 because FLAC starts with a definite "fLaC"
+                // marker, while MP3 frame detection is loose enough to accept things that aren't MP3.
+                try {
+                    InputStream is = createCombinedStream.get();
+                    FlacInputStream flacInputStream = new FlacInputStream(is);
+                    return repeatInstantly ? new LoopingAudioStream(input -> new RawAudioStream(flacInputStream.getFormat(), input), flacInputStream) : new RawAudioStream(flacInputStream.getFormat(), flacInputStream);
+                } catch (Exception eFlac) {
+                    LOGGER.debug("Failed to load as FLAC", eFlac);
+                }
 
                 // Try loading as MP3
                 try {

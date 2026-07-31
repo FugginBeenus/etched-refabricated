@@ -7,7 +7,7 @@ Etch a URL (direct audio files, SoundCloud, Bandcamp, and more) onto a blank dis
 ## Features
 
 - Etch online audio onto custom music discs at the Etching Table
-- Streams OGG, WAV, MP3, and AAC / `.m4a`
+- Streams OGG, WAV, FLAC, MP3, and AAC / `.m4a`
 - Speakers that take over a jukebox's audio, wired by placing them alongside it or wireless by pairing them to a Stereo
 - Per speaker volume and a master volume, with quieter speakers carrying a shorter distance
 - Boombox you can carry and play in-hand
@@ -36,7 +36,7 @@ Vanilla music discs play through speakers too, not only etched ones.
 ## What's different in this fork
 
 - Fixed the bug where non-OGG audio (many MP3 and streamed links) failed to play. Format detection no longer relies on a tiny mark/reset buffer, so larger streams load reliably.
-- Added AAC / `.m4a` playback.
+- Added AAC / `.m4a` and FLAC playback.
 - Added the Speaker and Stereo system, with wireless pairing, volume control, and hearing distance that follows volume.
 - Vanilla discs now route through speakers on both supported Minecraft versions.
 - Rebuilt the Speaker, Stereo, and Album Printer screens.

@@ -93,6 +93,8 @@ dependencies {
     shadowCommon(implementation("javazoom:jlayer:1.0.1"))
     // AAC/.m4a decoding (net.sourceforge.jaad.*) — bundled and relocated in shadowJar
     shadowCommon(implementation("de.sfuhrm:jaad:0.8.7"))
+    // FLAC decoding (org.jflac.*), LGPL 2.1 — bundled and relocated in shadowJar
+    shadowCommon(implementation("org.jflac:jflac-codec:1.5.2"))
 }
 
 processResources {
@@ -179,6 +181,7 @@ shadowJar {
     configurations = [project.configurations.shadowCommon]
     relocate "javazoom", "gg.moonflower.etched.javazoom"
     relocate "net.sourceforge.jaad", "gg.moonflower.etched.jaad"
+    relocate "org.jflac", "gg.moonflower.etched.jflac"
     archiveClassifier = "dev-shadow"
 }
 

@@ -1,40 +1,48 @@
-# 1.2.0
+# 1.3.0
 
-## The bard is back
+## Show off your records
 
-A bard villager works at an etching table, buys music discs, and sells labels, blank discs,
-album covers, note blocks and jukeboxes. Bard houses generate in plains, desert, savanna,
-snowy and taiga villages, each with an etching table sitting on the note block the bard
-plays while working.
+Two new blocks for anyone building a record shop.
 
-Houses are added to villages at runtime rather than through a datapack, so villages keep
-everything other mods have put in them. A village overhaul that owns its own layout simply
-does not receive the house, and there is a config toggle to switch the houses off entirely.
+The **Album Display** is a small stand that shows a single album's artwork. Right-click with a
+record or album cover to set it, right-click again to take it back. Stands place at any of
+sixteen angles rather than snapping to the four walls, so they can be arranged however a room
+wants them.
 
-## Rebuilt screens
+The **Album Crate** is a shop bin on legs holding twelve albums. They stand upright inside,
+filling from the back forward and riding a stepped floor so each sleeve clears the one in front
+and the whole row reads at a glance. Anvil-rename the crate item and the placed crate takes that
+name, so a shop can label its crates A to C and so on.
 
-The speaker, stereo and album printer screens are drawn fresh. A speaker's volume opens a
-waveform behind glass, so the control shows its own level. The stereo is drawn as the block
-you placed, and the upgrades you install appear on it as hardware: preamps seat in bays on
-the top face, transmitters plug into the back panel, and the wireless field widens with each
-transmitter. Paired speakers ride that field and stay hollow past what the preamps can
-drive, so pairing more than you can power is visible at a glance.
+## The portal radio is back
 
-Stereo upgrade bays are now typed and hold one part each, which makes the speaker and range
-ceilings real: a stack of preamps in one bay used to count as several.
+Feed a radio a cake, or carry one into the Nether, and it turns into a portal radio. It has been
+in the files for a long time without ever being reachable.
+
+## FLAC
+
+Discs can now be etched from FLAC links, alongside OGG, WAV, MP3 and AAC. Speakers get it too,
+since they decode the same way.
+
+## Recipes and the bard
+
+Every block has a recipe now, including the two new ones. The speaker gains a pair of oak logs
+for its cabinet, the stereo trades two of its six iron for copper, and the etching table costs
+noticeably more than it did, so buying one from a bard is the easier route rather than a worse
+deal. Preamps were repriced to sit alongside transmitters, which they had always undercut by a
+wide margin despite being just as strong an upgrade.
+
+The bard used to run a block shop, selling clay, hay, wool, bone, packed ice and gold. That is
+gone. It now deals in the mod's own blocks, upgrades and materials: a listening room at level
+three, the bigger machines at four, and the stereo with its preamps and transmitters at five.
 
 ## Fixes
 
-- Vanilla discs now play through speakers on 1.20.1, matching 1.21.1. They were previously
-  played twice over, which also made the volume sliders appear to do nothing.
-- Vanilla disc playback follows the per-speaker and master volume sliders, and quieter
-  speakers carry less far.
-- Volume sliders can be dragged, not only clicked.
-- Speaker link mode can be left again, by clicking the stereo or sneak-clicking a speaker.
-  Previously the only way out was destroying the stereo, which locked you out of the
-  per-speaker volume screen.
-- The stereo's paired speaker count no longer climbs forever as speakers are broken and
-  replaced.
+- Album covers were invisible on 1.20.1. The renderer that draws them was only ever registered
+  on 1.21, so covers, and the boombox held in hand, rendered as nothing.
+- Bard houses never appeared in modpacks with village overhauls. They were only added to
+  vanilla's own house pools, and an overhaul normally ships its own. The pools are searched for
+  now, so an overhaul's naming is picked up too.
 
 ## Known gaps
 

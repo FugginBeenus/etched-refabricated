@@ -213,7 +213,11 @@ publishMods {
 
     modrinth {
         projectId = project.modrinth_id
-        accessToken = providers.environmentVariable("MODRINTH_TOKEN")
+        // Store the token as modrinthToken in ~/.gradle/gradle.properties, which sits outside the
+        // repository and so cannot be committed. MODRINTH_TOKEN in the environment still works.
+        // Never put it in this project's gradle.properties: that file is tracked.
+        accessToken = providers.gradleProperty("modrinthToken")
+                .orElse(providers.environmentVariable("MODRINTH_TOKEN"))
         minecraftVersions.add(stonecutter.current.version)
         requires("fabric-api")
         requires("yacl")

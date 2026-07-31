@@ -10,10 +10,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Holds the single album a display stand is showing. The stack is synced to clients because the
- * renderer draws it in world.
- */
 public class AlbumDisplayBlockEntity extends BlockEntity {
 
     private ItemStack item = ItemStack.EMPTY;

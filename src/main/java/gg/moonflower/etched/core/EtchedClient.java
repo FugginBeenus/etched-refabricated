@@ -46,6 +46,7 @@ public class EtchedClient {
         MenuScreens.register(EtchedMenus.ALBUM_PRINTER_MENU, AlbumPrinterScreen::new);
         MenuScreens.register(EtchedMenus.STEREO_MENU, StereoScreen::new);
         MenuScreens.register(EtchedMenus.SPEAKER_MENU, SpeakerScreen::new);
+        MenuScreens.register(EtchedMenus.ALBUM_CRATE_MENU, AlbumCrateScreen::new);
         EntityRendererRegistry.register(EtchedEntities.JUKEBOX_MINECART,context -> {
             return new JukeboxMinecartRenderer<>(context);
         });
@@ -88,6 +89,8 @@ public class EtchedClient {
     /*public static void registerRenderers() {
         net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_DISPLAY_BE.get(),
                 gg.moonflower.etched.client.render.AlbumDisplayRenderer::new);
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_CRATE_BE.get(),
+                gg.moonflower.etched.client.render.AlbumCrateRenderer::new);
 
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
@@ -108,6 +111,8 @@ public class EtchedClient {
     public static void registerRenderers() {
         net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_DISPLAY_BE.get(),
                 gg.moonflower.etched.client.render.AlbumDisplayRenderer::new);
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_CRATE_BE.get(),
+                gg.moonflower.etched.client.render.AlbumCrateRenderer::new);
 
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));

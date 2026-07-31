@@ -13,11 +13,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * Draws the album a display stand is holding, stood up and tilted back so the artwork faces the room.
- * Album covers route through {@code AlbumCoverItemRenderer} on their own, since this goes through the
- * normal item renderer.
- */
 @Environment(EnvType.CLIENT)
 public class AlbumDisplayRenderer implements BlockEntityRenderer<AlbumDisplayBlockEntity> {
 

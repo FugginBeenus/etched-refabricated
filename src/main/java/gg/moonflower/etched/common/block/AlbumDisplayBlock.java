@@ -24,13 +24,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-/**
- * A stand that shows off a single album's artwork. Right-click with a record or album cover to set it,
- * right-click again to take it back.
- */
 public class AlbumDisplayBlock extends BaseEntityBlock {
 
-    /** Sixteen steps like a standing sign, so a stand can be angled rather than snapped to a wall. */
     public static final net.minecraft.world.level.block.state.properties.IntegerProperty ROTATION =
             net.minecraft.world.level.block.state.properties.BlockStateProperties.ROTATION_16;
 
@@ -42,23 +37,14 @@ public class AlbumDisplayBlock extends BaseEntityBlock {
         this.registerDefaultState(this.stateDefinition.any().setValue(ROTATION, 0));
     }
 
-    /**
-     * @return The nearest of the sixteen rotation steps to the given yaw
-     */
     public static int segmentFor(float degrees) {
         return net.minecraft.util.Mth.floor(degrees * 16.0F / 360.0F + 0.5F) & 15;
     }
 
-    /**
-     * @return The yaw a rotation step points at
-     */
     public static float degreesFor(int segment) {
         return segment * 360.0F / 16.0F;
     }
 
-    /**
-     * @return Whether the stand will show the given item
-     */
     public static boolean canDisplay(ItemStack stack) {
         if (PlayableRecord.isPlayableRecord(stack)) {
             return true;

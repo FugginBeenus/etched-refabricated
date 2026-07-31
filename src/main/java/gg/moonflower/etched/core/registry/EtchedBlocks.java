@@ -92,6 +92,16 @@ public class EtchedBlocks {
                     .properties(p -> p.noOcclusion())
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
+    public static final BlockEntry<gg.moonflower.etched.common.block.AlbumCrateBlock> ALBUM_CRATE =
+            Etched.REGISTRATE.block("album_crate", gg.moonflower.etched.common.block.AlbumCrateBlock::new)
+                    .properties(properties -> properties
+                            .mapColor(MapColor.PODZOL)
+                            .strength(2.0f)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion()
+                    )
+                    .item().tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).build()
+                    .register();
     public static final BlockEntry<gg.moonflower.etched.common.block.AlbumDisplayBlock> ALBUM_DISPLAY =
             Etched.REGISTRATE.block("album_display", gg.moonflower.etched.common.block.AlbumDisplayBlock::new)
                     .properties(properties -> properties
@@ -126,6 +136,10 @@ public class EtchedBlocks {
     public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity> STEREO_BE =
         (BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("stereo", gg.moonflower.etched.common.blockentity.StereoBlockEntity::new)
                     .validBlocks(STEREO)
+                    .register();
+    public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumCrateBlockEntity> ALBUM_CRATE_BE =
+        (BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumCrateBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("album_crate", gg.moonflower.etched.common.blockentity.AlbumCrateBlockEntity::new)
+                    .validBlocks(ALBUM_CRATE)
                     .register();
     public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity> ALBUM_DISPLAY_BE =
         (BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("album_display", gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity::new)

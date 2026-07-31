@@ -92,6 +92,16 @@ public class EtchedBlocks {
                     .properties(p -> p.noOcclusion())
                     .item().tab(CreativeModeTabs.TOOLS_AND_UTILITIES).build()
                     .register();
+    public static final BlockEntry<gg.moonflower.etched.common.block.AlbumDisplayBlock> ALBUM_DISPLAY =
+            Etched.REGISTRATE.block("album_display", gg.moonflower.etched.common.block.AlbumDisplayBlock::new)
+                    .properties(properties -> properties
+                            .mapColor(MapColor.PODZOL)
+                            .strength(1.0f)
+                            .sound(SoundType.WOOD)
+                            .noOcclusion()
+                    )
+                    .item().tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).build()
+                    .register();
     //registerWithItem("radio", () -> new RadioBlock(BlockBehaviour.Properties.copy(Blocks.JUKEBOX).noOcclusion()), new Item.Properties());
     /*
     public static final ItemEntry<PortalRadioItem> PORTAL_RADIO_ITEM =
@@ -116,6 +126,10 @@ public class EtchedBlocks {
     public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity> STEREO_BE =
         (BlockEntityEntry<gg.moonflower.etched.common.blockentity.StereoBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("stereo", gg.moonflower.etched.common.blockentity.StereoBlockEntity::new)
                     .validBlocks(STEREO)
+                    .register();
+    public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity> ALBUM_DISPLAY_BE =
+        (BlockEntityEntry<gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("album_display", gg.moonflower.etched.common.blockentity.AlbumDisplayBlockEntity::new)
+                    .validBlocks(ALBUM_DISPLAY)
                     .register();
             //BLOCK_ENTITIES.register("radio", () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null))
     public static void register() {} // i guess this is a hack?

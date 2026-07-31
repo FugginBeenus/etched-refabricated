@@ -86,6 +86,9 @@ public class EtchedClient {
     // renderer builds its cover data, and the album cover models registered as extra baked models.
     //? if >=1.21 {
     /*public static void registerRenderers() {
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_DISPLAY_BE.get(),
+                gg.moonflower.etched.client.render.AlbumDisplayRenderer::new);
+
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
 
@@ -103,6 +106,9 @@ public class EtchedClient {
     }
     *///?} else {
     public static void registerRenderers() {
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_DISPLAY_BE.get(),
+                gg.moonflower.etched.client.render.AlbumDisplayRenderer::new);
+
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
 

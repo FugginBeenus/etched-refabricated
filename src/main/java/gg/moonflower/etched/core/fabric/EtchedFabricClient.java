@@ -23,9 +23,7 @@ public class EtchedFabricClient implements ClientModInitializer {
         // (Etched.init()); calling it again here double-registers the payload type on 1.21.
         EtchedMessages.initClient();
         EtchedClient.registerItemGroups();
-        //? if >=1.21 {
-        /*EtchedClient.registerRenderers();
-        *///?}
+        EtchedClient.registerRenderers();
 
         ClientPickBlockGatherCallback.EVENT.register((player, result) -> {
             if (result.getType() == HitResult.Type.ENTITY && player.getAbilities().instabuild) {

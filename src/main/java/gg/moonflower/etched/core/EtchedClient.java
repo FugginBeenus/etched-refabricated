@@ -101,7 +101,27 @@ public class EtchedClient {
             }
         });
     }
-    *///?}
+    *///?} else {
+    public static void registerRenderers() {
+        net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
+                (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
+
+        net.fabricmc.fabric.api.resource.ResourceManagerHelper.get(net.minecraft.server.packs.PackType.CLIENT_RESOURCES)
+                .registerReloadListener(AlbumCoverItemRenderer.INSTANCE);
+
+        // Before 1.21 the extra models go through fabric-models-v0; ModelLoadingPlugin does not exist
+        // here. boombox_in_hand is included because ItemRendererMixin looks it up directly on this
+        // version, and an unregistered model resolves to the missing one.
+        net.fabricmc.fabric.api.client.model.ModelLoadingRegistry.INSTANCE.registerModelProvider((resourceManager, out) -> {
+            out.accept(BOOMBOX_IN_HAND_MODEL);
+            String folder = "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME;
+            for (ResourceLocation loc : resourceManager.listResources(folder, name -> name.getPath().endsWith(".json")).keySet()) {
+                String path = loc.getPath().substring("models/item/".length(), loc.getPath().length() - ".json".length());
+                out.accept(new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(loc.getNamespace(), path), "inventory"));
+            }
+        });
+    }
+    //?}
 
     public static void registerItemColors() {
         ColorProviderRegistry.ITEM.register((stack, index) -> index == 0 || index == 1 ? opaque(MusicLabelItem.getLabelColor(stack)) : -1, EtchedItems.MUSIC_LABEL.get());

@@ -70,10 +70,10 @@ public class EtchedVillagers {
 
     private static void registerTrades() {
         TradeOfferHelper.registerVillagerOffers(BARD_PROFESSION, 1, trades -> {
-            trades.add(buy(Items.MUSIC_DISC_13, 8, 1, 4, 20));
-            trades.add(buy(Items.MUSIC_DISC_11, 8, 1, 4, 20));
-            trades.add(buy(Items.MUSIC_DISC_CAT, 8, 1, 4, 20));
-            trades.add(buy(Items.MUSIC_DISC_OTHERSIDE, 8, 1, 4, 20));
+            trades.add(sell(Items.MUSIC_DISC_13, 8, 1, 4, 20));
+            trades.add(sell(Items.MUSIC_DISC_11, 8, 1, 4, 20));
+            trades.add(sell(Items.MUSIC_DISC_CAT, 8, 1, 4, 20));
+            trades.add(sell(Items.MUSIC_DISC_OTHERSIDE, 8, 1, 4, 20));
             trades.add(sell(Items.NOTE_BLOCK, 1, 2, 16, 2));
             trades.add(sell(EtchedItems.MUSIC_LABEL, 4, 2, 16, 1));
         });
@@ -112,6 +112,7 @@ public class EtchedVillagers {
         });
     }
 
+    // Both helpers read from the bard's side: buy takes the item off the player, sell hands it over.
     private static VillagerTrades.ItemListing buy(ItemLike item, int emeralds, int itemCount, int maxUses, int xp) {
         return new ItemTrade(() -> item, emeralds, itemCount, maxUses, xp, true);
     }

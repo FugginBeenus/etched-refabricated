@@ -1,3 +1,25 @@
+# 1.3.2
+
+## Fixes
+
+- The bard's four vanilla disc trades ran backwards. He bought discs off you for 8 emeralds
+  each instead of selling them to you at that price. All four now sell.
+
+# 1.3.1
+
+## Cover art from the file itself
+
+A disc etched from a self hosted link, on Google Drive or Dropbox or anywhere else, now takes
+its cover from the artwork embedded in the audio file's own tags. ID3 in MP3 and the picture
+block in FLAC are both read. Only the opening of the file is fetched, so this does not pull the
+whole track down to look for a picture that may not be there.
+
+## Item sprites
+
+The Speaker, Stereo, Album Printer, Album Crate and Album Display were showing their block
+models in the inventory. They have drawn sprites now, in the style of the ones the mod already
+had for the radio and boombox.
+
 # 1.3.0
 
 ## Show off your records

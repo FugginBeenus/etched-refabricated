@@ -72,6 +72,12 @@ public final class SoundSourceManager {
     }
 
     public static CompletableFuture<AlbumCover> resolveAlbumCover(String url, @Nullable DownloadProgressListener listener, Proxy proxy, ResourceManager resourceManager) {
+        // A link that belongs to no streaming service is a file we fetch ourselves, so the only cover
+        // it can have is one embedded in its own tags.
+        if (SOURCES.stream().noneMatch(s -> s.isValidUrl(url))) {
+            return gg.moonflower.etched.client.AlbumCoverCache.requestEmbedded(url);
+        }
+
         return CompletableFuture.supplyAsync(() -> SOURCES.stream().filter(s -> s.isValidUrl(url)).findFirst().flatMap(source -> {
             try {
                 return source.resolveAlbumCover(url, listener, proxy, resourceManager);

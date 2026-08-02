@@ -153,7 +153,7 @@ public class EtchedVillagers {
             Etched.LOGGER.info("Added bard houses to {} village house pools", filled);
         }
     }
-    
+
     private static int addHouses(ResourceManager resources,
                                  Registry<StructureTemplatePool> pools, Registry<StructureProcessorList> processors,
                                  String village, int weight,

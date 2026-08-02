@@ -98,16 +98,48 @@ public final class AlbumCoverCache {
         });
     }
 
+    /**
+     * Builds a cover from art embedded in the audio file itself, for links that belong to no streaming
+     * service. Only the opening of the file is read, since both ID3 and FLAC keep their tags at the
+     * start, so this does not pull the whole track down.
+     *
+     * @param url The audio file to look inside
+     * @return Its cover art, or an empty cover if it carries none
+     */
+    public static CompletableFuture<AlbumCover> requestEmbedded(String url) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (InputStream stream = get(url)) {
+                return gg.moonflower.etched.api.util.EmbeddedArtwork.read(stream);
+            } catch (Exception e) {
+                LOGGER.debug("Could not read embedded artwork from '{}'", url, e);
+                return java.util.Optional.<byte[]>empty();
+            }
+        }, Etched.downloadExecutor()).thenApplyAsync(art -> {
+            if (art.isEmpty()) {
+                return AlbumCover.EMPTY;
+            }
+            try {
+                return AlbumCover.of(AlbumImageProcessor.apply(readAlbumImage(art.get()), AlbumCoverItemRenderer.getOverlayImage()));
+            } catch (Exception e) {
+                LOGGER.error("Failed to decode embedded artwork from '{}'", url, e);
+                return AlbumCover.EMPTY;
+            }
+        }, Util.ioPool());
+    }
+
     // NativeImage.read only accepts PNG data, but album art from SoundCloud/Bandcamp is usually JPEG
     // (served even at .png URLs). Decode via ImageIO, which handles PNG/JPEG/GIF/BMP, then convert to
     // a NativeImage (ImageIO gives 0xAARRGGBB; NativeImage stores RGBA, so R and B are swapped).
     private static NativeImage readAlbumImage(Path path) throws IOException {
-        BufferedImage image;
         try (InputStream is = new FileInputStream(path.toFile())) {
-            image = ImageIO.read(is);
+            return readAlbumImage(IOUtils.toByteArray(is));
         }
+    }
+
+    private static NativeImage readAlbumImage(byte[] bytes) throws IOException {
+        BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
         if (image == null) {
-            throw new IOException("Unsupported album cover image format: " + path);
+            throw new IOException("Unsupported album cover image format");
         }
 
         int width = image.getWidth();

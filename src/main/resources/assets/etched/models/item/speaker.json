@@ -1,1 +1,6 @@
-{ "parent": "etched:block/speaker" }
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "etched:item/speaker"
+  }
+}

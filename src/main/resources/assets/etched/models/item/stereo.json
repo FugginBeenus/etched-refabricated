@@ -1,1 +1,6 @@
-{ "parent": "etched:block/stereo" }
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "etched:item/stereo"
+  }
+}

@@ -1,1 +1,6 @@
-{ "parent": "etched:block/album_printer" }
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "etched:item/album_printer"
+  }
+}

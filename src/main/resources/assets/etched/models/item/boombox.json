@@ -1,3 +1,6 @@
 {
-  "parent": "etched:item/boombox_in_hand"
+  "parent": "etched:item/boombox_in_hand",
+  "overrides": [
+    {"predicate": {"etched:playing": 1}, "model": "etched:item/boombox_playing"}
+  ]
 }

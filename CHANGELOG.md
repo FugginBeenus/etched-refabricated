@@ -1,3 +1,25 @@
+# 1.3.3
+
+## The boombox sits on your shoulder again
+
+Carrying a playing boombox held it aloft in an odd raised pose. The mod has always shipped a
+separate model for a boombox that is playing, drawn to rest on the shoulder, but the item
+property that switches to it was never registered on this port. The game had no way to know a
+boombox was playing, so it always fell back to the plain held model and that model was dead
+content. It is wired up on both Minecraft versions now.
+
+The holding arm also drifted while it was up there. The pose was being applied before vanilla
+layers on its idle sway, so the sway won. It is applied after now, and the free arm keeps its
+normal motion.
+
+## Fixes
+
+- Middle clicking a Minecart with Jukebox gave an empty hand. It hands over the item now, in
+  survival as well as creative.
+- Middle clicking a portal radio on 1.21.1 gave a plain radio. Only 1.20.1 had the check.
+- Album crates lost their custom name when broken. A crate renamed on an anvil keeps that name,
+  so a shop can label its bins and still rearrange them.
+
 # 1.3.2
 
 ## Fixes

@@ -181,7 +181,6 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
         }
     }
 
-    // FIXME rewrite
     private void renderLabel(GuiGraphics guiGraphics, int x, int y, int index) {
         if (this.labelStack.isEmpty() || this.discStack.isEmpty()) {
             return;

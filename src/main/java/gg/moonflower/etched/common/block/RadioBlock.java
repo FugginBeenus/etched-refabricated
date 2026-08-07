@@ -212,12 +212,13 @@ public class RadioBlock extends BaseEntityBlock {
     //? if >=1.21 {
     /*@Override
     public ItemStack getCloneItemStack(net.minecraft.world.level.LevelReader level, BlockPos pos, BlockState state) {
-        return new ItemStack(EtchedBlocks.RADIO);
+        return state.getValue(PORTAL)
+                ? new ItemStack(gg.moonflower.etched.core.registry.EtchedItems.PORTAL_RADIO_ITEM.get())
+                : new ItemStack(EtchedBlocks.RADIO);
     }
     *///?} else {
     @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        //FIXME
         return state.getValue(PORTAL)
                 ? new ItemStack(gg.moonflower.etched.core.registry.EtchedItems.PORTAL_RADIO_ITEM.get())
                 : new ItemStack(EtchedBlocks.RADIO);

@@ -89,10 +89,22 @@ public class AlbumJukeboxBlock extends BaseEntityBlock {
     @Override
     public void neighborChanged(BlockState blockState, Level level, BlockPos pos, Block block, BlockPos blockPos2, boolean bl) {
         if (!level.isClientSide()) {
-            boolean bl2 = blockState.getValue(POWERED);
-            if (bl2 != level.hasNeighborSignal(pos)) {
-                level.setBlock(pos, blockState.cycle(POWERED), 2);
+            boolean wasPowered = blockState.getValue(POWERED);
+            boolean powered = level.hasNeighborSignal(pos);
+            if (wasPowered != powered) {
+                level.setBlock(pos, blockState.setValue(POWERED, powered), 2);
                 level.sendBlockUpdated(pos, blockState, level.getBlockState(pos), 3);
+
+                // The rising edge only, so one pulse is one action rather than two. Listeners are told
+                // directly, because a track change is not part of the block's saved data.
+                if (powered && level instanceof net.minecraft.server.level.ServerLevel serverLevel
+                        && level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.AlbumJukeboxBlockEntity jukebox
+                        && jukebox.onRedstonePulse()) {
+                    new gg.moonflower.etched.common.network.play.SetAlbumJukeboxTrackPacket(
+                            pos, jukebox.getPlayingIndex(), jukebox.getTrack())
+                            .sendToClients(net.fabricmc.fabric.api.networking.v1.PlayerLookup.tracking(
+                                    serverLevel, serverLevel.getChunkAt(pos).getPos()));
+                }
             }
         }
     }

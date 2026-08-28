@@ -41,6 +41,7 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
     private int playingIndex;
     private int playingTrack;
     private Button albumButton;
+    private Button redstoneButton;
 
     public AlbumJukeboxScreen(AlbumJukeboxMenu dispenserMenu, Inventory inventory, Component component) {
         super(dispenserMenu, inventory, component);
@@ -67,7 +68,7 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
 
         if (((albumJukebox.getPlayingIndex() == oldIndex && albumJukebox.getTrack() != oldTrack) || albumJukebox.recalculatePlayingIndex(!next)) && albumJukebox.getPlayingIndex() != -1) {
             SoundTracker.playAlbum(albumJukebox, albumJukebox.getBlockState(), level, this.menu.getPos(), true);
-            var packet = new SetAlbumJukeboxTrackPacket(albumJukebox.getPlayingIndex(), albumJukebox.getTrack());
+            var packet = new SetAlbumJukeboxTrackPacket(this.menu.getPos(), albumJukebox.getPlayingIndex(), albumJukebox.getTrack());
             packet.sendToServer();
             //EtchedMessages.PLAY.sendToServer(new SetAlbumJukeboxTrackPacket(albumJukebox.getPlayingIndex(), albumJukebox.getTrack()));
         }
@@ -91,6 +92,12 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
                 .bounds(this.leftPos + 122, this.topPos + 46, 46, 18).build());
         this.updateAlbumButton();
 
+        // What a redstone pulse does, under the track controls it affects.
+        this.redstoneButton = this.addRenderableWidget(Button.builder(this.redstoneText(), b ->
+                this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, AlbumJukeboxMenu.BUTTON_REDSTONE_MODE))
+                .bounds(this.leftPos + 9, this.topPos + 56, 43, 18)
+                .tooltip(Tooltip.create(Component.translatable("screen." + Etched.MOD_ID + ".album_jukebox.redstone.tooltip"))).build());
+
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;
     }
 
@@ -100,7 +107,20 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
         this.updateAlbumButton();
     }
 
+    private Component redstoneText() {
+        String key = switch (this.menu.getRedstoneMode()) {
+            case AlbumJukeboxBlockEntity.REDSTONE_NEXT -> "next";
+            case AlbumJukeboxBlockEntity.REDSTONE_PREVIOUS -> "previous";
+            case AlbumJukeboxBlockEntity.REDSTONE_TOGGLE -> "toggle";
+            default -> "restart";
+        };
+        return Component.translatable("screen." + Etched.MOD_ID + ".album_jukebox.redstone." + key);
+    }
+
     private void updateAlbumButton() {
+        if (this.redstoneButton != null) {
+            this.redstoneButton.setMessage(this.redstoneText());
+        }
         if (this.albumButton == null) {
             return;
         }

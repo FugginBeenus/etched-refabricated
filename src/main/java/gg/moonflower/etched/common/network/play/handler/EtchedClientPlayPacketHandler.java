@@ -124,13 +124,16 @@ public class EtchedClientPlayPacketHandler {
     }
 
     public static void handleSetAlbumJukeboxTrack(SetAlbumJukeboxTrackPacket pkt, Minecraft client) {
-            client.execute(()->{
-                if (client.level != null && client.screen instanceof AlbumJukeboxScreen screen) {
-                    BlockPos pos = screen.getMenu().getPos();
-                    if (screen.getMenu().setPlayingTrack(client.level, pkt)) {
-                        AlbumJukeboxBlockEntity entity = (AlbumJukeboxBlockEntity) Objects.requireNonNull(client.level.getBlockEntity(pos));
-                        SoundTracker.playAlbum(entity, entity.getBlockState(), client.level, pos, true);
-                    }
+            client.execute(() -> {
+                if (client.level == null) {
+                    return;
+                }
+                // Driven off the position in the packet rather than the open screen, so a redstone skip,
+                // or another player's skip, is heard by everyone in range and not just whoever has the
+                // menu open.
+                if (client.level.getBlockEntity(pkt.pos()) instanceof AlbumJukeboxBlockEntity entity
+                        && entity.setPlayingIndex(pkt.playingIndex(), pkt.track())) {
+                    SoundTracker.playAlbum(entity, entity.getBlockState(), client.level, pkt.pos(), true);
                 }
             });
     }

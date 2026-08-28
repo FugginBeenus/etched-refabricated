@@ -35,6 +35,16 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     private static final int[] SLOTS = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 
     private NonNullList<ItemStack> items;
+    // What a redstone pulse does. RESTART is the original behaviour, where power simply gates playback,
+    // and stays the default so existing contraptions keep working.
+    public static final int REDSTONE_RESTART = 0;
+    public static final int REDSTONE_NEXT = 1;
+    public static final int REDSTONE_PREVIOUS = 2;
+    public static final int REDSTONE_TOGGLE = 3;
+    public static final int REDSTONE_MODES = 4;
+
+    private int redstoneMode = REDSTONE_RESTART;
+    private boolean paused;
     private int playingIndex;
     private int track;
     private ItemStack playingStack;
@@ -107,6 +117,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         this.storedCover = nbt.contains("StoredCover")
                 ? ItemStack.parse(provider, nbt.getCompound("StoredCover")).orElse(ItemStack.EMPTY)
                 : ItemStack.EMPTY;
+        this.redstoneMode = Mth.clamp(nbt.getInt("RedstoneMode"), 0, REDSTONE_MODES - 1);
+        this.paused = nbt.getBoolean("Paused");
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -122,6 +134,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         if (!this.storedCover.isEmpty()) {
             nbt.put("StoredCover", this.storedCover.save(provider));
         }
+        nbt.putInt("RedstoneMode", this.redstoneMode);
+        nbt.putBoolean("Paused", this.paused);
     }
 
     @Override
@@ -139,6 +153,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         this.storedCover = nbt.contains("StoredCover")
                 ? ItemStack.of(nbt.getCompound("StoredCover"))
                 : ItemStack.EMPTY;
+        this.redstoneMode = Mth.clamp(nbt.getInt("RedstoneMode"), 0, REDSTONE_MODES - 1);
+        this.paused = nbt.getBoolean("Paused");
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -154,6 +170,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         if (!this.storedCover.isEmpty()) {
             nbt.put("StoredCover", this.storedCover.save(new CompoundTag()));
         }
+        nbt.putInt("RedstoneMode", this.redstoneMode);
+        nbt.putBoolean("Paused", this.paused);
     }
 
     @Override
@@ -366,7 +384,55 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     }
 
     public boolean isPlaying() {
-        BlockState state = this.getBlockState();
-        return (!state.hasProperty(AlbumJukeboxBlock.POWERED) || !state.getValue(AlbumJukeboxBlock.POWERED)) && !this.isEmpty();
+        if (this.isEmpty()) {
+            return false;
+        }
+        // Only RESTART lets power gate playback. In the other modes a pulse is a command, so holding the
+        // line high must not silence the jukebox.
+        if (this.redstoneMode == REDSTONE_RESTART) {
+            BlockState state = this.getBlockState();
+            return !state.hasProperty(AlbumJukeboxBlock.POWERED) || !state.getValue(AlbumJukeboxBlock.POWERED);
+        }
+        return !this.paused;
+    }
+
+    public int getRedstoneMode() {
+        return this.redstoneMode;
+    }
+
+    public void setRedstoneMode(int mode) {
+        this.redstoneMode = Mth.clamp(mode, 0, REDSTONE_MODES - 1);
+        // Leaving a mode that pauses would otherwise strand the jukebox silent with no way back.
+        if (this.redstoneMode == REDSTONE_RESTART) {
+            this.paused = false;
+        }
+        this.setChanged();
+        this.updatePlaying();
+    }
+
+    public boolean isPaused() {
+        return this.paused;
+    }
+
+    /**
+     * Acts on the rising edge of a redstone signal. Returns whether the track moved, so the caller can
+     * tell listeners about it.
+     */
+    public boolean onRedstonePulse() {
+        switch (this.redstoneMode) {
+            case REDSTONE_NEXT -> this.next();
+            case REDSTONE_PREVIOUS -> this.previous();
+            case REDSTONE_TOGGLE -> {
+                this.paused = !this.paused;
+                this.setChanged();
+                this.updatePlaying();
+                return false;
+            }
+            default -> {
+                return false;
+            }
+        }
+        this.setChanged();
+        return true;
     }
 }

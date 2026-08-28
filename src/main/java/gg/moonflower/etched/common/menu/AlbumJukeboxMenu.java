@@ -24,6 +24,7 @@ import java.util.List;
 public class AlbumJukeboxMenu extends AbstractContainerMenu {
 
     public static final int BUTTON_TOGGLE_ALBUM = 0;
+    public static final int BUTTON_REDSTONE_MODE = 1;
 
     private final BlockPos.MutableBlockPos pos;
     private final Container container;
@@ -92,6 +93,18 @@ public class AlbumJukeboxMenu extends AbstractContainerMenu {
                 AlbumJukeboxMenu.this.pos.setZ(value);
             }
         });
+        this.addDataSlot(new DataSlot() {
+            @Override
+            public int get() {
+                AlbumJukeboxBlockEntity jukebox = AlbumJukeboxMenu.this.jukebox();
+                return jukebox != null ? jukebox.getRedstoneMode() : AlbumJukeboxMenu.this.redstoneMode;
+            }
+
+            @Override
+            public void set(int value) {
+                AlbumJukeboxMenu.this.redstoneMode = value;
+            }
+        });
 
         for (int n = 0; n < 3; ++n) {
             for (int m = 0; m < 3; ++m) {
@@ -123,6 +136,19 @@ public class AlbumJukeboxMenu extends AbstractContainerMenu {
         });
     }
 
+    // Mirrors the block entity while the screen is open; on the client the container is not the block
+    // entity, so the synced value is what the button reads.
+    private int redstoneMode;
+
+    private AlbumJukeboxBlockEntity jukebox() {
+        return this.container instanceof AlbumJukeboxBlockEntity blockEntity ? blockEntity : null;
+    }
+
+    public int getRedstoneMode() {
+        AlbumJukeboxBlockEntity jukebox = this.jukebox();
+        return jukebox != null ? jukebox.getRedstoneMode() : this.redstoneMode;
+    }
+
     public ItemStack getCoverSlotItem() {
         return this.coverContainer.getItem(0);
     }
@@ -138,6 +164,14 @@ public class AlbumJukeboxMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int id) {
+        if (id == BUTTON_REDSTONE_MODE) {
+            AlbumJukeboxBlockEntity jukebox = this.jukebox();
+            if (jukebox == null) {
+                return false;
+            }
+            jukebox.setRedstoneMode((jukebox.getRedstoneMode() + 1) % AlbumJukeboxBlockEntity.REDSTONE_MODES);
+            return true;
+        }
         if (id != BUTTON_TOGGLE_ALBUM) {
             return false;
         }

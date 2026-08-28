@@ -2,6 +2,7 @@ package gg.moonflower.etched.core.fabric;
 
 import com.google.gson.GsonBuilder;
 import dev.isxander.yacl3.api.*;
+import dev.isxander.yacl3.api.controller.StringControllerBuilder;
 import dev.isxander.yacl3.api.controller.TickBoxControllerBuilder;
 import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
@@ -11,6 +12,11 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 public class EtchedConfig {
@@ -45,6 +51,48 @@ public class EtchedConfig {
     @SerialEntry(comment = "Adds bard houses to villages as they generate. Turn off if a village overhaul mod should own village layout entirely.")
     public boolean addBardHousesToVillages = true;
 
+    @SerialEntry(comment = "Domains that discs and radios are allowed to stream from, such as \"files.catbox.moe\". Subdomains of a listed domain are allowed too. Leave empty to allow any domain. The server's own list is what counts, so a client cannot talk its way past it.")
+    public List<String> allowedDomains = new ArrayList<>();
+
+    /**
+     * Whether a URL may be streamed, according to the allowed domain list. An empty list allows
+     * anything, which is the default and what a single player world wants.
+     *
+     * <p>Checked against the host only. A listed domain also covers its subdomains, but a host is never
+     * matched on a bare suffix, so listing {@code bandcamp.com} does not let {@code notbandcamp.com}
+     * through.
+     */
+    public static boolean isDomainAllowed(String url) {
+        List<String> allowed = HANDLER.instance().allowedDomains;
+        if (allowed == null || allowed.isEmpty()) {
+            return true;
+        }
+        // A local sound is a sound event already in the game, not something streamed off a site, so the
+        // domain list has no say over it.
+        if (gg.moonflower.etched.api.record.TrackData.isLocalSound(url)) {
+            return true;
+        }
+
+        String host;
+        try {
+            host = new URI(url).getHost();
+        } catch (Exception e) {
+            return false;
+        }
+        if (host == null) {
+            return false;
+        }
+
+        host = host.toLowerCase(Locale.ROOT);
+        for (String entry : allowed) {
+            String domain = entry.trim().toLowerCase(Locale.ROOT);
+            if (!domain.isEmpty() && (host.equals(domain) || host.endsWith("." + domain))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Screen getConfigScreen(Screen screen){
         return YetAnotherConfigLib.createBuilder()
                 .title(Component.literal("Etched"))
@@ -76,6 +124,15 @@ public class EtchedConfig {
                                         .binding(true,() -> this.addBardHousesToVillages,aBoolean -> {this.addBardHousesToVillages = aBoolean;})
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
+                                .build())
+                        .group(ListOption.<String>createBuilder()
+                                .name(Component.literal("Allowed Domains"))
+                                .description(OptionDescription.createBuilder()
+                                        .text(Component.literal("Domains discs and radios may stream from, such as \"files.catbox.moe\". Subdomains of a listed domain are allowed. Leave the list empty to allow any domain."))
+                                        .build())
+                                .binding(new ArrayList<>(), () -> this.allowedDomains, value -> this.allowedDomains = new ArrayList<>(value))
+                                .controller(StringControllerBuilder::create)
+                                .initial("")
                                 .build())
                         .build()
                 )

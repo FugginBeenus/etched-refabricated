@@ -28,10 +28,19 @@ public class EtchedServerPlayPacketHandler {
             return;
         }
 
+        // Checked here rather than in the screen. This is the only point the server accepts a URL from a
+        // client, for the etching table and the radio both, so a client that never opens the screen still
+        // cannot get an unlisted domain past it. An empty string is the field being cleared.
+        String url = pkt.url();
+        if (!url.isEmpty() && !gg.moonflower.etched.core.fabric.EtchedConfig.isDomainAllowed(url)) {
+            player.displayClientMessage(net.minecraft.network.chat.Component.translatable("message.etched.domain_not_allowed"), true);
+            return;
+        }
+
         if (player.containerMenu instanceof EtchingMenu menu) {
-            server.execute(() -> menu.setUrl(pkt.url()));
+            server.execute(() -> menu.setUrl(url));
         } else if (player.containerMenu instanceof RadioMenu menu) {
-            server.execute(() -> menu.setUrl(pkt.url()));
+            server.execute(() -> menu.setUrl(url));
         }
     }
 

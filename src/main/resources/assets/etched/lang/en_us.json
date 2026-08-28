@@ -65,5 +65,6 @@
   "sound_source.etched.requesting": "Requesting from %s...",
   "sound_source.etched.sound_cloud": "Provided by SoundCloud",
   "subtitles.etched.ui.etching_table.take_result": "Etching Table used",
-  "itemGroup.etched": "Etched"
+  "itemGroup.etched": "Etched",
+  "message.etched.domain_not_allowed": "This server does not allow music from that site."
 }

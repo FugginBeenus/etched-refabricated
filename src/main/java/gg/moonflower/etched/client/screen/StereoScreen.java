@@ -12,10 +12,10 @@ import java.util.List;
 
 public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
 
-    // The unit's top-left. StereoMenu.PREAMP_X is UNIT_X + 8 so the bays drawn on the top face sit
-    // directly under the slots feeding them.
-    private static final int UNIT_X = 58;
-    private static final int UNIT_Y = 70;
+    // The chassis' top-left. Centred: (176 - HiFiPanel.CHASSIS_W) / 2, with the upgrade columns either
+    // side of it and each bay level with its slot.
+    private static final int CHASSIS_X = 34;
+    private static final int CHASSIS_Y = 52;
 
     private HiFiButton modeButton;
     private MasterSlider masterSlider;
@@ -105,33 +105,27 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
         int x = this.leftPos;
         int y = this.topPos;
         HiFiPanel.panel(g, x, y, this.imageWidth, this.imageHeight);
+        HiFiPanel.stereoChassis(g, x + CHASSIS_X, y + CHASSIS_Y, this.preamps(), this.transmitters(),
+                this.menu.getPairedCount(), this.menu.getMaxSpeakers());
 
-        HiFiPanel.Anchors unit = HiFiPanel.stereoUnit(g, x + UNIT_X, y + UNIT_Y, this.preamps(), this.transmitters());
-
-        // Upgrade slots, with a faint chip in the empty ones and a short leader line to the part of the
-        // unit they feed.
+        // An empty slot shows a faint ghost of the part it takes, so the two columns are told apart at a
+        // glance rather than by trying to put something in the wrong one.
         for (int i = 0; i < StereoMenu.PREAMP_SLOTS; i++) {
-            int sx = x + StereoMenu.PREAMP_X + i * 22;
-            int sy = y + StereoMenu.PREAMP_Y;
+            int sx = x + StereoMenu.PREAMP_X;
+            int sy = y + StereoMenu.UPGRADE_Y + i * StereoMenu.UPGRADE_SPACING;
             HiFiPanel.slot(g, sx, sy);
             if (this.slotEmpty(i)) {
-                HiFiPanel.ghostChip(g, sx, sy);
+                HiFiPanel.stamp(g, sx + 3, sy + 4, HiFiPanel.GAIN, HiFiPanel.GHOST);
             }
-            HiFiPanel.line(g, sx + 8, sy + 17, sx + 8, y + UNIT_Y + 2, HiFiPanel.SOFT);
         }
         for (int i = 0; i < StereoMenu.TRANSMITTER_SLOTS; i++) {
             int sx = x + StereoMenu.TRANSMITTER_X;
-            int sy = y + StereoMenu.TRANSMITTER_Y + i * StereoMenu.TRANSMITTER_SPACING;
+            int sy = y + StereoMenu.UPGRADE_Y + i * StereoMenu.UPGRADE_SPACING;
             HiFiPanel.slot(g, sx, sy);
             if (this.slotEmpty(StereoMenu.PREAMP_SLOTS + i)) {
-                HiFiPanel.ghostChip(g, sx, sy);
+                HiFiPanel.stamp(g, sx + 3, sy + 4, HiFiPanel.ANTENNA, HiFiPanel.GHOST);
             }
         }
-        // No leader lines here: the dongles are drawn entering the back panel and the bays sit right
-        // beside them, so a harness only added tangle over the top of the plugs.
-
-        HiFiPanel.wirelessField(g, unit.leftX() - 2, unit.midY() + 4, this.transmitters(),
-                this.menu.getPairedCount(), this.menu.getMaxSpeakers());
 
         for (int row = 0; row < 3; row++) {
             for (int col = 0; col < 9; col++) {
@@ -155,9 +149,9 @@ public class StereoScreen extends AbstractContainerScreen<StereoMenu> {
 
     // The field draws the speakers and their reach; the exact numbers are here for anyone who wants them.
     private boolean overField(int mouseX, int mouseY) {
-        int fx = this.leftPos + 8;
-        int fy = this.topPos + UNIT_Y;
-        return mouseX >= fx && mouseX < this.leftPos + UNIT_X && mouseY >= fy && mouseY < fy + 42;
+        int fx = this.leftPos + CHASSIS_X + HiFiPanel.WIN_DX;
+        int fy = this.topPos + CHASSIS_Y + HiFiPanel.WIN_DY;
+        return mouseX >= fx && mouseX < fx + HiFiPanel.WIN_W && mouseY >= fy && mouseY < fy + HiFiPanel.WIN_H;
     }
 
     @Override

@@ -6,43 +6,51 @@ import net.minecraft.network.chat.Component;
 
 public final class HiFiPanel {
 
-    // Panel chrome: vanilla's structure, warmed very slightly.
-    public static final int BG = 0xFFCDC6BA;
-    public static final int HI = 0xFFEAE4D9;
-    public static final int LO = 0xFFA79D90;
-    public static final int EDGE = 0xFF4A4239;
-    public static final int FACE_BTN = 0xFFB8B0A4;
+    // Panel chrome: vanilla's own container values, warmed by a hair so the mod keeps a tone of its
+    // own. Neutral greys and a hard bevel are what let these screens sit beside a chest or a furnace.
+    public static final int BG = 0xFFC6C4C0;
+    public static final int HI = 0xFFFFFFFF;
+    public static final int LO = 0xFF57534D;
+    public static final int EDGE = 0xFF1A1A1A;
+    public static final int FACE_BTN = 0xFFC6C4C0;
 
-    // Slots.
-    public static final int SLOT = 0xFF9C948A;
-    public static final int SLOT_SH = 0xFF5E564C;
+    // Slots, at vanilla's contrast.
+    public static final int SLOT = 0xFF8B8987;
+    public static final int SLOT_SH = 0xFF373737;
 
     // Recessed display glass.
     public static final int GLASS = 0xFF332E27;
     public static final int GRID = 0xFF554C42;
 
     // Line art.
-    public static final int INK = 0xFF5A5147;
-    public static final int SOFT = 0xFF8F857A;
-
-    // The drawn unit's own surfaces, lit lighter than the panel so it reads as an object sitting on it
-    // rather than an outline scratched into it.
-    public static final int UNIT_FACE = 0xFFE2DBCF;
-    public static final int UNIT_TOP = 0xFFC0B8AA;
-    public static final int UNIT_BACK = 0xFFA9A093;
+    public static final int INK = 0xFF4A4A48;
+    public static final int SOFT = 0xFF8A8886;
+    // Dim enough to read as a hint on a slot instead of vanishing into it.
+    public static final int GHOST = 0xFF6E6C6A;
 
     // Text.
-    public static final int TEXT = 0xFF453C31;
-    public static final int DIM = 0xFF7A6F62;
+    public static final int TEXT = 0xFF404040;
+    public static final int DIM = 0xFF707070;
 
     // Amber, used only where it carries meaning: signal, level, "installed", "in range". Matches the
     // copper knobs on the stereo block.
     public static final int AM = 0xFFC4661F;
     public static final int AM_HI = 0xFFE9963A;
     public static final int AM_GLOW = 0xFFFFE0B0;
+    public static final int AM_LO = 0xFF8A430F;
 
     // The teal of the stereo block's own VU window, so the drawn unit reads as the block the player placed.
     public static final int DISPLAY = 0xFF43B0A6;
+
+    // Sampled from the stereo block's texture so its drawing is recognisably that block.
+    public static final int BODY = 0xFF1D1B19;
+    public static final int BODY_HI = 0xFF42403F;
+    public static final int BODY_LO = 0xFF0D0C0B;
+    public static final int TEAL_BG = 0xFF101C1E;
+    public static final int TEAL_SCAN = 0xFF16262A;
+    public static final int TEAL = 0xFF1B757D;
+    public static final int TEAL_HI = 0xFFB4D4E1;
+    public static final int SOCKET = 0xFF2E2A25;
 
     // The most speakers the field plots individually, which is the ceiling two preamps allow.
     private static final int MAX_SPEAKER_GLYPHS = 6;
@@ -79,15 +87,43 @@ public final class HiFiPanel {
         }
     }
 
-    public static void arc(GuiGraphics g, int cx, int cy, int r, double a0, double a1, int color) {
-        double step = Math.max(0.004, 0.55 / Math.max(1, r));
-        for (double t = a0; t <= a1; t += step) {
-            px(g, cx + (int) Math.round(r * Math.cos(t)), cy + (int) Math.round(r * Math.sin(t)), color);
+    /**
+     * Midpoint circle. The angular stepping in {@link #arc} doubles some pixels and drops others, which
+     * shows badly at the small radii the coverage display works at.
+     */
+    public static void ring(GuiGraphics g, int cx, int cy, int r, int color) {
+        int x = r;
+        int y = 0;
+        int err = 1 - r;
+        while (x >= y) {
+            px(g, cx + x, cy + y, color);
+            px(g, cx + y, cy + x, color);
+            px(g, cx - x, cy + y, color);
+            px(g, cx - y, cy + x, color);
+            px(g, cx + x, cy - y, color);
+            px(g, cx + y, cy - x, color);
+            px(g, cx - x, cy - y, color);
+            px(g, cx - y, cy - x, color);
+            y++;
+            if (err < 0) {
+                err += 2 * y + 1;
+            } else {
+                x--;
+                err += 2 * (y - x) + 1;
+            }
         }
     }
 
-    public static void circle(GuiGraphics g, int cx, int cy, int r, int color) {
-        arc(g, cx, cy, r, 0.0, Math.PI * 2.0, color);
+    /** Draws a hand-authored pixel glyph, so small art stays exact instead of being computed. */
+    public static void stamp(GuiGraphics g, int x, int y, String[] rows, int color) {
+        for (int j = 0; j < rows.length; j++) {
+            String row = rows[j];
+            for (int i = 0; i < row.length(); i++) {
+                if (row.charAt(i) == '#') {
+                    px(g, x + i, y + j, color);
+                }
+            }
+        }
     }
 
     public static void box(GuiGraphics g, int x, int y, int x2, int y2, int color) {
@@ -181,128 +217,112 @@ public final class HiFiPanel {
         }
     }
 
-    public static void ghostChip(GuiGraphics g, int x, int y) {
-        box(g, x + 3, y + 6, x + 13, y + 11, SOFT);
-        for (int i = 0; i < 3; i++) {
-            px(g, x + 5 + i * 3, y + 4, SOFT);
-            px(g, x + 5 + i * 3, y + 13, SOFT);
+    // Hand-authored so they stay crisp at 1:1. Stepped bars read as gain, stacked arcs as a transmitter.
+    public static final String[] GAIN = {
+            "........##",
+            "........##",
+            "....##..##",
+            "....##..##",
+            "##..##..##",
+            "##..##..##",
+            "##..##..##",
+            "##..##..##",
+    };
+    public static final String[] ANTENNA = {
+            "..######..",
+            ".#......#.",
+            "#........#",
+            "..........",
+            "...####...",
+            "..#....#..",
+            "..........",
+            "....##....",
+    };
+    private static final String[] SPEAKER_ON = {"#####", "#####", "##.##", "#####", "#####"};
+    private static final String[] SPEAKER_OFF = {"#####", "#...#", "#...#", "#...#", "#####"};
+
+    // The drawn chassis, straight on rather than in projection, and symmetric about the panel's centre.
+    // Each bay sits directly opposite the slot that fills it, which is what lets the screen do without
+    // the leader lines the old three-quarter drawing needed.
+    public static final int CHASSIS_W = 108;
+    public static final int CHASSIS_H = 50;
+    public static final int WIN_DX = 30;
+    public static final int WIN_DY = 5;
+    public static final int WIN_W = 48;
+    public static final int WIN_H = 40;
+    private static final int BAY_W = 20;
+    private static final int BAY_H = 16;
+    private static final int PREAMP_BAY_DX = 6;
+    private static final int TRANSMITTER_BAY_DX = 82;
+    private static final int[] BAY_DY = {6, 28};
+
+    public static void stereoChassis(GuiGraphics g, int ox, int oy, int preamps, int transmitters,
+                                     int paired, int maxSpeakers) {
+        g.fill(ox, oy, ox + CHASSIS_W, oy + CHASSIS_H, BODY);
+        g.fill(ox + 1, oy + 1, ox + CHASSIS_W - 1, oy + 2, BODY_HI);
+        g.fill(ox + 1, oy + CHASSIS_H - 2, ox + CHASSIS_W - 1, oy + CHASSIS_H - 1, BODY_LO);
+        box(g, ox, oy, ox + CHASSIS_W - 1, oy + CHASSIS_H - 1, EDGE);
+
+        for (int i = 0; i < BAY_DY.length; i++) {
+            bay(g, ox + PREAMP_BAY_DX, oy + BAY_DY[i], i < preamps, GAIN);
+            bay(g, ox + TRANSMITTER_BAY_DX, oy + BAY_DY[i], i < transmitters, ANTENNA);
+        }
+        coverage(g, ox + WIN_DX, oy + WIN_DY, transmitters, paired, maxSpeakers);
+    }
+
+    // An empty bay still shows the part it takes, faintly, so which slot wants what is visible before
+    // the player tries to put something in it.
+    private static void bay(GuiGraphics g, int x, int y, boolean installed, String[] glyph) {
+        int gx = x + (BAY_W - 10) / 2;
+        int gy = y + (BAY_H - 8) / 2;
+        if (installed) {
+            g.fill(x, y, x + BAY_W, y + BAY_H, AM);
+            g.fill(x, y, x + BAY_W, y + 1, AM_HI);
+            g.fill(x, y + BAY_H - 1, x + BAY_W, y + BAY_H, AM_LO);
+            stamp(g, gx, gy, glyph, AM_LO);
+            box(g, x, y, x + BAY_W - 1, y + BAY_H - 1, BODY_LO);
+        } else {
+            g.fill(x, y, x + BAY_W, y + BAY_H, SOCKET);
+            stamp(g, gx, gy, glyph, SOFT);
+            box(g, x, y, x + BAY_W - 1, y + BAY_H - 1, BODY_HI);
         }
     }
 
-    public static Anchors stereoUnit(GuiGraphics g, int ox, int oy, int preamps, int transmitters) {
-        int depth = 8;
-        int fx = ox;
-        int fy = oy + 8;
-        int fx2 = ox + 52;
-        int fy2 = oy + 30;
-        int midY = fy + 11;
-
-        // Solid faces first so the unit reads as an object against the panel, then the outline over them.
-        // The top face and back panel are slanted, so they fill by scanline.
-        for (int sy = oy; sy < fy; sy++) {
-            int off = depth - (sy - oy);
-            g.fill(fx + off, sy, fx2 + off, sy + 1, UNIT_TOP);
+    // One picture for the whole wireless state: a ring per transmitter for reach, a glyph per paired
+    // speaker, hollow once the count runs past what the preamps can actually drive.
+    private static void coverage(GuiGraphics g, int x, int y, int transmitters, int paired, int maxSpeakers) {
+        g.fill(x, y, x + WIN_W, y + WIN_H, TEAL_BG);
+        for (int sy = y + 2; sy < y + WIN_H - 1; sy += 3) {
+            g.fill(x + 2, sy, x + WIN_W - 2, sy + 1, TEAL_SCAN);
         }
-        for (int sx = fx2; sx < fx2 + depth; sx++) {
-            int off = sx - fx2;
-            g.fill(sx, fy - off, sx + 1, fy2 - off, UNIT_BACK);
-        }
-        g.fill(fx, fy, fx2, fy2, UNIT_FACE);
+        box(g, x, y, x + WIN_W - 1, y + WIN_H - 1, BODY_LO);
 
-        // Front face, top face and back panel, in three-quarter view so the places upgrades install into
-        // are both visible.
-        box(g, fx, fy, fx2, fy2, INK);
-        line(g, fx, fy, fx + depth, oy, INK);
-        line(g, fx + depth, oy, fx2 + depth, oy, INK);
-        line(g, fx2, fy, fx2 + depth, oy, INK);
-        line(g, fx2 + depth, oy, fx2 + depth, fy2 - depth, INK);
-        line(g, fx2, fy2, fx2 + depth, fy2 - depth, INK);
-
-        // The block's own face: a VU window between two copper knobs, with corner screws.
-        int dx1 = fx + 18;
-        int dx2 = fx2 - 18;
-        g.fill(dx1, midY - 6, dx2, midY + 6, GLASS);
-        box(g, dx1 - 1, midY - 7, dx2, midY + 6, SOFT);
-        int[] bars = {3, 5, 2, 4};
-        for (int i = 0; i < bars.length; i++) {
-            int bx = dx1 + 2 + i * 3;
-            g.fill(bx, midY + 4 - bars[i], bx + 2, midY + 4, DISPLAY);
-        }
-        for (int i = 0; i < 2; i++) {
-            int kx = i == 0 ? fx + 10 : fx2 - 10;
-            circle(g, kx, midY, 5, SOFT);
-            g.fill(kx - 1, midY - 1, kx + 2, midY + 2, AM);
-            line(g, kx, midY, kx, midY - 4, INK);
-        }
-        px(g, fx + 3, fy + 3, SOFT);
-        px(g, fx2 - 3, fy + 3, SOFT);
-
-        // Two preamp bays on the top face, aligned under the slots above them. An empty bay is drawn as a
-        // recessed socket so it's clear something goes there.
-        for (int i = 0; i < 2; i++) {
-            int bx = fx + 8 + i * 22;
-            int by = oy + 2;
-            if (i < preamps) {
-                box(g, bx, by, bx + 16, by + 4, INK);
-                g.fill(bx + 1, by + 1, bx + 16, by + 4, AM);
-                px(g, bx + 14, by + 2, AM_GLOW);
-            } else {
-                g.fill(bx + 1, by + 1, bx + 16, by + 4, UNIT_BACK);
-                box(g, bx, by, bx + 16, by + 4, SOFT);
-            }
+        int cx = x + WIN_W / 2;
+        int cy = y + WIN_H / 2;
+        int[] radii = {6, 11, 16};
+        for (int i = 0; i < 1 + Math.min(transmitters, radii.length - 1); i++) {
+            ring(g, cx, cy, radii[i], TEAL);
         }
 
-        // Two transmitter ports in the back panel, dongles plugged in connector-first when installed.
-        for (int i = 0; i < 2; i++) {
-            int dx = fx2 + depth;
-            int dy = fy - 2 + i * 11;
-            if (i < transmitters) {
-                g.fill(dx, dy, dx + 3, dy + 3, SOFT);
-                line(g, dx + 3, dy - 1, dx + 12, dy - 1, INK);
-                line(g, dx + 3, dy + 4, dx + 12, dy + 4, INK);
-                line(g, dx + 12, dy - 1, dx + 12, dy + 4, INK);
-                g.fill(dx + 4, dy, dx + 12, dy + 4, AM);
-                px(g, dx + 9, dy + 1, AM_GLOW);
-            } else {
-                g.fill(dx - 4, dy, dx - 1, dy + 3, GLASS);
-                box(g, dx - 5, dy - 1, dx - 1, dy + 3, SOFT);
-            }
-        }
-
-        return new Anchors(fx, midY, fx2 + depth);
-    }
-
-    public static void wirelessField(GuiGraphics g, int cx, int cy, int transmitters, int paired, int maxSpeakers) {
-        double from = 2.55;
-        double to = 3.75;
-        int[] radii = {11, 19, 27, 35};
-        int rings = 1 + Math.min(transmitters, 3);
-        for (int i = 0; i < rings; i++) {
-            arc(g, cx, cy, radii[i], from, to, SOFT);
-        }
-
-        // Speakers spread evenly across the whole sweep and alternate between two radii, so neighbours are
-        // separated both along the arc and across it. Pinning them all to one radius made a full set
-        // bunch together and overlap.
         int shown = Math.min(paired, MAX_SPEAKER_GLYPHS);
         for (int i = 0; i < shown; i++) {
-            double a = from + (i + 0.5) * (to - from) / shown;
-            int r = i % 2 == 0 ? 34 : 24;
-            int sx = cx + (int) Math.round(r * Math.cos(a));
-            int sy = cy + (int) Math.round(r * Math.sin(a));
-            boolean driven = i < maxSpeakers;
-            box(g, sx - 3, sy - 3, sx + 3, sy + 3, driven ? INK : SOFT);
-            if (driven) {
-                g.fill(sx - 2, sy - 2, sx + 3, sy + 3, AM);
-                px(g, sx, sy, AM_GLOW);
+            double a = -Math.PI / 2.0 + i * (Math.PI * 2.0 / shown);
+            int sx = cx + (int) Math.round(13 * Math.cos(a));
+            int sy = cy + (int) Math.round(13 * Math.sin(a));
+            if (i < maxSpeakers) {
+                stamp(g, sx - 2, sy - 2, SPEAKER_ON, TEAL_HI);
+                px(g, sx, sy, TEAL_BG);
+            } else {
+                stamp(g, sx - 2, sy - 2, SPEAKER_OFF, TEAL);
             }
         }
+
+        // Drawn last, so the unit always sits on top of its own field.
+        g.fill(cx - 2, cy - 2, cx + 3, cy + 3, AM);
+        px(g, cx, cy, AM_GLOW);
     }
 
     private static double clamp01(double v) {
         return v < 0.0 ? 0.0 : Math.min(v, 1.0);
-    }
-
-    public record Anchors(int leftX, int midY, int backX) {
     }
 }

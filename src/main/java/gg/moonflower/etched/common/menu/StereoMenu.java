@@ -21,17 +21,15 @@ public class StereoMenu extends AbstractContainerMenu {
     public static final int BUTTON_MODE = 201;
     // Ids 0-100 set the master volume as a percent.
 
-    public static final int PREAMP_SLOTS = 2;
+    public static final int PREAMP_SLOTS = StereoBlockEntity.PREAMP_SLOTS;
     public static final int TRANSMITTER_SLOTS = StereoBlockEntity.UPGRADE_SLOTS - PREAMP_SLOTS;
 
-    // Slot positions, shared with the screen so its drawing of the unit lines up with them.
-    // PREAMP_X matches the screen's UNIT_X + 8, so each slot sits directly over the bay it feeds.
-    public static final int PREAMP_X = 66;
-    public static final int PREAMP_Y = 48;
-    // The transmitter bays stack vertically behind the unit, clear of the dongles drawn plugging into it.
-    public static final int TRANSMITTER_X = 134;
-    public static final int TRANSMITTER_Y = 70;
-    public static final int TRANSMITTER_SPACING = 20;
+    // Slot positions, shared with the screen so the chassis it draws lines up with them. The two columns
+    // flank the chassis, each slot level with the bay it fills.
+    public static final int PREAMP_X = 10;
+    public static final int TRANSMITTER_X = 150;
+    public static final int UPGRADE_Y = 57;
+    public static final int UPGRADE_SPACING = 22;
     public static final int INVENTORY_Y = 118;
     public static final int HOTBAR_Y = 176;
 
@@ -52,15 +50,14 @@ public class StereoMenu extends AbstractContainerMenu {
         this.container = container;
         container.startOpen(inventory.player);
 
-        // The upgrade slots sit where the hardware physically goes on the screen's drawing of the unit:
-        // preamps seat on the top face, transmitters plug into the back panel. Each slot only takes its
-        // own kind, so the drawing always matches what is installed.
+        // Preamps down the left, transmitters down the right, each opposite the bay it fills. Each slot
+        // only takes its own kind, so the chassis drawing always matches what is installed.
         for (int i = 0; i < PREAMP_SLOTS; i++) {
-            this.addSlot(new UpgradeSlot(container, i, PREAMP_X + i * 22, PREAMP_Y,
+            this.addSlot(new UpgradeSlot(container, i, PREAMP_X, UPGRADE_Y + i * UPGRADE_SPACING,
                     EtchedItems.PREAMP.asItem()));
         }
         for (int i = 0; i < TRANSMITTER_SLOTS; i++) {
-            this.addSlot(new UpgradeSlot(container, PREAMP_SLOTS + i, TRANSMITTER_X, TRANSMITTER_Y + i * TRANSMITTER_SPACING,
+            this.addSlot(new UpgradeSlot(container, PREAMP_SLOTS + i, TRANSMITTER_X, UPGRADE_Y + i * UPGRADE_SPACING,
                     EtchedItems.TRANSMITTER.asItem()));
         }
 
@@ -179,7 +176,7 @@ public class StereoMenu extends AbstractContainerMenu {
                 if (!this.moveItemStackTo(slotStack, upgrades, this.slots.size(), true)) {
                     return ItemStack.EMPTY;
                 }
-            } else if (!this.moveItemStackTo(slotStack, 0, upgrades, false)) {
+            } else if (!this.moveIntoUpgrades(slotStack)) {
                 return ItemStack.EMPTY;
             }
 
@@ -194,6 +191,23 @@ public class StereoMenu extends AbstractContainerMenu {
             slot.onTake(player, slotStack);
         }
         return itemStack;
+    }
+
+    // Shift-clicking an upgrade cannot go through moveItemStackTo: when the target bay is already
+    // occupied, vanilla merges using the item's own stack size and writes the count straight onto the
+    // stored stack, which walks past both this slot's limit of one and the block entity's clamp. That
+    // is how two transmitters ended up in a single bay, each one still counting toward the range.
+    // Bays are filled here instead, one part into each empty bay that accepts it.
+    private boolean moveIntoUpgrades(ItemStack stack) {
+        boolean moved = false;
+        for (int i = 0; i < StereoBlockEntity.UPGRADE_SLOTS && !stack.isEmpty(); i++) {
+            Slot slot = this.slots.get(i);
+            if (slot.getItem().isEmpty() && slot.mayPlace(stack)) {
+                slot.set(stack.split(1));
+                moved = true;
+            }
+        }
+        return moved;
     }
 
     @Override

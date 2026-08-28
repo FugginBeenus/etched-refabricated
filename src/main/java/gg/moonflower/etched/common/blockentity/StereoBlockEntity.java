@@ -28,6 +28,7 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
     public static final int RANGE_PER_TRANSMITTER = 16;
 
     public static final int UPGRADE_SLOTS = 4;
+    public static final int PREAMP_SLOTS = 2;
 
     public static final int MODE_ALL = 0;
 
@@ -71,7 +72,7 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
         int count = 0;
         for (net.minecraft.world.item.ItemStack stack : this.upgrades) {
             if (stack.is(item)) {
-                count += stack.getCount();
+                count++;
             }
         }
         return count;
@@ -270,7 +271,14 @@ public class StereoBlockEntity extends BlockEntity implements net.minecraft.worl
 
     @Override
     public boolean canPlaceItem(int slot, net.minecraft.world.item.ItemStack stack) {
-        return isUpgrade(stack);
+        // Typed per bay, matching the menu's slots, so a hopper can't drop a preamp into a
+        // transmitter port and leave the drawing disagreeing with the stats.
+        if (stack.getCount() > 1) {
+            return false;
+        }
+        return slot < PREAMP_SLOTS
+                ? stack.is(gg.moonflower.etched.core.registry.EtchedItems.PREAMP.asItem())
+                : stack.is(gg.moonflower.etched.core.registry.EtchedItems.TRANSMITTER.asItem());
     }
 
     @Override

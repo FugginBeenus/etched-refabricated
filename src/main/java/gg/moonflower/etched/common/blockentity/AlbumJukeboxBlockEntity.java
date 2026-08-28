@@ -384,16 +384,20 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     }
 
     public boolean isPlaying() {
-        if (this.isEmpty()) {
-            return false;
-        }
-        // Only RESTART lets power gate playback. In the other modes a pulse is a command, so holding the
-        // line high must not silence the jukebox.
+        return !this.isEmpty() && !this.isSilenced();
+    }
+
+    /**
+     * Whether the jukebox should be quiet right now. Only RESTART lets power gate playback; in the other
+     * modes a pulse is a command, so holding the line high must not silence it. Sound playback asks this
+     * too, rather than reading the powered property itself.
+     */
+    public boolean isSilenced() {
         if (this.redstoneMode == REDSTONE_RESTART) {
             BlockState state = this.getBlockState();
-            return !state.hasProperty(AlbumJukeboxBlock.POWERED) || !state.getValue(AlbumJukeboxBlock.POWERED);
+            return state.hasProperty(AlbumJukeboxBlock.POWERED) && state.getValue(AlbumJukeboxBlock.POWERED);
         }
-        return !this.paused;
+        return this.paused;
     }
 
     public int getRedstoneMode() {
@@ -426,7 +430,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
                 this.paused = !this.paused;
                 this.setChanged();
                 this.updatePlaying();
-                return false;
+                return true;
             }
             default -> {
                 return false;

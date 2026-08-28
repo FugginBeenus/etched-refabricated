@@ -95,7 +95,7 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
         // What a redstone pulse does, under the track controls it affects.
         this.redstoneButton = this.addRenderableWidget(Button.builder(this.redstoneText(), b ->
                 this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, AlbumJukeboxMenu.BUTTON_REDSTONE_MODE))
-                .bounds(this.leftPos + 9, this.topPos + 56, 43, 18)
+                .bounds(this.leftPos + 9, this.topPos + 15, 43, 16)
                 .tooltip(Tooltip.create(Component.translatable("screen." + Etched.MOD_ID + ".album_jukebox.redstone.tooltip"))).build());
 
         this.titleLabelX = (this.imageWidth - this.font.width(this.title)) / 2;

@@ -457,7 +457,10 @@ public class SoundTracker {
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
         Map<BlockPos, SoundInstance> playingRecords = ((LevelRendererAccessor)Minecraft.getInstance().levelRenderer).getPlayingRecords();
 
-        if (!state.hasProperty(AlbumJukeboxBlock.POWERED) || !state.getValue(AlbumJukeboxBlock.POWERED) && !force && !jukebox.recalculatePlayingIndex(false)) {// Something must already be playing since it would otherwise be -1 and a change would occur
+        // Whether power silences the jukebox depends on its redstone mode now, so ask the block entity
+        // rather than reading the property here.
+        boolean silenced = jukebox.isSilenced();
+        if (!state.hasProperty(AlbumJukeboxBlock.POWERED) || !silenced && !force && !jukebox.recalculatePlayingIndex(false)) {// Something must already be playing since it would otherwise be -1 and a change would occur
             return;
         }
 
@@ -471,7 +474,7 @@ public class SoundTracker {
             setRecordPlayingNearby(level, pos, false);
         }
 
-        if (state.getValue(AlbumJukeboxBlock.POWERED)) {
+        if (silenced) {
             jukebox.stopPlaying();
         }
 

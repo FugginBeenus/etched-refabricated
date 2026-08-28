@@ -131,8 +131,10 @@ public class EtchedClientPlayPacketHandler {
                 // Driven off the position in the packet rather than the open screen, so a redstone skip,
                 // or another player's skip, is heard by everyone in range and not just whoever has the
                 // menu open.
-                if (client.level.getBlockEntity(pkt.pos()) instanceof AlbumJukeboxBlockEntity entity
-                        && entity.setPlayingIndex(pkt.playingIndex(), pkt.track())) {
+                if (client.level.getBlockEntity(pkt.pos()) instanceof AlbumJukeboxBlockEntity entity) {
+                    entity.setPlayingIndex(pkt.playingIndex(), pkt.track());
+                    // Forced, and not conditional on the index moving: pausing changes no track but must
+                    // still stop the sound.
                     SoundTracker.playAlbum(entity, entity.getBlockState(), client.level, pkt.pos(), true);
                 }
             });

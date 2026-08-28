@@ -85,7 +85,7 @@ public class EtchedServerPlayPacketHandler {
                 if (menu.setPlayingTrack(level, pkt)) {
                     // The menu's position is the authority; a client does not get to name the block it
                     // is changing.
-                    var packet = new SetAlbumJukeboxTrackPacket(menu.getPos(), pkt.playingIndex(), pkt.track());
+                    var packet = new SetAlbumJukeboxTrackPacket(menu.getPos(), pkt.playingIndex(), pkt.track(), false);
                     packet.sendToClients(PlayerLookup.tracking(level, level.getChunkAt(menu.getPos()).getPos()));
                     //EtchedMessages.PLAY.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(menu.getPos())), new SetAlbumJukeboxTrackPacket(pkt.playingIndex(), pkt.track()));
                 }

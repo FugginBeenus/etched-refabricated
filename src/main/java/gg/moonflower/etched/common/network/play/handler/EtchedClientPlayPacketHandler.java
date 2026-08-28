@@ -132,6 +132,7 @@ public class EtchedClientPlayPacketHandler {
                 // or another player's skip, is heard by everyone in range and not just whoever has the
                 // menu open.
                 if (client.level.getBlockEntity(pkt.pos()) instanceof AlbumJukeboxBlockEntity entity) {
+                    entity.setSilenced(pkt.silenced());
                     entity.setPlayingIndex(pkt.playingIndex(), pkt.track());
                     // Forced, and not conditional on the index moving: pausing changes no track but must
                     // still stop the sound.

@@ -95,15 +95,20 @@ public class AlbumJukeboxBlock extends BaseEntityBlock {
                 level.setBlock(pos, blockState.setValue(POWERED, powered), 2);
                 level.sendBlockUpdated(pos, blockState, level.getBlockState(pos), 3);
 
-                // The rising edge only, so one pulse is one action rather than two. Listeners are told
-                // directly, because a track change is not part of the block's saved data.
-                if (powered && level instanceof net.minecraft.server.level.ServerLevel serverLevel
-                        && level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.AlbumJukeboxBlockEntity jukebox
-                        && jukebox.onRedstonePulse()) {
-                    new gg.moonflower.etched.common.network.play.SetAlbumJukeboxTrackPacket(
-                            pos, jukebox.getPlayingIndex(), jukebox.getTrack())
-                            .sendToClients(net.fabricmc.fabric.api.networking.v1.PlayerLookup.tracking(
-                                    serverLevel, serverLevel.getChunkAt(pos).getPos()));
+                if (level instanceof net.minecraft.server.level.ServerLevel serverLevel
+                        && level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.AlbumJukeboxBlockEntity jukebox) {
+                    // A pulse is one action, so only the rising edge commands. The falling edge is
+                    // reported only in restart mode, where releasing power is what resumes; telling
+                    // listeners in the other modes would restart the track a button had just skipped to.
+                    if (powered) {
+                        jukebox.onRedstonePulse();
+                    }
+                    if (powered || jukebox.getRedstoneMode() == gg.moonflower.etched.common.blockentity.AlbumJukeboxBlockEntity.REDSTONE_RESTART) {
+                        new gg.moonflower.etched.common.network.play.SetAlbumJukeboxTrackPacket(
+                                pos, jukebox.getPlayingIndex(), jukebox.getTrack(), jukebox.isSilenced())
+                                .sendToClients(net.fabricmc.fabric.api.networking.v1.PlayerLookup.tracking(
+                                        serverLevel, serverLevel.getChunkAt(pos).getPos()));
+                    }
                 }
             }
         }

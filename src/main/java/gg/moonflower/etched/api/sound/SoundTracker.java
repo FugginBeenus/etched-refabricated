@@ -474,8 +474,10 @@ public class SoundTracker {
             setRecordPlayingNearby(level, pos, false);
         }
 
+        // The sound is already stopped above. Returning here rather than clearing the position keeps the
+        // current disc and track, so resuming replays what was playing instead of jumping to the first.
         if (silenced) {
-            jukebox.stopPlaying();
+            return;
         }
 
         if (jukebox.getPlayingIndex() < 0) {// Nothing can be played inside the jukebox

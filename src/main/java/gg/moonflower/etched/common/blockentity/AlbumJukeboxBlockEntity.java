@@ -45,6 +45,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
 
     private int redstoneMode = REDSTONE_RESTART;
     private boolean paused;
+    // What the server last said. Only read on the client, which cannot work it out reliably itself.
+    private boolean silenced;
     private int playingIndex;
     private int track;
     private ItemStack playingStack;
@@ -119,6 +121,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
                 : ItemStack.EMPTY;
         this.redstoneMode = Mth.clamp(nbt.getInt("RedstoneMode"), 0, REDSTONE_MODES - 1);
         this.paused = nbt.getBoolean("Paused");
+        this.silenced = nbt.getBoolean("Silenced");
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -136,6 +139,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         }
         nbt.putInt("RedstoneMode", this.redstoneMode);
         nbt.putBoolean("Paused", this.paused);
+        nbt.putBoolean("Silenced", this.isSilenced());
     }
 
     @Override
@@ -155,6 +159,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
                 : ItemStack.EMPTY;
         this.redstoneMode = Mth.clamp(nbt.getInt("RedstoneMode"), 0, REDSTONE_MODES - 1);
         this.paused = nbt.getBoolean("Paused");
+        this.silenced = nbt.getBoolean("Silenced");
         if (this.loaded) {
             SoundTracker.playAlbum(this, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos(), false);
         }
@@ -172,6 +177,7 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
         }
         nbt.putInt("RedstoneMode", this.redstoneMode);
         nbt.putBoolean("Paused", this.paused);
+        nbt.putBoolean("Silenced", this.isSilenced());
     }
 
     @Override
@@ -393,11 +399,20 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
      * too, rather than reading the powered property itself.
      */
     public boolean isSilenced() {
+        // The client is told; it does not work this out. The powered state and the paused flag reach it
+        // in separate packets that can land in either order.
+        if (this.level != null && this.level.isClientSide()) {
+            return this.silenced;
+        }
         if (this.redstoneMode == REDSTONE_RESTART) {
             BlockState state = this.getBlockState();
             return state.hasProperty(AlbumJukeboxBlock.POWERED) && state.getValue(AlbumJukeboxBlock.POWERED);
         }
         return this.paused;
+    }
+
+    public void setSilenced(boolean silenced) {
+        this.silenced = silenced;
     }
 
     public int getRedstoneMode() {
@@ -419,24 +434,18 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     }
 
     /**
-     * Acts on the rising edge of a redstone signal. Returns whether the track moved, so the caller can
-     * tell listeners about it.
+     * Acts on the rising edge of a redstone signal. The caller tells listeners either way, since a pause
+     * moves no track but still has to be heard.
      */
-    public boolean onRedstonePulse() {
+    public void onRedstonePulse() {
         switch (this.redstoneMode) {
             case REDSTONE_NEXT -> this.next();
             case REDSTONE_PREVIOUS -> this.previous();
-            case REDSTONE_TOGGLE -> {
-                this.paused = !this.paused;
-                this.setChanged();
-                this.updatePlaying();
-                return true;
-            }
+            case REDSTONE_TOGGLE -> this.paused = !this.paused;
             default -> {
-                return false;
+                return;
             }
         }
         this.setChanged();
-        return true;
     }
 }

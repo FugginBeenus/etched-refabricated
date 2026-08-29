@@ -24,6 +24,11 @@ import org.jetbrains.annotations.Nullable;
 public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
 
     public static final int SLOTS = 18;
+    /**
+     * How long a track is assumed to run when nothing better is known. A station must keep moving no
+     * matter what is in it, so an unknown length is a guess rather than a stall.
+     */
+    public static final int DEFAULT_TRACK_TICKS = 20 * 180;
 
     private NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
     private int discIndex;
@@ -34,8 +39,6 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     private Component stationName;
     // Radios tuned to this station. Kept here so a track change reaches all of them at once.
     private final java.util.Set<BlockPos> radios = new java.util.HashSet<>();
-    // When the current track went on air, so a report that arrives moments later can be ignored.
-    private long trackStartedAt;
     // What is on air and how long it has been, so the station keeps its schedule with nobody listening.
     @Nullable
     private String airUrl;
@@ -146,6 +149,35 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         this.putOnAir();
     }
 
+    /**
+     * How long the track on air runs. A vanilla disc's length is known to the game itself, so the station
+     * times those exactly without anyone listening. An etched link has no length the server can read, so
+     * the longest anyone has been heard playing it is used, falling back to an assumed length.
+     */
+    private int durationTicks() {
+        int vanilla = this.vanillaLength(this.getItem(this.discIndex));
+        if (vanilla > 0) {
+            return vanilla;
+        }
+        int learned = gg.moonflower.etched.common.block.TrackDurations.get(this.airUrl);
+        return learned > 0 ? learned : DEFAULT_TRACK_TICKS;
+    }
+
+    //? if >=1.21 {
+    /*private int vanillaLength(ItemStack stack) {
+        if (this.level == null) {
+            return 0;
+        }
+        return net.minecraft.world.item.JukeboxSong.fromStack(this.level.registryAccess(), stack)
+                .map(song -> song.value().lengthInTicks())
+                .orElse(0);
+    }
+    *///?} else {
+    private int vanillaLength(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.RecordItem record ? record.getLengthInTicks() : 0;
+    }
+    //?}
+
     /** Starts whatever is now current, resetting the clock and telling the listeners. */
     private void putOnAir() {
         this.airUrl = this.getCurrentUrl();
@@ -155,9 +187,8 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     }
 
     /**
-     * Runs the station's schedule. Once a listener has heard a track through, its length is known and the
-     * station moves on by itself, whether anyone is tuned in or not. Until then it still waits to be told
-     * the track ended, which is all it could do before.
+     * Runs the station's schedule, entirely on its own. Nothing a radio does can move it: a radio being
+     * broken or switched off used to report the track as finished and skipped it for everyone listening.
      */
     public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, RadioStationBlockEntity station) {
         if (station.airUrl == null) {
@@ -169,8 +200,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
 
         station.elapsed++;
-        int duration = gg.moonflower.etched.common.block.TrackDurations.get(station.airUrl);
-        if (duration > 0 && station.elapsed >= duration) {
+        if (station.elapsed >= station.durationTicks()) {
             station.advance();
         }
     }
@@ -237,15 +267,6 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         super.setRemoved();
     }
 
-    /**
-     * Whether a track has been on air long enough that a listener could really have finished it. A sound
-     * that fails a moment after starting reports the same way as one that ended, and without this a
-     * station would race through every disc it holds.
-     */
-    public boolean trackHasRun() {
-        return this.level != null && this.level.getGameTime() - this.trackStartedAt > 40L;
-    }
-
     public void tune(BlockPos radioPos) {
         this.radios.add(radioPos.immutable());
         this.setChanged();
@@ -279,7 +300,6 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
             return;
         }
         String url = this.getCurrentUrl();
-        this.trackStartedAt = this.level.getGameTime();
         java.util.Iterator<BlockPos> it = this.radios.iterator();
         boolean changed = false;
         while (it.hasNext()) {

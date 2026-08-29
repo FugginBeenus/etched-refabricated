@@ -22,9 +22,14 @@ public final class TrackDurations {
     private TrackDurations() {
     }
 
+    /**
+     * Records a length, keeping the longest ever seen. A play cut short, by the radio being broken or
+     * switched off, reports less than the real length, and a track cannot be shorter than the longest
+     * anyone has heard of it.
+     */
     public static void learn(String url, int ticks) {
         if (url != null && ticks >= MIN_TICKS) {
-            DURATIONS.put(url, ticks);
+            DURATIONS.merge(url, ticks, Math::max);
         }
     }
 

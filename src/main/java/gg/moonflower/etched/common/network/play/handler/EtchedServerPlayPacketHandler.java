@@ -50,20 +50,14 @@ public class EtchedServerPlayPacketHandler {
         }
         server.execute(() -> {
             net.minecraft.server.level.ServerLevel level = player.serverLevel();
+            // Must come from a radio that really exists, so a made-up packet cannot poison a length.
             if (!level.isLoaded(pkt.radioPos())
-                    || !(level.getBlockEntity(pkt.radioPos()) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio)) {
+                    || !(level.getBlockEntity(pkt.radioPos()) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity)) {
                 return;
             }
-            net.minecraft.core.BlockPos stationPos = radio.getStationPos();
-            if (stationPos == null || !level.isLoaded(stationPos)
-                    || !(level.getBlockEntity(stationPos) instanceof gg.moonflower.etched.common.blockentity.RadioStationBlockEntity station)) {
-                return;
-            }
-            // Only the first report moves the station on. The others name a track it has already left.
+            // Only ever a hint about length. The station keeps its own time, so a radio cannot move it
+            // on, and breaking one no longer skips the track for everyone else listening.
             gg.moonflower.etched.common.block.TrackDurations.learn(pkt.finishedUrl(), pkt.playedTicks());
-            if (station.trackHasRun() && java.util.Objects.equals(station.getCurrentUrl(), pkt.finishedUrl())) {
-                station.advance();
-            }
         });
     }
 

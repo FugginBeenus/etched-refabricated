@@ -34,6 +34,8 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     private Component stationName;
     // Radios tuned to this station. Kept here so a track change reaches all of them at once.
     private final java.util.Set<BlockPos> radios = new java.util.HashSet<>();
+    // When the current track went on air, so a report that arrives moments later can be ignored.
+    private long trackStartedAt;
 
     public RadioStationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -121,7 +123,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         if (this.track + 1 < this.trackCountAt(this.discIndex)) {
             this.track++;
             this.setChanged();
-            this.broadcast();
+            this.broadcast(true);
             return;
         }
 
@@ -131,7 +133,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
                 this.discIndex = slot;
                 this.track = 0;
                 this.setChanged();
-                this.broadcast();
+                this.broadcast(true);
                 return;
             }
         }
@@ -199,6 +201,15 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         super.setRemoved();
     }
 
+    /**
+     * Whether a track has been on air long enough that a listener could really have finished it. A sound
+     * that fails a moment after starting reports the same way as one that ended, and without this a
+     * station would race through every disc it holds.
+     */
+    public boolean trackHasRun() {
+        return this.level != null && this.level.getGameTime() - this.trackStartedAt > 40L;
+    }
+
     public void tune(BlockPos radioPos) {
         this.radios.add(radioPos.immutable());
         this.setChanged();
@@ -223,10 +234,16 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
      * radio's own link field is what is set, so all its existing playback carries the sound.
      */
     public void broadcast() {
+        this.broadcast(false);
+    }
+
+    /** @param restart whether listeners should start the track again even if the link is unchanged */
+    public void broadcast(boolean restart) {
         if (this.level == null || this.level.isClientSide()) {
             return;
         }
         String url = this.getCurrentUrl();
+        this.trackStartedAt = this.level.getGameTime();
         java.util.Iterator<BlockPos> it = this.radios.iterator();
         boolean changed = false;
         while (it.hasNext()) {
@@ -240,7 +257,11 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
                 changed = true;
                 continue;
             }
-            radio.setUrl(url);
+            if (restart) {
+                radio.setUrlAndRestart(url);
+            } else {
+                radio.setUrl(url);
+            }
         }
         if (changed) {
             this.setChanged();

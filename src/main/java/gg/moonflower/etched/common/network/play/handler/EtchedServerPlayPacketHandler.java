@@ -60,7 +60,7 @@ public class EtchedServerPlayPacketHandler {
                 return;
             }
             // Only the first report moves the station on. The others name a track it has already left.
-            if (java.util.Objects.equals(station.getCurrentUrl(), pkt.finishedUrl())) {
+            if (station.trackHasRun() && java.util.Objects.equals(station.getCurrentUrl(), pkt.finishedUrl())) {
                 station.advance();
             }
         });

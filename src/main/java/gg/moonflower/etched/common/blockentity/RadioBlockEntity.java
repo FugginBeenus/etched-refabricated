@@ -133,6 +133,19 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         }
     }
 
+    /**
+     * Sets the link and always tells listeners, even when it has not changed. A station moving on to
+     * another copy of the same track, or wrapping back to its only disc, has to restart it; the ordinary
+     * setter would see no change and leave the radio silent.
+     */
+    public void setUrlAndRestart(String url) {
+        this.url = url;
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+    }
+
     @Nullable
     public BlockPos getStationPos() {
         return this.stationPos;

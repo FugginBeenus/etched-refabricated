@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_orientable",
+  "textures": {
+    "top": "etched:block/radio_station_top",
+    "front": "etched:block/radio_station_front",
+    "side": "etched:block/radio_station_side",
+    "particle": "etched:block/radio_station_side"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "TTT",
+    "TRT",
+    "TST"
+  ],
+  "key": {
+    "T": { "item": "etched:transmitter" },
+    "R": { "item": "etched:radio" },
+    "S": { "item": "minecraft:sculk_sensor" }
+  },
+  "result": {
+    "item": "etched:radio_station"
+  }
+}

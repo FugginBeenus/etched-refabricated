@@ -120,6 +120,17 @@ public class EtchedBlocks {
                     .register();
             EtchedItems.register("portal_radio", () -> new PortalRadioItem(RADIO.get(), new Item.Properties()));
 */
+    public static final BlockEntry<gg.moonflower.etched.common.block.RadioStationBlock> RADIO_STATION =
+            Etched.REGISTRATE.block("radio_station", gg.moonflower.etched.common.block.RadioStationBlock::new)
+                    .properties(properties -> properties
+                            .mapColor(MapColor.COLOR_BLACK)
+                            .strength(3.0f)
+                            .sound(SoundType.STONE)
+                            .requiresCorrectToolForDrops()
+                    )
+                    .item().tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).build()
+                    .register();
+
     public static final BlockEntityEntry<AlbumJukeboxBlockEntity> ALBUM_JUKEBOX_BE =
             (BlockEntityEntry<AlbumJukeboxBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("album_jukebox", AlbumJukeboxBlockEntity::new)
                     .validBlocks(ALBUM_JUKEBOX)
@@ -146,5 +157,10 @@ public class EtchedBlocks {
                     .validBlocks(ALBUM_DISPLAY)
                     .register();
             //BLOCK_ENTITIES.register("radio", () -> BlockEntityType.Builder.of(RadioBlockEntity::new, RADIO.get()).build(null))
+    public static final BlockEntityEntry<gg.moonflower.etched.common.blockentity.RadioStationBlockEntity> RADIO_STATION_BE =
+        (BlockEntityEntry<gg.moonflower.etched.common.blockentity.RadioStationBlockEntity>)(Object)Etched.REGISTRATE.blockEntity("radio_station", gg.moonflower.etched.common.blockentity.RadioStationBlockEntity::new)
+                    .validBlocks(RADIO_STATION)
+                    .register();
+
     public static void register() {} // i guess this is a hack?
 }

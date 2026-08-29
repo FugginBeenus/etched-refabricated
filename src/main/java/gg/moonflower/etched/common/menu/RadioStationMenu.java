@@ -17,10 +17,10 @@ public class RadioStationMenu extends AbstractContainerMenu {
     // one every other screen in the mod uses.
     public static final int COLUMNS = 5;
     public static final int SLOT_X = 43;
-    public static final int SLOT_Y = 32;
+    public static final int SLOT_Y = 36;
     public static final int INVENTORY_X = 8;
-    public static final int INVENTORY_Y = 110;
-    public static final int HOTBAR_Y = 170;
+    public static final int INVENTORY_Y = 112;
+    public static final int HOTBAR_Y = 172;
 
     private final Container container;
 

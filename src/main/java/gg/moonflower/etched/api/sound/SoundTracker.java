@@ -461,8 +461,11 @@ public class SoundTracker {
                 // stream here ended the sound seconds in.
                 AbstractOnlineSoundInstance record = getEtchedRecord(url, RADIO, level, pos, 8, AudioSource.AudioFileType.FILE);
                 record.setLoop(false);
+                // Timed so the station learns how long this track is and can keep its own schedule.
+                long startedAt = level.getGameTime();
                 playRecord(pos, StopListeningSound.create(record, () -> Minecraft.getInstance().tell(() ->
-                        new gg.moonflower.etched.common.network.play.ServerboundStationTrackEndedPacket(pos, url).sendToServer())));
+                        new gg.moonflower.etched.common.network.play.ServerboundStationTrackEndedPacket(
+                                pos, url, (int) Math.min(Integer.MAX_VALUE, level.getGameTime() - startedAt)).sendToServer())));
             } else {
                 AbstractOnlineSoundInstance record = getEtchedRecord(url, RADIO, level, pos, 8, AudioSource.AudioFileType.BOTH);
                 record.setLoop(true); // If the sound is a file, then just continue looping that specific track

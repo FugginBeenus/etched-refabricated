@@ -36,6 +36,10 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     private final java.util.Set<BlockPos> radios = new java.util.HashSet<>();
     // When the current track went on air, so a report that arrives moments later can be ignored.
     private long trackStartedAt;
+    // What is on air and how long it has been, so the station keeps its schedule with nobody listening.
+    @Nullable
+    private String airUrl;
+    private int elapsed;
 
     public RadioStationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -122,8 +126,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     public void advance() {
         if (this.track + 1 < this.trackCountAt(this.discIndex)) {
             this.track++;
-            this.setChanged();
-            this.broadcast(true);
+            this.putOnAir();
             return;
         }
 
@@ -132,8 +135,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
             if (this.trackCountAt(slot) > 0) {
                 this.discIndex = slot;
                 this.track = 0;
-                this.setChanged();
-                this.broadcast(true);
+                this.putOnAir();
                 return;
             }
         }
@@ -141,8 +143,36 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         // Nothing playable left in the station.
         this.discIndex = 0;
         this.track = 0;
+        this.putOnAir();
+    }
+
+    /** Starts whatever is now current, resetting the clock and telling the listeners. */
+    private void putOnAir() {
+        this.airUrl = this.getCurrentUrl();
+        this.elapsed = 0;
         this.setChanged();
-        this.broadcast();
+        this.broadcast(true);
+    }
+
+    /**
+     * Runs the station's schedule. Once a listener has heard a track through, its length is known and the
+     * station moves on by itself, whether anyone is tuned in or not. Until then it still waits to be told
+     * the track ended, which is all it could do before.
+     */
+    public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, RadioStationBlockEntity station) {
+        if (station.airUrl == null) {
+            // Look again now and then, to pick up discs put in while nothing was on air.
+            if (level.getGameTime() % 20L == 0L && station.getCurrentUrl() != null) {
+                station.putOnAir();
+            }
+            return;
+        }
+
+        station.elapsed++;
+        int duration = gg.moonflower.etched.common.block.TrackDurations.get(station.airUrl);
+        if (duration > 0 && station.elapsed >= duration) {
+            station.advance();
+        }
     }
 
     /** Puts the station back on the first thing it can play, used when its discs change. */
@@ -168,7 +198,13 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
             this.rewindToPlayable();
         }
         // Listeners follow the new list straight away rather than waiting for the current track to end.
-        this.broadcast();
+        // Only a genuinely different track restarts the clock; adding a disc further down the list must
+        // not interrupt what is already playing.
+        if (!java.util.Objects.equals(this.getCurrentUrl(), this.airUrl)) {
+            this.putOnAir();
+        } else {
+            this.broadcast();
+        }
     }
 
     @Override

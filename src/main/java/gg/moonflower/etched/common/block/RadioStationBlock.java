@@ -82,6 +82,15 @@ public class RadioStationBlock extends BaseEntityBlock {
     }
 
     @Override
+    public <T extends BlockEntity> net.minecraft.world.level.block.entity.BlockEntityTicker<T> getTicker(
+            Level level, BlockState state, net.minecraft.world.level.block.entity.BlockEntityType<T> type) {
+        // Server only: the schedule is the server's, so every listener agrees on what is on air.
+        return level.isClientSide() ? null : createTickerHelper(type,
+                gg.moonflower.etched.core.registry.EtchedBlocks.RADIO_STATION_BE.get(),
+                RadioStationBlockEntity::serverTick);
+    }
+
+    @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }

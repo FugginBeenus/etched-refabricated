@@ -64,6 +64,9 @@ public class EtchingMenu extends AbstractContainerMenu {
     private final Container input;
     private final Container result;
     private final Player player;
+    // Blank discs the pending result costs. An album is a disc per track, so the price is paid here,
+    // where a stack of blanks sits in one slot, rather than in a grid that only takes one per slot.
+    private int resultCost = 1;
     private String url;
     private int urlId;
     private long lastSoundTime;
@@ -132,7 +135,7 @@ public class EtchingMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(Player player, ItemStack stack) {
-                EtchingMenu.this.discSlot.remove(1);
+                EtchingMenu.this.discSlot.remove(EtchingMenu.this.resultCost);
                 EtchingMenu.this.labelSlot.remove(1);
                 if (!EtchingMenu.this.discSlot.hasItem() || !EtchingMenu.this.labelSlot.hasItem()) {
                     EtchingMenu.this.labelIndex.set(0);
@@ -360,12 +363,22 @@ public class EtchingMenu extends AbstractContainerMenu {
                         data[i] = trackData;
                     }
 
+                    // Etching an album writes every track onto the one disc, so it costs a blank for
+                    // each. Re-etching a disc that already exists still costs only itself.
+                    this.resultCost = discStack.getItem() instanceof BlankMusicDiscItem ? Math.max(1, data.length) : 1;
+
                     EtchedMusicDiscItem.setMusic(resultStack, data);
                     EtchedMusicDiscItem.setColor(resultStack, discColor, primaryLabelColor, secondaryLabelColor);
                     EtchedMusicDiscItem.setPattern(resultStack, EtchedMusicDiscItem.LabelPattern.values()[this.labelIndex.get()]);
 
                     return resultStack;
                 }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenAcceptAsync(resultStack -> {
+                    // Not enough blanks for every track, so there is nothing to take yet.
+                    if (this.discSlot.getItem().getCount() < this.resultCost) {
+                        this.resultSlot.set(ItemStack.EMPTY);
+                        this.broadcastChanges();
+                        return;
+                    }
                     if (this.urlId == currentId && !ItemStack.matches(resultStack, this.resultSlot.getItem()) && !ItemStack.matches(resultStack, this.discSlot.getItem())) {
                         this.resultSlot.set(resultStack);
                         this.urlId++;

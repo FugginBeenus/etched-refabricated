@@ -21,9 +21,9 @@ import java.util.List;
 /**
  * Turns an album etched onto one disc into a real album: a cover holding one disc per track.
  *
- * <p>Etching an album link writes every track onto a single disc, for the price of a single blank, which
- * made an album cheaper than the songs on it. Splitting it out costs a blank disc for every track after
- * the first, so an album ends up costing the same as etching its tracks one at a time, plus the cover.
+ * <p>The discs are paid for at the etching table, which charges a blank for every track on the album, so
+ * splitting one out costs only the cover. A crafting grid takes one item per slot, which made asking for
+ * the blanks here both awkward and a limit on how long an album could be.
  */
 public class AlbumSplitRecipe extends CustomRecipe {
 
@@ -37,11 +37,10 @@ public class AlbumSplitRecipe extends CustomRecipe {
     }
     //?}
 
-    /** The album disc, when the grid holds exactly one cover, one multi-track disc and enough blanks. */
+    /** The album disc, when the grid holds exactly one empty cover and one multi-track disc. */
     private static ItemStack findAlbumDisc(java.util.function.IntFunction<ItemStack> items, int size) {
         ItemStack album = ItemStack.EMPTY;
         int covers = 0;
-        int blanks = 0;
 
         for (int i = 0; i < size; i++) {
             ItemStack stack = items.apply(i);
@@ -53,8 +52,6 @@ public class AlbumSplitRecipe extends CustomRecipe {
                 if (++covers > 1 || !AlbumCoverItem.getRecords(stack).isEmpty()) {
                     return ItemStack.EMPTY;
                 }
-            } else if (stack.is(EtchedItems.BLANK_MUSIC_DISC.asItem())) {
-                blanks++;
             } else if (stack.is(EtchedItems.ETCHED_MUSIC_DISC.asItem())) {
                 if (!album.isEmpty()) {
                     return ItemStack.EMPTY;
@@ -68,10 +65,7 @@ public class AlbumSplitRecipe extends CustomRecipe {
         if (covers != 1 || album.isEmpty()) {
             return ItemStack.EMPTY;
         }
-
-        int tracks = trackCount(album);
-        // One disc's worth is already etched, so the rest have to be paid for.
-        return tracks > 1 && blanks == tracks - 1 ? album : ItemStack.EMPTY;
+        return trackCount(album) > 1 ? album : ItemStack.EMPTY;
     }
 
     private static int trackCount(ItemStack album) {
@@ -128,7 +122,7 @@ public class AlbumSplitRecipe extends CustomRecipe {
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return width * height >= 3;
+        return width * height >= 2;
     }
 
     @Override

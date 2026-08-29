@@ -54,33 +54,71 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     /** The link currently on air, or null when the station has nothing playable in it. */
     @Nullable
     public String getCurrentUrl() {
-        TrackData[] tracks = this.tracksAt(this.discIndex);
-        if (tracks == null || this.track >= tracks.length) {
-            return null;
+        return this.urlAt(this.discIndex, this.track);
+    }
+
+    /**
+     * How many tracks the disc in this slot has, or zero when it holds nothing playable. A vanilla disc
+     * counts as one: its sound event is what goes on air, exactly as a jukebox plays it.
+     */
+    private int trackCountAt(int slot) {
+        if (slot < 0 || slot >= SLOTS) {
+            return 0;
         }
-        String url = tracks[this.track].url();
-        return TrackData.isValidURL(url) ? url : null;
+        ItemStack stack = this.getItem(slot);
+        if (!PlayableRecord.isPlayableRecord(stack)) {
+            return 0;
+        }
+        TrackData[] tracks = PlayableRecord.getStackMusic(stack).orElse(null);
+        if (tracks != null && tracks.length > 0) {
+            return tracks.length;
+        }
+        return this.vanillaSound(stack) != null ? 1 : 0;
     }
 
     @Nullable
-    private TrackData[] tracksAt(int slot) {
-        if (slot < 0 || slot >= SLOTS) {
+    private String urlAt(int slot, int track) {
+        if (slot < 0 || slot >= SLOTS || track < 0) {
             return null;
         }
         ItemStack stack = this.getItem(slot);
         if (!PlayableRecord.isPlayableRecord(stack)) {
             return null;
         }
-        return PlayableRecord.getStackMusic(stack).orElse(null);
+
+        TrackData[] tracks = PlayableRecord.getStackMusic(stack).orElse(null);
+        if (tracks != null && track < tracks.length) {
+            String url = tracks[track].url();
+            return TrackData.isValidURL(url) ? url : null;
+        }
+        return track == 0 ? this.vanillaSound(stack) : null;
     }
+
+    /** The sound a vanilla disc plays, which counts as a link the same way a local sound does. */
+    @Nullable
+    //? if >=1.21 {
+    /*private String vanillaSound(ItemStack stack) {
+        if (this.level == null) {
+            return null;
+        }
+        return net.minecraft.world.item.JukeboxSong.fromStack(this.level.registryAccess(), stack)
+                .map(song -> song.value().soundEvent().value().getLocation().toString())
+                .orElse(null);
+    }
+    *///?} else {
+    private String vanillaSound(ItemStack stack) {
+        return stack.getItem() instanceof net.minecraft.world.item.RecordItem record
+                ? record.getSound().getLocation().toString()
+                : null;
+    }
+    //?}
 
     /**
      * Moves to the next track, then to the next disc holding one, wrapping around. Stops on the first
      * playable thing it finds so an empty slot in the middle of the list is simply skipped.
      */
     public void advance() {
-        TrackData[] current = this.tracksAt(this.discIndex);
-        if (current != null && this.track + 1 < current.length) {
+        if (this.track + 1 < this.trackCountAt(this.discIndex)) {
             this.track++;
             this.setChanged();
             this.broadcast();
@@ -89,7 +127,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
 
         for (int step = 1; step <= SLOTS; step++) {
             int slot = Math.floorMod(this.discIndex + step, SLOTS);
-            if (this.tracksAt(slot) != null) {
+            if (this.trackCountAt(slot) > 0) {
                 this.discIndex = slot;
                 this.track = 0;
                 this.setChanged();
@@ -108,7 +146,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     /** Puts the station back on the first thing it can play, used when its discs change. */
     public void rewindToPlayable() {
         for (int slot = 0; slot < SLOTS; slot++) {
-            if (this.tracksAt(slot) != null) {
+            if (this.trackCountAt(slot) > 0) {
                 this.discIndex = slot;
                 this.track = 0;
                 this.setChanged();
@@ -124,9 +162,11 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     public void setItem(int slot, ItemStack stack) {
         super.setItem(slot, stack);
         // Swapping a disc out from under the station must not leave it pointing at nothing.
-        if (this.tracksAt(this.discIndex) == null) {
+        if (this.trackCountAt(this.discIndex) == 0) {
             this.rewindToPlayable();
         }
+        // Listeners follow the new list straight away rather than waiting for the current track to end.
+        this.broadcast();
     }
 
     @Override

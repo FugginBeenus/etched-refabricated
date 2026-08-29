@@ -65,7 +65,7 @@ public class EtchedServerPlayPacketHandler {
         if (player == null || !(player.containerMenu instanceof gg.moonflower.etched.common.menu.RadioMenu menu)) {
             return;
         }
-        server.execute(() -> menu.tuneTo(player, pkt.tuned() ? pkt.stationPos() : null));
+        server.execute(() -> menu.tuneTo(pkt.tuned() ? pkt.stationPos() : null));
     }
 
     public static void handleSetStationName(gg.moonflower.etched.common.network.play.ServerboundSetStationNamePacket pkt, MinecraftServer server, ServerPlayer player) {

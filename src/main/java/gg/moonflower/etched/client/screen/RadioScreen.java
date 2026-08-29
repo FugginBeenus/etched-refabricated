@@ -22,6 +22,9 @@ public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
 
     private boolean canEdit;
     private EditBox url;
+    // What the box held when the screen opened. Done is also how the screen is closed, so an untouched
+    // box must not be sent: doing so overwrote whatever station the radio was following.
+    private String openedUrl = "";
 
     // Stations the server says exist. The dropdown is drawn by hand: vanilla has no such widget, and a
     // cycling button hides how many there are.
@@ -97,8 +100,9 @@ public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
         this.url.setCanLoseFocus(false);
         this.addRenderableWidget(this.url);
         this.addRenderableWidget(Button.builder(CommonComponents.GUI_DONE, button -> {
-            var packet = new ServerboundSetUrlPacket(this.url.getValue());
-            packet.sendToServer();
+            if (!this.url.getValue().equals(this.openedUrl)) {
+                new ServerboundSetUrlPacket(this.url.getValue()).sendToServer();
+            }
             this.minecraft.setScreen(null);
         }).bounds((this.width - this.imageWidth) / 2, (this.height - this.imageHeight) / 2 + this.imageHeight + 5, this.imageWidth, 20).build());
 
@@ -180,6 +184,7 @@ public class RadioScreen extends AbstractContainerScreen<RadioMenu> {
     }
 
     public void receiveUrl(String url) {
+        this.openedUrl = url == null ? "" : url;
         this.canEdit = true;
         this.url.setVisible(true);
         this.url.setValue(url);

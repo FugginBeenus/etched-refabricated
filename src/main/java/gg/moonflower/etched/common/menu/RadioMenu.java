@@ -38,6 +38,9 @@ public class RadioMenu extends AbstractContainerMenu {
     }
 
     public void setUrl(String url) {
+        // Typing a link by hand is a manual override, so the radio leaves whatever station it was on.
+        // Otherwise the station would keep pushing its own track over the top of it.
+        this.tuneTo(null);
         this.urlConsumer.accept(url);
     }
 
@@ -45,7 +48,7 @@ public class RadioMenu extends AbstractContainerMenu {
      * Tunes this radio to a station, or back to its own link when given null. Leaving a station first
      * matters: otherwise the old one keeps pushing tracks at a radio that has moved on.
      */
-    public void tuneTo(Player player, @org.jetbrains.annotations.Nullable net.minecraft.core.BlockPos stationPos) {
+    public void tuneTo(@org.jetbrains.annotations.Nullable net.minecraft.core.BlockPos stationPos) {
         this.access.execute((level, radioPos) -> {
             if (!(level.getBlockEntity(radioPos) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio)) {
                 return;

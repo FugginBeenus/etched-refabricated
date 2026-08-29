@@ -84,6 +84,9 @@ public class RadioBlock extends BaseEntityBlock {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
+        if (player.isShiftKeyDown()) {
+            return toggleSwitch(level, pos, player);
+        }
         player.openMenu(state.getMenuProvider(level, pos)).ifPresent(__ -> {
             String url = level.getBlockEntity(pos) instanceof RadioBlockEntity be ? be.getUrl() : "";
             var packet = new ClientboundSetUrlPacket(url);
@@ -97,6 +100,9 @@ public class RadioBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand interactionHand, BlockHitResult blockHitResult) {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
+        }
+        if (player.isShiftKeyDown()) {
+            return toggleSwitch(level, pos, player);
         }
         ItemStack stack = player.getItemInHand(interactionHand);
         if (stack.getItem() == Items.CAKE && !state.getValue(PORTAL)) {
@@ -116,6 +122,17 @@ public class RadioBlock extends BaseEntityBlock {
         return InteractionResult.CONSUME;
     }
     //?}
+
+    // Crouching is the on/off switch, so music can be silenced without losing what it was tuned to.
+    private static InteractionResult toggleSwitch(Level level, BlockPos pos, Player player) {
+        if (!(level.getBlockEntity(pos) instanceof RadioBlockEntity radio)) {
+            return InteractionResult.PASS;
+        }
+        boolean off = radio.toggleSwitchedOff();
+        player.displayClientMessage(Component.translatable(
+                "block." + Etched.MOD_ID + ".radio." + (off ? "off" : "on")), true);
+        return InteractionResult.CONSUME;
+    }
 
     // The list is what the screen's station dropdown shows.
     private static void sendStationList(Level level, BlockPos radioPos, ServerPlayer player) {
@@ -254,7 +271,8 @@ public class RadioBlock extends BaseEntityBlock {
             return;
         }
 
-        if (radio.getUrl() == null) {
+        // Notes follow the sound, so a radio switched off shows none either.
+        if (!radio.isPlaying()) {
             return;
         }
 

@@ -28,6 +28,8 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     // Set when tuned to a station. The station pushes each track's link here as it goes on air.
     @Nullable
     private BlockPos stationPos;
+    // Switched off by hand. The link and the station are kept, so turning it back on resumes.
+    private boolean switchedOff;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
         this(EtchedBlocks.RADIO_BE.get(), pos, state);
@@ -59,6 +61,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         super.loadAdditional(nbt, provider);
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
         this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
+        this.switchedOff = nbt.getBoolean("SwitchedOff");
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -72,6 +75,9 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         if (this.stationPos != null) {
             nbt.putLong("StationPos", this.stationPos.asLong());
         }
+        if (this.switchedOff) {
+            nbt.putBoolean("SwitchedOff", true);
+        }
     }
 
     @Override
@@ -84,6 +90,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         super.load(nbt);
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
         this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
+        this.switchedOff = nbt.getBoolean("SwitchedOff");
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -96,6 +103,9 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         }
         if (this.stationPos != null) {
             nbt.putLong("StationPos", this.stationPos.asLong());
+        }
+        if (this.switchedOff) {
+            nbt.putBoolean("SwitchedOff", true);
         }
     }
 
@@ -160,8 +170,24 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         }
     }
 
+    public boolean isSwitchedOff() {
+        return this.switchedOff;
+    }
+
+    /** Flips the switch, returning the new state so the block can tell the player. */
+    public boolean toggleSwitchedOff() {
+        this.switchedOff = !this.switchedOff;
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+        return this.switchedOff;
+    }
+
     public boolean isPlaying() {
         BlockState state = this.getBlockState();
-        return (!state.hasProperty(RadioBlock.POWERED) || !state.getValue(RadioBlock.POWERED)) && !StringUtil.isNullOrEmpty(this.url);
+        return !this.switchedOff
+                && (!state.hasProperty(RadioBlock.POWERED) || !state.getValue(RadioBlock.POWERED))
+                && !StringUtil.isNullOrEmpty(this.url);
     }
 }

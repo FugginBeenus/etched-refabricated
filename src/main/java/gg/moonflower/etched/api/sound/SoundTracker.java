@@ -445,6 +445,12 @@ public class SoundTracker {
         if (!state.hasProperty(RadioBlock.POWERED) || state.getValue(RadioBlock.POWERED)) { // Something must already be playing since it would otherwise be -1 and a change would occur
             return;
         }
+        // Switched off by hand. The sound above is already stopped, and the link is kept so that
+        // switching back on picks up the station again.
+        if (level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio
+                && radio.isSwitchedOff()) {
+            return;
+        }
 
         if (TrackData.isValidURL(url)) {
             boolean tuned = level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio

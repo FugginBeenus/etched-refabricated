@@ -21,7 +21,7 @@ public class RadioStationScreen extends AbstractContainerScreen<RadioStationMenu
     public RadioStationScreen(RadioStationMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
         this.imageWidth = 176;
-        this.imageHeight = 195;
+        this.imageHeight = 161;
     }
 
     @Override

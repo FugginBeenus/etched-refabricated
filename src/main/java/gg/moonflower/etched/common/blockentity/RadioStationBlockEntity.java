@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
 
-    public static final int SLOTS = 20;
+    public static final int SLOTS = 18;
 
     private NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
     private int discIndex;

@@ -13,14 +13,14 @@ import net.minecraft.world.item.ItemStack;
 
 public class RadioStationMenu extends AbstractContainerMenu {
 
-    // Twenty discs as four rows of five, centred. Ten across would have needed a wider panel than the
-    // one every other screen in the mod uses.
-    public static final int COLUMNS = 5;
-    public static final int SLOT_X = 43;
+    // Eighteen discs as two rows of nine, lined up with the inventory below so the screen reads as one
+    // grid rather than a narrow block floating in the middle.
+    public static final int COLUMNS = 9;
+    public static final int SLOT_X = 8;
     public static final int SLOT_Y = 36;
     public static final int INVENTORY_X = 8;
-    public static final int INVENTORY_Y = 112;
-    public static final int HOTBAR_Y = 172;
+    public static final int INVENTORY_Y = 78;
+    public static final int HOTBAR_Y = 138;
 
     private final Container container;
 

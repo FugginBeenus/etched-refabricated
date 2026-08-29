@@ -25,6 +25,9 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
 
     private String url;
     private boolean loaded;
+    // Set when tuned to a station. The station pushes each track's link here as it goes on air.
+    @Nullable
+    private BlockPos stationPos;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
         this(EtchedBlocks.RADIO_BE.get(), pos, state);
@@ -55,6 +58,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     protected void loadAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
+        this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -64,6 +68,9 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     protected void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider provider) {
         if (this.url != null) {
             nbt.putString("Url", this.url);
+        }
+        if (this.stationPos != null) {
+            nbt.putLong("StationPos", this.stationPos.asLong());
         }
     }
 
@@ -76,6 +83,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     public void load(CompoundTag nbt) {
         super.load(nbt);
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
+        this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -85,6 +93,9 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     public void saveAdditional(CompoundTag nbt) {
         if (this.url != null) {
             nbt.putString("Url", this.url);
+        }
+        if (this.stationPos != null) {
+            nbt.putLong("StationPos", this.stationPos.asLong());
         }
     }
 
@@ -119,6 +130,20 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
             if (this.level != null) {
                 this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
             }
+        }
+    }
+
+    @Nullable
+    public BlockPos getStationPos() {
+        return this.stationPos;
+    }
+
+    /** Tunes to a station, or clears back to a plain link when given null. */
+    public void setStation(@Nullable BlockPos stationPos) {
+        this.stationPos = stationPos == null ? null : stationPos.immutable();
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
         }
     }
 

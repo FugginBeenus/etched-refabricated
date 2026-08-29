@@ -72,5 +72,6 @@
   "screen.etched.album_jukebox.redstone.previous": "Previous",
   "screen.etched.album_jukebox.redstone.tooltip": "What a redstone pulse does. Restart lets power stop the jukebox, so a lever stops and resumes it.",
   "block.etched.radio_station": "Radio Station",
-  "container.etched.radio_station": "Radio Station"
+  "container.etched.radio_station": "Radio Station",
+  "container.etched.radio.no_station": "No station"
 }

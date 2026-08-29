@@ -448,8 +448,18 @@ public class SoundTracker {
 
         if (TrackData.isValidURL(url)) {
             AbstractOnlineSoundInstance record = getEtchedRecord(url, RADIO, level, pos, 8, AudioSource.AudioFileType.BOTH);
-            record.setLoop(true); // If the sound is a file, then just continue looping that specific track
-            playRecord(pos, record); // Get the new block state
+            boolean tuned = level.getBlockEntity(pos) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio
+                    && radio.getStationPos() != null;
+            if (tuned) {
+                // A station decides what plays next, so its listeners must not loop one track for ever.
+                // Finishing is the only signal the server has that a track has ended.
+                record.setLoop(false);
+                playRecord(pos, StopListeningSound.create(record, () -> Minecraft.getInstance().tell(() ->
+                        new gg.moonflower.etched.common.network.play.ServerboundStationTrackEndedPacket(pos, url).sendToServer())));
+            } else {
+                record.setLoop(true); // If the sound is a file, then just continue looping that specific track
+                playRecord(pos, record); // Get the new block state
+            }
         }
     }
 

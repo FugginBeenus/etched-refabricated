@@ -123,6 +123,14 @@ public class EtchedClientPlayPacketHandler {
             });
     }
 
+    public static void handleStationList(gg.moonflower.etched.common.network.play.ClientboundStationListPacket pkt, Minecraft client) {
+        client.execute(() -> {
+            if (client.screen instanceof gg.moonflower.etched.client.screen.RadioScreen screen) {
+                screen.setStations(pkt.stations(), pkt.tuned(), pkt.tunedTo());
+            }
+        });
+    }
+
     public static void handleSetAlbumJukeboxTrack(SetAlbumJukeboxTrackPacket pkt, Minecraft client) {
             client.execute(() -> {
                 if (client.level == null) {

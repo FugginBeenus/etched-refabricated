@@ -44,6 +44,35 @@ public class EtchedServerPlayPacketHandler {
         }
     }
 
+    public static void handleStationTrackEnded(gg.moonflower.etched.common.network.play.ServerboundStationTrackEndedPacket pkt, MinecraftServer server, ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+        server.execute(() -> {
+            net.minecraft.server.level.ServerLevel level = player.serverLevel();
+            if (!level.isLoaded(pkt.radioPos())
+                    || !(level.getBlockEntity(pkt.radioPos()) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio)) {
+                return;
+            }
+            net.minecraft.core.BlockPos stationPos = radio.getStationPos();
+            if (stationPos == null || !level.isLoaded(stationPos)
+                    || !(level.getBlockEntity(stationPos) instanceof gg.moonflower.etched.common.blockentity.RadioStationBlockEntity station)) {
+                return;
+            }
+            // Only the first report moves the station on. The others name a track it has already left.
+            if (java.util.Objects.equals(station.getCurrentUrl(), pkt.finishedUrl())) {
+                station.advance();
+            }
+        });
+    }
+
+    public static void handleTuneRadio(gg.moonflower.etched.common.network.play.ServerboundTuneRadioPacket pkt, MinecraftServer server, ServerPlayer player) {
+        if (player == null || !(player.containerMenu instanceof gg.moonflower.etched.common.menu.RadioMenu menu)) {
+            return;
+        }
+        server.execute(() -> menu.tuneTo(player, pkt.tuned() ? pkt.stationPos() : null));
+    }
+
     public static void handleSetStationName(gg.moonflower.etched.common.network.play.ServerboundSetStationNamePacket pkt, MinecraftServer server, ServerPlayer player) {
         if (player == null) {
             return;

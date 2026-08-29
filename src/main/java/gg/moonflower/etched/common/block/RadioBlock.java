@@ -88,6 +88,7 @@ public class RadioBlock extends BaseEntityBlock {
             String url = level.getBlockEntity(pos) instanceof RadioBlockEntity be ? be.getUrl() : "";
             var packet = new ClientboundSetUrlPacket(url);
             packet.sendToClient((ServerPlayer) player);
+            sendStationList(level, pos, (ServerPlayer) player);
         });
         return InteractionResult.CONSUME;
     }
@@ -109,11 +110,27 @@ public class RadioBlock extends BaseEntityBlock {
             String url = level.getBlockEntity(pos) instanceof RadioBlockEntity be ? be.getUrl() : "";
             var packet = new ClientboundSetUrlPacket(url);
             packet.sendToClient((ServerPlayer) player);
+            sendStationList(level, pos, (ServerPlayer) player);
             //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) player), );
         });
         return InteractionResult.CONSUME;
     }
     //?}
+
+    // The list is what the screen's station dropdown shows.
+    private static void sendStationList(Level level, BlockPos radioPos, ServerPlayer player) {
+        java.util.List<gg.moonflower.etched.common.network.play.ClientboundStationListPacket.Entry> entries =
+                new java.util.ArrayList<>();
+        for (gg.moonflower.etched.common.blockentity.RadioStationBlockEntity station :
+                gg.moonflower.etched.common.block.RadioStations.listIn(level)) {
+            entries.add(new gg.moonflower.etched.common.network.play.ClientboundStationListPacket.Entry(
+                    station.getBlockPos(), station.getName().getString()));
+        }
+        BlockPos tunedTo = level.getBlockEntity(radioPos) instanceof RadioBlockEntity radio
+                ? radio.getStationPos() : null;
+        new gg.moonflower.etched.common.network.play.ClientboundStationListPacket(
+                entries, tunedTo != null, tunedTo == null ? BlockPos.ZERO : tunedTo).sendToClient(player);
+    }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {

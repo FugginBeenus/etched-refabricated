@@ -40,4 +40,30 @@ public class RadioMenu extends AbstractContainerMenu {
     public void setUrl(String url) {
         this.urlConsumer.accept(url);
     }
+
+    /**
+     * Tunes this radio to a station, or back to its own link when given null. Leaving a station first
+     * matters: otherwise the old one keeps pushing tracks at a radio that has moved on.
+     */
+    public void tuneTo(Player player, @org.jetbrains.annotations.Nullable net.minecraft.core.BlockPos stationPos) {
+        this.access.execute((level, radioPos) -> {
+            if (!(level.getBlockEntity(radioPos) instanceof gg.moonflower.etched.common.blockentity.RadioBlockEntity radio)) {
+                return;
+            }
+
+            net.minecraft.core.BlockPos previous = radio.getStationPos();
+            if (previous != null && level.getBlockEntity(previous) instanceof gg.moonflower.etched.common.blockentity.RadioStationBlockEntity old) {
+                old.untune(radioPos);
+            }
+
+            if (stationPos == null) {
+                radio.setStation(null);
+                return;
+            }
+            if (level.getBlockEntity(stationPos) instanceof gg.moonflower.etched.common.blockentity.RadioStationBlockEntity station) {
+                radio.setStation(stationPos);
+                station.tune(radioPos);
+            }
+        });
+    }
 }

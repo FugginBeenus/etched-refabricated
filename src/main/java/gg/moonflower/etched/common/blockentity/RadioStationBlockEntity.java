@@ -32,6 +32,8 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     // there is nothing to hand a name typed into the screen.
     @Nullable
     private Component stationName;
+    // Radios tuned to this station. Kept here so a track change reaches all of them at once.
+    private final java.util.Set<BlockPos> radios = new java.util.HashSet<>();
 
     public RadioStationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -81,6 +83,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         if (current != null && this.track + 1 < current.length) {
             this.track++;
             this.setChanged();
+            this.broadcast();
             return;
         }
 
@@ -90,6 +93,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
                 this.discIndex = slot;
                 this.track = 0;
                 this.setChanged();
+                this.broadcast();
                 return;
             }
         }
@@ -98,6 +102,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         this.discIndex = 0;
         this.track = 0;
         this.setChanged();
+        this.broadcast();
     }
 
     /** Puts the station back on the first thing it can play, used when its discs change. */
@@ -137,6 +142,69 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     @Override
     public int getMaxStackSize() {
         return 1;
+    }
+
+    // Listed while loaded, so a radio anywhere in the world can find this station.
+    @Override
+    public void setLevel(net.minecraft.world.level.Level level) {
+        super.setLevel(level);
+        gg.moonflower.etched.common.block.RadioStations.add(level, this.worldPosition);
+    }
+
+    @Override
+    public void setRemoved() {
+        if (this.level != null) {
+            gg.moonflower.etched.common.block.RadioStations.remove(this.level, this.worldPosition);
+        }
+        super.setRemoved();
+    }
+
+    public void tune(BlockPos radioPos) {
+        this.radios.add(radioPos.immutable());
+        this.setChanged();
+        this.broadcast();
+    }
+
+    public void untune(BlockPos radioPos) {
+        this.radios.remove(radioPos);
+        this.setChanged();
+    }
+
+    public boolean isTuned(BlockPos radioPos) {
+        return this.radios.contains(radioPos);
+    }
+
+    public int getListenerCount() {
+        return this.radios.size();
+    }
+
+    /**
+     * Pushes whatever is on air to every tuned radio, dropping any that have been broken or retuned. The
+     * radio's own link field is what is set, so all its existing playback carries the sound.
+     */
+    public void broadcast() {
+        if (this.level == null || this.level.isClientSide()) {
+            return;
+        }
+        String url = this.getCurrentUrl();
+        java.util.Iterator<BlockPos> it = this.radios.iterator();
+        boolean changed = false;
+        while (it.hasNext()) {
+            BlockPos pos = it.next();
+            if (!this.level.isLoaded(pos)) {
+                continue;
+            }
+            if (!(this.level.getBlockEntity(pos) instanceof RadioBlockEntity radio)
+                    || !this.worldPosition.equals(radio.getStationPos())) {
+                it.remove();
+                changed = true;
+                continue;
+            }
+            radio.setUrl(url);
+        }
+        if (changed) {
+            this.setChanged();
+        }
     }
 
     /** Renames the station from its own screen. An empty name falls back to the default. */
@@ -198,6 +266,10 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        this.radios.clear();
+        for (long packed : nbt.getLongArray("Radios")) {
+            this.radios.add(BlockPos.of(packed));
+        }
         String savedName = nbt.getString("StationName");
         this.stationName = savedName.isEmpty() ? null : Component.literal(savedName);
     }
@@ -210,6 +282,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        nbt.putLongArray("Radios", this.radios.stream().mapToLong(BlockPos::asLong).toArray());
         if (this.stationName != null) {
             // Plain text: the name is typed by a player, and the component serializer takes different
             // arguments on either version.
@@ -231,6 +304,10 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        this.radios.clear();
+        for (long packed : nbt.getLongArray("Radios")) {
+            this.radios.add(BlockPos.of(packed));
+        }
         String savedName = nbt.getString("StationName");
         this.stationName = savedName.isEmpty() ? null : Component.literal(savedName);
     }
@@ -243,6 +320,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        nbt.putLongArray("Radios", this.radios.stream().mapToLong(BlockPos::asLong).toArray());
         if (this.stationName != null) {
             // Plain text: the name is typed by a player, and the component serializer takes different
             // arguments on either version.

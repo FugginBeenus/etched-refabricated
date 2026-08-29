@@ -29,6 +29,9 @@ public class EtchedMessages {
     public static final ResourceLocation SERVER_SET_URL = key("server_set_url");
     public static final ResourceLocation SERVER_SET_COVER_ART = key("server_set_cover_art");
     public static final ResourceLocation SERVER_SET_STATION_NAME = key("server_set_station_name");
+    public static final ResourceLocation SERVER_TUNE_RADIO = key("server_tune_radio");
+    public static final ResourceLocation SERVER_STATION_TRACK_ENDED = key("server_station_track_ended");
+    public static final ResourceLocation CLIENT_STATION_LIST = key("client_station_list");
     public static final ResourceLocation SHARED_SET_ALBUM_JUKEBOX_TRACK = key("shared_set_album_jukebox_track");
 
     private static ResourceLocation key(String name) {
@@ -52,6 +55,8 @@ public class EtchedMessages {
         server_register(SetAlbumJukeboxTrackPacket.class, SHARED_SET_ALBUM_JUKEBOX_TRACK, EtchedServerPlayPacketHandler::handleSetAlbumJukeboxTrack);
         server_register(SetCoverArtPacket.class, SERVER_SET_COVER_ART, EtchedServerPlayPacketHandler::handleSetCoverArt);
         server_register(ServerboundSetStationNamePacket.class, SERVER_SET_STATION_NAME, EtchedServerPlayPacketHandler::handleSetStationName);
+        server_register(ServerboundTuneRadioPacket.class, SERVER_TUNE_RADIO, EtchedServerPlayPacketHandler::handleTuneRadio);
+        server_register(ServerboundStationTrackEndedPacket.class, SERVER_STATION_TRACK_ENDED, EtchedServerPlayPacketHandler::handleStationTrackEnded);
 
         ServerPlayNetworking.registerGlobalReceiver(EtchedPayload.TYPE, (payload, context) -> {
             TriConsumer handler = SERVER_HANDLERS.get(payload.packetId());
@@ -69,6 +74,7 @@ public class EtchedMessages {
         client_register(ClientboundPlayMusicPacket.class, CLIENT_PLAY_MUSIC, EtchedClientPlayPacketHandler::handlePlayMusicPacket);
         client_register(ClientboundSetUrlPacket.class, CLIENT_SET_URL, EtchedClientPlayPacketHandler::handleSetUrl);
         client_register(SetAlbumJukeboxTrackPacket.class, SHARED_SET_ALBUM_JUKEBOX_TRACK, EtchedClientPlayPacketHandler::handleSetAlbumJukeboxTrack);
+        client_register(ClientboundStationListPacket.class, CLIENT_STATION_LIST, EtchedClientPlayPacketHandler::handleStationList);
 
         ClientPlayNetworking.registerGlobalReceiver(EtchedPayload.TYPE, (payload, context) -> {
             java.util.function.BiConsumer<FriendlyByteBuf, Minecraft> handler = CLIENT_HANDLERS.get(payload.packetId());
@@ -108,6 +114,8 @@ public class EtchedMessages {
         server_register(SetAlbumJukeboxTrackPacket.class, SHARED_SET_ALBUM_JUKEBOX_TRACK, EtchedServerPlayPacketHandler::handleSetAlbumJukeboxTrack);
         server_register(SetCoverArtPacket.class, SERVER_SET_COVER_ART, EtchedServerPlayPacketHandler::handleSetCoverArt);
         server_register(ServerboundSetStationNamePacket.class, SERVER_SET_STATION_NAME, EtchedServerPlayPacketHandler::handleSetStationName);
+        server_register(ServerboundTuneRadioPacket.class, SERVER_TUNE_RADIO, EtchedServerPlayPacketHandler::handleTuneRadio);
+        server_register(ServerboundStationTrackEndedPacket.class, SERVER_STATION_TRACK_ENDED, EtchedServerPlayPacketHandler::handleStationTrackEnded);
     }
 
     @Environment(EnvType.CLIENT)
@@ -117,6 +125,7 @@ public class EtchedMessages {
         client_register(ClientboundPlayMusicPacket.class, CLIENT_PLAY_MUSIC, EtchedClientPlayPacketHandler::handlePlayMusicPacket);
         client_register(ClientboundSetUrlPacket.class, CLIENT_SET_URL, EtchedClientPlayPacketHandler::handleSetUrl);
         client_register(SetAlbumJukeboxTrackPacket.class, SHARED_SET_ALBUM_JUKEBOX_TRACK, EtchedClientPlayPacketHandler::handleSetAlbumJukeboxTrack);
+        client_register(ClientboundStationListPacket.class, CLIENT_STATION_LIST, EtchedClientPlayPacketHandler::handleStationList);
     }
 
     @Environment(EnvType.CLIENT)

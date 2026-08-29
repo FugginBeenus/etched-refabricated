@@ -90,6 +90,12 @@ public class SpeakerBlock extends BaseEntityBlock {
 
         boolean paired = stereo.togglePaired(pos);
         int active = stereo.getPairedSpeakers().size();
+        if (paired && player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+            gg.moonflower.etched.core.registry.EtchedAdvancements.award(serverPlayer, gg.moonflower.etched.core.registry.EtchedAdvancements.AUDIOPHILE);
+            if (active >= 6) {
+                gg.moonflower.etched.core.registry.EtchedAdvancements.award(serverPlayer, gg.moonflower.etched.core.registry.EtchedAdvancements.GOES_UP_TO_11);
+            }
+        }
         player.displayClientMessage(net.minecraft.network.chat.Component.translatable(key + (paired ? "paired" : "unpaired"), active, stereo.getMaxSpeakers()), true);
         return net.minecraft.world.InteractionResult.CONSUME;
     }

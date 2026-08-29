@@ -132,6 +132,9 @@ public class EtchingMenu extends AbstractContainerMenu {
 
             @Override
             public void onTake(Player player, ItemStack stack) {
+                if (player instanceof net.minecraft.server.level.ServerPlayer serverPlayer) {
+                    gg.moonflower.etched.core.registry.EtchedAdvancements.award(serverPlayer, gg.moonflower.etched.core.registry.EtchedAdvancements.RECORD_SCRATCH);
+                }
                 EtchingMenu.this.discSlot.remove(1);
                 EtchingMenu.this.labelSlot.remove(1);
                 if (!EtchingMenu.this.discSlot.hasItem() || !EtchingMenu.this.labelSlot.hasItem()) {

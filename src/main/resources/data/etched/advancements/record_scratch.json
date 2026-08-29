@@ -1,0 +1,22 @@
+{
+  "display": {
+    "icon": {
+      "item": "etched:etched_music_disc"
+    },
+    "title": {
+      "translate": "advancements.etched.record_scratch.title"
+    },
+    "description": {
+      "translate": "advancements.etched.record_scratch.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "background": "minecraft:textures/block/note_block.png"
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

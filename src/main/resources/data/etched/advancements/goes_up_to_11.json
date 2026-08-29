@@ -1,0 +1,22 @@
+{
+  "parent": "etched:audiophile",
+  "display": {
+    "icon": {
+      "item": "etched:stereo"
+    },
+    "title": {
+      "translate": "advancements.etched.goes_up_to_11.title"
+    },
+    "description": {
+      "translate": "advancements.etched.goes_up_to_11.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

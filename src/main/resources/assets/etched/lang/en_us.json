@@ -75,5 +75,15 @@
   "container.etched.radio_station": "Radio Station",
   "container.etched.radio.no_station": "No station",
   "block.etched.radio.off": "Radio off",
-  "block.etched.radio.on": "Radio on"
+  "block.etched.radio.on": "Radio on",
+  "advancements.etched.record_scratch.title": "Record Scratch",
+  "advancements.etched.record_scratch.description": "Etch your first disc",
+  "advancements.etched.audiophile.title": "Audiophile",
+  "advancements.etched.audiophile.description": "Link a speaker to a stereo",
+  "advancements.etched.goes_up_to_11.title": "Goes up to 11",
+  "advancements.etched.goes_up_to_11.description": "Drive six speakers from one stereo",
+  "advancements.etched.toss_a_coin.title": "Toss a Coin",
+  "advancements.etched.toss_a_coin.description": "Trade with a bard",
+  "advancements.etched.broadcast_radio.title": "Broadcast Radio",
+  "advancements.etched.broadcast_radio.description": "Put a radio station on the air"
 }

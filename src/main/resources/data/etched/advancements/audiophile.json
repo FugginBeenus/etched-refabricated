@@ -1,0 +1,22 @@
+{
+  "parent": "etched:record_scratch",
+  "display": {
+    "icon": {
+      "item": "etched:speaker"
+    },
+    "title": {
+      "translate": "advancements.etched.audiophile.title"
+    },
+    "description": {
+      "translate": "advancements.etched.audiophile.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

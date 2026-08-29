@@ -57,14 +57,17 @@ public class RadioStationBlock extends BaseEntityBlock {
 
     // A station is worth naming, since that is what listeners tune to. From 1.21 the container carries
     // its own custom name, so this is only wired up by hand before that.
-    //? if <1.21 {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        //? if <1.21 {
         if (stack.hasCustomHoverName() && level.getBlockEntity(pos) instanceof RadioStationBlockEntity station) {
-            station.setCustomName(stack.getHoverName());
+            station.setStationName(stack.getHoverName());
+        }
+        //?}
+        if (placer instanceof net.minecraft.server.level.ServerPlayer player) {
+            gg.moonflower.etched.core.registry.EtchedAdvancements.award(player, gg.moonflower.etched.core.registry.EtchedAdvancements.BROADCAST_RADIO);
         }
     }
-    //?}
 
     @Override
     public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moving) {

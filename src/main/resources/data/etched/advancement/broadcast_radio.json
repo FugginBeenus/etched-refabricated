@@ -1,0 +1,22 @@
+{
+  "parent": "etched:record_scratch",
+  "display": {
+    "icon": {
+      "id": "etched:radio_station"
+    },
+    "title": {
+      "translate": "advancements.etched.broadcast_radio.title"
+    },
+    "description": {
+      "translate": "advancements.etched.broadcast_radio.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "criteria": {
+    "earned": {
+      "trigger": "minecraft:impossible"
+    }
+  }
+}

@@ -44,6 +44,15 @@ public class EtchedServerPlayPacketHandler {
         }
     }
 
+    public static void handleSetStationName(gg.moonflower.etched.common.network.play.ServerboundSetStationNamePacket pkt, MinecraftServer server, ServerPlayer player) {
+        if (player == null) {
+            return;
+        }
+        if (player.containerMenu instanceof gg.moonflower.etched.common.menu.RadioStationMenu menu) {
+            server.execute(() -> menu.setStationName(pkt.name()));
+        }
+    }
+
     public static void handleEditMusicLabel(ServerboundEditMusicLabelPacket pkt, MinecraftServer server, ServerPlayer player) {
         int slot = pkt.slot();
         if (!Inventory.isHotbarSlot(slot) && slot != 40) {

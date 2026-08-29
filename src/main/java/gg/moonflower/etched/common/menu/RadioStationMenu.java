@@ -13,11 +13,14 @@ import net.minecraft.world.item.ItemStack;
 
 public class RadioStationMenu extends AbstractContainerMenu {
 
-    public static final int SLOT_X = 8;
-    public static final int SLOT_Y = 22;
+    // Twenty discs as four rows of five, centred. Ten across would have needed a wider panel than the
+    // one every other screen in the mod uses.
+    public static final int COLUMNS = 5;
+    public static final int SLOT_X = 43;
+    public static final int SLOT_Y = 32;
     public static final int INVENTORY_X = 8;
-    public static final int INVENTORY_Y = 62;
-    public static final int HOTBAR_Y = 120;
+    public static final int INVENTORY_Y = 110;
+    public static final int HOTBAR_Y = 170;
 
     private final Container container;
 
@@ -32,7 +35,7 @@ public class RadioStationMenu extends AbstractContainerMenu {
         container.startOpen(inventory.player);
 
         for (int i = 0; i < RadioStationBlockEntity.SLOTS; i++) {
-            this.addSlot(new Slot(container, i, SLOT_X + i * 18, SLOT_Y) {
+            this.addSlot(new Slot(container, i, SLOT_X + (i % COLUMNS) * 18, SLOT_Y + (i / COLUMNS) * 18) {
                 @Override
                 public boolean mayPlace(ItemStack stack) {
                     return PlayableRecord.isPlayableRecord(stack);
@@ -92,6 +95,18 @@ public class RadioStationMenu extends AbstractContainerMenu {
             }
         }
         return moved;
+    }
+
+    /** Applies a name typed into the station's screen. Blank clears it back to the default. */
+    public void setStationName(String name) {
+        if (!(this.container instanceof RadioStationBlockEntity station)) {
+            return;
+        }
+        String trimmed = name.trim();
+        if (trimmed.length() > gg.moonflower.etched.common.network.play.ServerboundSetStationNamePacket.MAX_LENGTH) {
+            trimmed = trimmed.substring(0, gg.moonflower.etched.common.network.play.ServerboundSetStationNamePacket.MAX_LENGTH);
+        }
+        station.setStationName(trimmed.isEmpty() ? null : net.minecraft.network.chat.Component.literal(trimmed));
     }
 
     @Override

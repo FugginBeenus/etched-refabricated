@@ -23,11 +23,15 @@ import org.jetbrains.annotations.Nullable;
  */
 public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
 
-    public static final int SLOTS = 9;
+    public static final int SLOTS = 20;
 
     private NonNullList<ItemStack> items = NonNullList.withSize(SLOTS, ItemStack.EMPTY);
     private int discIndex;
     private int track;
+    // The station keeps its own name. From 1.21 the parent's name field is private with no setter, so
+    // there is nothing to hand a name typed into the screen.
+    @Nullable
+    private Component stationName;
 
     public RadioStationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -135,6 +139,29 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         return 1;
     }
 
+    /** Renames the station from its own screen. An empty name falls back to the default. */
+    public void setStationName(@Nullable Component name) {
+        this.stationName = name;
+        this.setChanged();
+        if (this.level != null) {
+            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        }
+    }
+
+    // A name set in the screen wins; otherwise fall back to the parent, which is what an anvil-renamed
+    // item ends up in.
+    @Nullable
+    @Override
+    public Component getCustomName() {
+        return this.stationName != null ? this.stationName : super.getCustomName();
+    }
+
+    @Override
+    public Component getName() {
+        Component custom = this.getCustomName();
+        return custom != null ? custom : this.getDefaultName();
+    }
+
     @Override
     protected Component getDefaultName() {
         return Component.translatable("container.etched.radio_station");
@@ -171,6 +198,8 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        String savedName = nbt.getString("StationName");
+        this.stationName = savedName.isEmpty() ? null : Component.literal(savedName);
     }
 
     @Override
@@ -181,6 +210,11 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        if (this.stationName != null) {
+            // Plain text: the name is typed by a player, and the component serializer takes different
+            // arguments on either version.
+            nbt.putString("StationName", this.stationName.getString());
+        }
     }
 
     @Override
@@ -197,6 +231,8 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        String savedName = nbt.getString("StationName");
+        this.stationName = savedName.isEmpty() ? null : Component.literal(savedName);
     }
 
     @Override
@@ -207,6 +243,11 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        if (this.stationName != null) {
+            // Plain text: the name is typed by a player, and the component serializer takes different
+            // arguments on either version.
+            nbt.putString("StationName", this.stationName.getString());
+        }
     }
 
     @Override

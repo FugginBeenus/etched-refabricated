@@ -111,7 +111,6 @@ public class AlbumJukeboxScreen extends AbstractContainerScreen<AlbumJukeboxMenu
         String key = switch (this.menu.getRedstoneMode()) {
             case AlbumJukeboxBlockEntity.REDSTONE_NEXT -> "next";
             case AlbumJukeboxBlockEntity.REDSTONE_PREVIOUS -> "previous";
-            case AlbumJukeboxBlockEntity.REDSTONE_TOGGLE -> "toggle";
             default -> "restart";
         };
         return Component.translatable("screen." + Etched.MOD_ID + ".album_jukebox.redstone." + key);

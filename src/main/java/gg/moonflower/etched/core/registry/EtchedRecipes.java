@@ -1,7 +1,6 @@
 package gg.moonflower.etched.core.registry;
 
 import gg.moonflower.etched.common.recipe.ComplexMusicLabelRecipe;
-import gg.moonflower.etched.common.recipe.AlbumSplitRecipe;
 import gg.moonflower.etched.common.recipe.MusicDiscCopyRecipe;
 import gg.moonflower.etched.core.Etched;
 import net.minecraft.core.Registry;
@@ -22,13 +21,6 @@ public class EtchedRecipes {
         BuiltInRegistries.RECIPE_SERIALIZER,
             Etched.MOD_ID+":copy_music_disc",
         new SimpleCraftingRecipeSerializer<>(MusicDiscCopyRecipe::new)
-    );
-
-    public static final RecipeSerializer<AlbumSplitRecipe> SPLIT_ALBUM =
-    Registry.register(
-        BuiltInRegistries.RECIPE_SERIALIZER,
-            Etched.MOD_ID+":split_album",
-        new SimpleCraftingRecipeSerializer<>(AlbumSplitRecipe::new)
     );
 
     public static void register() {

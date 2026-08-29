@@ -30,6 +30,8 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
     private BlockPos stationPos;
     // Switched off by hand. The link and the station are kept, so turning it back on resumes.
     private boolean switchedOff;
+    // When the station's current track began, so this radio can join it part way through.
+    private long airStartedAt;
 
     public RadioBlockEntity(BlockPos pos, BlockState state) {
         this(EtchedBlocks.RADIO_BE.get(), pos, state);
@@ -62,6 +64,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
         this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
         this.switchedOff = nbt.getBoolean("SwitchedOff");
+        this.airStartedAt = nbt.getLong("AirStartedAt");
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -78,6 +81,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         if (this.switchedOff) {
             nbt.putBoolean("SwitchedOff", true);
         }
+        nbt.putLong("AirStartedAt", this.airStartedAt);
     }
 
     @Override
@@ -91,6 +95,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         this.url = nbt.contains("Url", Tag.TAG_STRING) ? nbt.getString("Url") : null;
         this.stationPos = nbt.contains("StationPos") ? BlockPos.of(nbt.getLong("StationPos")) : null;
         this.switchedOff = nbt.getBoolean("SwitchedOff");
+        this.airStartedAt = nbt.getLong("AirStartedAt");
         if (this.loaded) {
             SoundTracker.playRadio(this.url, this.getBlockState(), (ClientLevel) this.level, this.getBlockPos());
         }
@@ -107,6 +112,7 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         if (this.switchedOff) {
             nbt.putBoolean("SwitchedOff", true);
         }
+        nbt.putLong("AirStartedAt", this.airStartedAt);
     }
 
     @Override
@@ -143,16 +149,23 @@ public class RadioBlockEntity extends BlockEntity implements Clearable {
         }
     }
 
+    public long getAirStartedAt() {
+        return this.airStartedAt;
+    }
+
     /**
-     * Sets the link and always tells listeners, even when it has not changed. A station moving on to
-     * another copy of the same track, or wrapping back to its only disc, has to restart it; the ordinary
-     * setter would see no change and leave the radio silent.
+     * Takes what a station has on air, together with when it started. Told to listeners whenever either
+     * changes, so a radio switched back on picks the broadcast up where it now is.
      */
-    public void setUrlAndRestart(String url) {
+    public void setStationTrack(@Nullable String url, long startedAt, boolean restart) {
+        boolean changed = !Objects.equals(this.url, url) || this.airStartedAt != startedAt;
         this.url = url;
-        this.setChanged();
-        if (this.level != null) {
-            this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+        this.airStartedAt = startedAt;
+        if (changed || restart) {
+            this.setChanged();
+            if (this.level != null) {
+                this.level.sendBlockUpdated(this.worldPosition, this.getBlockState(), this.getBlockState(), 3);
+            }
         }
     }
 

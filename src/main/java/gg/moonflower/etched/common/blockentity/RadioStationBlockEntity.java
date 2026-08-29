@@ -42,7 +42,9 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     // What is on air and how long it has been, so the station keeps its schedule with nobody listening.
     @Nullable
     private String airUrl;
-    private int elapsed;
+    // When the track on air began, in game time. Listeners work out how far in they are from this, so
+    // one joining part way through comes in at the same point as everyone else.
+    private long airStartedAt;
 
     public RadioStationBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -181,9 +183,13 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
     /** Starts whatever is now current, resetting the clock and telling the listeners. */
     private void putOnAir() {
         this.airUrl = this.getCurrentUrl();
-        this.elapsed = 0;
+        this.airStartedAt = this.level != null ? this.level.getGameTime() : 0L;
         this.setChanged();
         this.broadcast(true);
+    }
+
+    public long getAirStartedAt() {
+        return this.airStartedAt;
     }
 
     /**
@@ -199,8 +205,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
             return;
         }
 
-        station.elapsed++;
-        if (station.elapsed >= station.durationTicks()) {
+        if (level.getGameTime() - station.airStartedAt >= station.durationTicks()) {
             station.advance();
         }
     }
@@ -313,11 +318,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
                 changed = true;
                 continue;
             }
-            if (restart) {
-                radio.setUrlAndRestart(url);
-            } else {
-                radio.setUrl(url);
-            }
+            radio.setStationTrack(url, this.airStartedAt, restart);
         }
         if (changed) {
             this.setChanged();
@@ -383,6 +384,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        this.airStartedAt = nbt.getLong("AirStartedAt");
         this.radios.clear();
         for (long packed : nbt.getLongArray("Radios")) {
             this.radios.add(BlockPos.of(packed));
@@ -399,6 +401,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        nbt.putLong("AirStartedAt", this.airStartedAt);
         nbt.putLongArray("Radios", this.radios.stream().mapToLong(BlockPos::asLong).toArray());
         if (this.stationName != null) {
             // Plain text: the name is typed by a player, and the component serializer takes different
@@ -421,6 +424,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         this.discIndex = nbt.getInt("DiscIndex");
         this.track = nbt.getInt("Track");
+        this.airStartedAt = nbt.getLong("AirStartedAt");
         this.radios.clear();
         for (long packed : nbt.getLongArray("Radios")) {
             this.radios.add(BlockPos.of(packed));
@@ -437,6 +441,7 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
         }
         nbt.putInt("DiscIndex", this.discIndex);
         nbt.putInt("Track", this.track);
+        nbt.putLong("AirStartedAt", this.airStartedAt);
         nbt.putLongArray("Radios", this.radios.stream().mapToLong(BlockPos::asLong).toArray());
         if (this.stationName != null) {
             // Plain text: the name is typed by a player, and the component serializer takes different

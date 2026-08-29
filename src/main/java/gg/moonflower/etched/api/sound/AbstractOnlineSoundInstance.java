@@ -53,6 +53,8 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
     private final String url;
     private final String subtitle;
     private final int attenuationDistance;
+    // How far into the track to start, for joining a station already in progress.
+    private float startOffsetSeconds;
     private final DownloadProgressListener progressListener;
     private final AudioSource.AudioFileType type;
     private final boolean stereo;
@@ -168,6 +170,28 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
         return weighedSoundEvents;
     }
 
+    /**
+     * Starts the track this far in, for joining a station's broadcast already in progress. Applied once
+     * when the stream opens, on a background thread, so playback itself is never held up.
+     */
+    public AbstractOnlineSoundInstance setStartOffset(float seconds) {
+        this.startOffsetSeconds = seconds;
+        return this;
+    }
+
+    private AudioStream applyStartOffset(AudioStream stream) {
+        if (this.startOffsetSeconds <= 0.0F) {
+            return stream;
+        }
+        try {
+            return gg.moonflower.etched.api.sound.stream.AudioSkip.skip(stream, this.startOffsetSeconds);
+        } catch (Exception e) {
+            // Better to hear the track from its start than not at all.
+            LOGGER.warn("Failed to skip {}s into audio", this.startOffsetSeconds, e);
+            return stream;
+        }
+    }
+
     public AbstractOnlineSoundInstance setLoop(boolean loop) {
         this.looping = loop;
         return this;
@@ -195,7 +219,7 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
                     return EmptyAudioStream.INSTANCE;
                 }
                 onlineSound.getProgressListener().onSuccess();
-                return stream;
+                return this.applyStartOffset(stream);
             }, Util.backgroundExecutor());
         }
 
@@ -217,7 +241,7 @@ public class AbstractOnlineSoundInstance extends AbstractSoundInstance {
                 return EmptyAudioStream.INSTANCE;
             }
             onlineSound.getProgressListener().onSuccess();
-            return stream;
+            return this.applyStartOffset(stream);
         }, Util.backgroundExecutor());
     }
 

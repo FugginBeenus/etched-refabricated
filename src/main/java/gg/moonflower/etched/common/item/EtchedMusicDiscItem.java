@@ -91,16 +91,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
 
         return TrackData.isValid(nbt.getCompound("Music")) ? 1 : 0;
     }
-
-    public static LabelPattern getPattern(ItemStack stack) {
-        CompoundTag nbt = EtchedData.getTag(stack);
-        if (nbt == null || !nbt.contains("Pattern", Tag.TAG_ANY_NUMERIC)) {
-            return LabelPattern.FLAT;
-        }
-        int id = nbt.getByte("Pattern");
-        return id < 0 || id >= LabelPattern.values().length ? LabelPattern.FLAT : LabelPattern.values()[id];
-    }
-
     public static int getDiscColor(ItemStack stack) {
         CompoundTag nbt = EtchedData.getTag(stack);
         if (nbt == null) {
@@ -175,15 +165,6 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
             });
         }
     }
-
-    public static void setPattern(ItemStack stack, @Nullable LabelPattern pattern) {
-        if (pattern == null) {
-            EtchedData.removeTag(stack, "Pattern");
-        } else {
-            EtchedData.mutateTag(stack, nbt -> nbt.putByte("Pattern", (byte) pattern.ordinal()));
-        }
-    }
-
     public static void setColor(ItemStack stack, int discColor, int primaryColor, int secondaryColor) {
         EtchedData.mutateTag(stack, tag -> {
             tag.putInt("DiscColor", discColor);
@@ -193,40 +174,5 @@ public class EtchedMusicDiscItem extends PlayableRecordItem {
             labelTag.putInt("Secondary", secondaryColor);
             tag.put("LabelColor", labelTag);
         });
-    }
-
-    public enum LabelPattern {
-
-        FLAT, CROSS, EYE, PARALLEL, STAR, GOLD(true);
-
-        private final boolean simple;
-        private final Pair<ResourceLocation, ResourceLocation> textures;
-
-        LabelPattern() {
-            this(false);
-        }
-
-        LabelPattern(boolean simple) {
-            this.simple = simple;
-
-            String name = this.name().toLowerCase(Locale.ROOT);
-            this.textures = Pair.of(
-                    gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/item/" + name + "_label" + (simple ? "" : "_top") + ".png"),
-                    gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "textures/item/" + name + "_label" + (simple ? "" : "_bottom") + ".png")
-            );
-        }
-
-
-        public Pair<ResourceLocation, ResourceLocation> getTextures() {
-            return this.textures;
-        }
-
-        public boolean isSimple() {
-            return this.simple;
-        }
-
-        public boolean isColorable() {
-            return this != GOLD;
-        }
     }
 }

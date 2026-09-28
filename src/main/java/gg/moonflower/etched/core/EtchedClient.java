@@ -128,14 +128,13 @@ public class EtchedClient {
             if (index == 0) {
                 return opaque(EtchedMusicDiscItem.getDiscColor(stack));
             }
-            if (EtchedMusicDiscItem.getPattern(stack).isColorable()) {
-                if (index == 1) {
-                    return opaque(EtchedMusicDiscItem.getLabelPrimaryColor(stack));
-                }
-                if (index == 2) {
-                    return opaque(EtchedMusicDiscItem.getLabelSecondaryColor(stack));
-                }
+            if (index == 1) {
+                return opaque(EtchedMusicDiscItem.getLabelPrimaryColor(stack));
             }
+            if (index == 2) {
+                return opaque(EtchedMusicDiscItem.getLabelSecondaryColor(stack));
+            }
+        
             return -1;
         }, EtchedItems.ETCHED_MUSIC_DISC.get());
     }

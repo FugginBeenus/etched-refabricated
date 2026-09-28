@@ -1,31 +1,23 @@
 package gg.moonflower.etched.client.screen;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import gg.moonflower.etched.api.record.PlayableRecord;
 import gg.moonflower.etched.api.record.TrackData;
-import gg.moonflower.etched.common.item.ComplexMusicLabelItem;
-import gg.moonflower.etched.common.item.EtchedMusicDiscItem;
-import gg.moonflower.etched.common.item.MusicLabelItem;
 import gg.moonflower.etched.common.menu.EtchingMenu;
 import gg.moonflower.etched.common.network.EtchedMessages;
 import gg.moonflower.etched.common.network.play.ServerboundSetUrlPacket;
 import gg.moonflower.etched.core.Etched;
 import gg.moonflower.etched.core.registry.EtchedItems;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +37,6 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
     private int urlTicks;
     private String oldUrl;
     private String invalidReason;
-    private boolean displayLabels;
 
     public EtchingScreen(EtchingMenu menu, Inventory inventory, Component component) {
         super(menu, inventory, component);
@@ -115,7 +106,6 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
         this.url.setFocused(editable);
         this.setFocused(editable ? this.url : null);
 
-        this.displayLabels = !this.discStack.isEmpty() && !this.labelStack.isEmpty();
     }
 
     @Override
@@ -167,69 +157,10 @@ public class EtchingScreen extends AbstractContainerScreen<EtchingMenu> implemen
         }
 
         guiGraphics.blit(TEXTURE, this.leftPos + 9, this.topPos + 21, 0, (this.discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.get() || (!this.discStack.isEmpty() && !this.labelStack.isEmpty()) ? 180 : 196), 158, 16);
-
-        if (this.displayLabels) {
-            for (int index = 0; index < 6; index++) {
-                int x = this.leftPos + 46 + (index * 14);
-                int y = this.topPos + 65;
-                RenderSystem.setShaderTexture(0, TEXTURE);
-
-                int u = index == this.menu.getLabelIndex() ? 14 : mouseX >= x && mouseY >= y && mouseX < x + 14 && mouseY < y + 14 ? 28 : 0;
-                guiGraphics.blit(TEXTURE, x, y, u, 212, 14, 14);
-                this.renderLabel(guiGraphics, x, y, index);
-            }
-        }
-    }
-
-    private void renderLabel(GuiGraphics guiGraphics, int x, int y, int index) {
-        if (this.labelStack.isEmpty() || this.discStack.isEmpty()) {
-            return;
-        }
-
-        EtchedMusicDiscItem.LabelPattern pattern = EtchedMusicDiscItem.LabelPattern.values()[index];
-        int primaryLabelColor = 0xFFFFFF;
-        int secondaryLabelColor = primaryLabelColor;
-        if (this.labelStack.getItem() instanceof MusicLabelItem) {
-            primaryLabelColor = MusicLabelItem.getLabelColor(this.labelStack);
-            secondaryLabelColor = primaryLabelColor;
-        } else if (this.labelStack.getItem() instanceof ComplexMusicLabelItem) {
-            primaryLabelColor = ComplexMusicLabelItem.getPrimaryColor(this.labelStack);
-            secondaryLabelColor = ComplexMusicLabelItem.getSecondaryColor(this.labelStack);
-        }
-
-        if (pattern.isColorable()) {
-            RenderSystem.setShaderColor((float) (primaryLabelColor >> 16 & 255) / 255.0F, (float) (primaryLabelColor >> 8 & 255) / 255.0F, (float) (primaryLabelColor & 255) / 255.0F, 1.0F);
-        }
-
-        Pair<ResourceLocation, ResourceLocation> textures = pattern.getTextures();
-        RenderSystem.setShaderTexture(0, textures.getLeft());
-
-        guiGraphics.blit(textures.getLeft(), x, y, 14, 14, 1, 1, 14, 14, 16, 16);
-        if (!pattern.isSimple()) {
-            if (pattern.isColorable()) {
-                RenderSystem.setShaderColor((float) (secondaryLabelColor >> 16 & 255) / 255.0F, (float) (secondaryLabelColor >> 8 & 255) / 255.0F, (float) (secondaryLabelColor & 255) / 255.0F, 1.0F);
-            }
-
-            guiGraphics.blit(textures.getRight(), x, y, 14, 14, 1, 1, 14, 14, 16, 16);
-        }
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int i) {
-        if (this.displayLabels) {
-            for (int index = 0; index < 6; index++) {
-                int x = this.leftPos + 46 + (index * 14);
-                int y = this.topPos + 65;
-
-                if (mouseX >= x && mouseY >= y && mouseX < x + 14 && mouseY < y + 14 && this.menu.getLabelIndex() != index) {
-                    Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
-                    this.minecraft.gameMode.handleInventoryButtonClick(this.menu.containerId, index);
-                    return true;
-                }
-            }
-        }
-
         return super.mouseClicked(mouseX, mouseY, i);
     }
 

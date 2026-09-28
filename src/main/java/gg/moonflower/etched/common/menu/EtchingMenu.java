@@ -57,7 +57,6 @@ public class EtchingMenu extends AbstractContainerMenu {
     }
 
     private final ContainerLevelAccess access;
-    private final DataSlot labelIndex;
     private final Slot discSlot;
     private final Slot labelSlot;
     private final Slot resultSlot;
@@ -84,7 +83,6 @@ public class EtchingMenu extends AbstractContainerMenu {
     public EtchingMenu(MenuType<?> menuType, int id, Inventory inventory, ContainerLevelAccess containerLevelAccess) {
         super(menuType, id);
         this.player = inventory.player;
-        this.labelIndex = DataSlot.standalone();
         this.input = new SimpleContainer(2) {
             @Override
             public void setChanged() {
@@ -137,9 +135,6 @@ public class EtchingMenu extends AbstractContainerMenu {
                 }
                 EtchingMenu.this.discSlot.remove(1);
                 EtchingMenu.this.labelSlot.remove(1);
-                if (!EtchingMenu.this.discSlot.hasItem() || !EtchingMenu.this.labelSlot.hasItem()) {
-                    EtchingMenu.this.labelIndex.set(0);
-                }
 
                 EtchingMenu.this.setupResultSlot();
                 EtchingMenu.this.broadcastChanges();
@@ -165,7 +160,6 @@ public class EtchingMenu extends AbstractContainerMenu {
             this.addSlot(new Slot(inventory, x, 8 + x * 18, 156));
         }
 
-        this.addDataSlot(this.labelIndex);
     }
 
     private static void checkStatus(String url) throws IOException {
@@ -200,17 +194,6 @@ public class EtchingMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return stillValid(this.access, player, EtchedBlocks.ETCHING_TABLE.get());
-    }
-
-    @Override
-    public boolean clickMenuButton(Player player, int index) {
-        if (index >= 0 && index < EtchedMusicDiscItem.LabelPattern.values().length) {
-            this.labelIndex.set(index);
-            this.setupResultSlot();
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override
@@ -251,11 +234,6 @@ public class EtchingMenu extends AbstractContainerMenu {
         ItemStack resultStack = this.resultSlot.getItem();
 
         if (resultStack.isEmpty() && labelStack.isEmpty()) {
-            if (!discStack.isEmpty() && discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.asItem()) {
-                this.labelIndex.set(EtchedMusicDiscItem.getPattern(discStack).ordinal());
-            } else {
-                this.labelIndex.set(0);
-            }
         }
 
         this.setupResultSlot();
@@ -274,119 +252,112 @@ public class EtchingMenu extends AbstractContainerMenu {
         //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), new ClientboundInvalidEtchUrlPacket(""));
         (new ClientboundInvalidEtchUrlPacket("")).sendToClient((ServerPlayer)this.player);
         this.resultSlot.set(ItemStack.EMPTY);
-        if (this.labelIndex.get() >= 0 && this.labelIndex.get() < EtchedMusicDiscItem.LabelPattern.values().length) {
-            ItemStack discStack = this.discSlot.getItem();
-            ItemStack labelStack = this.labelSlot.getItem();
+        ItemStack discStack = this.discSlot.getItem();
+        ItemStack labelStack = this.labelSlot.getItem();
 
-            if (discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.get() || (!discStack.isEmpty() && !labelStack.isEmpty())) {
-                if (this.url == null && !discStack.isEmpty()) {
-                    this.url = PlayableRecord.getStackAlbum(discStack).map(TrackData::url).orElse(null);
-                }
-                if (!TrackData.isValidURL(this.url)) {
-                    return;
-                }
-
-                int currentId = this.currentRequestId = this.urlId;
-                this.currentRequest = CompletableFuture.supplyAsync(() -> {
-                    ItemStack resultStack = new ItemStack(EtchedItems.ETCHED_MUSIC_DISC.get());
-                    resultStack.setCount(1);
-
-                    int discColor = 0x515151;
-                    int primaryLabelColor = 0xFFFFFF;
-                    int secondaryLabelColor = 0xFFFFFF;
-                    TrackData[] data = new TrackData[]{TrackData.EMPTY};
-                    if (discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.get()) {
-                        discColor = EtchedMusicDiscItem.getDiscColor(discStack);
-                        primaryLabelColor = EtchedMusicDiscItem.getLabelPrimaryColor(discStack);
-                        secondaryLabelColor = EtchedMusicDiscItem.getLabelSecondaryColor(discStack);
-                        data = PlayableRecord.getStackMusic(discStack).orElse(data);
-                    }
-                    if (data.length == 1 && !labelStack.isEmpty()) {
-                        data[0] = data[0].withTitle(MusicLabelItem.getTitle(labelStack)).withArtist(MusicLabelItem.getAuthor(labelStack));
-                    }
-                    if (SoundSourceManager.isValidUrl(this.url)) {
-                        try {
-                            if (IGNORE_CACHE) {
-                                DATA_CACHE.invalidateAll();
-                            }
-                            data = DATA_CACHE.get(this.url, () -> SoundSourceManager.resolveTracks(this.url, null, Proxy.NO_PROXY)).join();
-                        } catch (Exception e) {
-                            if (!level.isClientSide()) {
-                                var exceptionPacket = new ClientboundInvalidEtchUrlPacket(e instanceof CompletionException ? e.getCause().getMessage() : e.getMessage());
-                                exceptionPacket.sendToClient((ServerPlayer) this.player);
-                                //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), new ClientboundInvalidEtchUrlPacket(e instanceof CompletionException ? e.getCause().getMessage() : e.getMessage()));
-                            }
-                            if (e instanceof CompletionException) {
-                                throw (CompletionException) e;
-                            }
-                            throw new CompletionException(e);
-                        }
-                    } else if (!TrackData.isLocalSound(this.url)) {
-                        try {
-                            checkStatus(this.url);
-                            data = new TrackData[]{data[0].withUrl(this.url)};
-                        } catch (UnknownHostException e) {
-                            if (!level.isClientSide()) {
-                                var exception = new ClientboundInvalidEtchUrlPacket("Unknown host: " + this.url);
-                                exception.sendToClient((ServerPlayer) this.player);
-                                //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), );
-                            }
-                            throw new CompletionException("Invalid URL", e);
-                        } catch (Exception e) {
-                            if (!level.isClientSide()) {
-                                var exception = new ClientboundInvalidEtchUrlPacket(e.getLocalizedMessage());
-                                exception.sendToClient((ServerPlayer)this.player);
-                                //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), new ClientboundInvalidEtchUrlPacket(e.getLocalizedMessage()));
-                            }
-                            throw new CompletionException("Invalid URL", e);
-                        }
-                    }
-                    if (discStack.getItem() instanceof BlankMusicDiscItem) {
-                        discColor = ((BlankMusicDiscItem) discStack.getItem()).getColor(discStack);
-                    }
-                    if (labelStack.getItem() instanceof MusicLabelItem) {
-                        primaryLabelColor = MusicLabelItem.getLabelColor(labelStack);
-                        secondaryLabelColor = primaryLabelColor;
-                    } else if (labelStack.getItem() instanceof ComplexMusicLabelItem) {
-                        primaryLabelColor = ComplexMusicLabelItem.getPrimaryColor(labelStack);
-                        secondaryLabelColor = ComplexMusicLabelItem.getSecondaryColor(labelStack);
-                    }
-
-                    for (int i = 0; i < data.length; i++) {
-                        TrackData trackData = data[i];
-                        if (trackData.artist().equals(TrackData.EMPTY.artist())) {
-                            trackData = trackData.withArtist(MusicLabelItem.getAuthor(labelStack));
-                        }
-                        if (TrackData.isLocalSound(this.url)) {
-                            trackData = trackData.withUrl(gg.moonflower.etched.api.util.EtchedResourceLocation.of(this.url).toString());
-                        }
-                        data[i] = trackData;
-                    }
-
-                    EtchedMusicDiscItem.setMusic(resultStack, data);
-                    EtchedMusicDiscItem.setColor(resultStack, discColor, primaryLabelColor, secondaryLabelColor);
-                    EtchedMusicDiscItem.setPattern(resultStack, EtchedMusicDiscItem.LabelPattern.values()[this.labelIndex.get()]);
-
-                    return resultStack;
-                }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenAcceptAsync(resultStack -> {
-                    if (this.urlId == currentId && !ItemStack.matches(resultStack, this.resultSlot.getItem()) && !ItemStack.matches(resultStack, this.discSlot.getItem())) {
-                        this.resultSlot.set(resultStack);
-                        this.urlId++;
-                        this.urlId %= 1000;
-                        this.broadcastChanges();
-                    }
-                }, level.getServer()).exceptionally(e -> {
-                    e.printStackTrace();
-                    return null;
-                });
+        if (discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.get() || (!discStack.isEmpty() && !labelStack.isEmpty())) {
+            if (this.url == null && !discStack.isEmpty()) {
+                this.url = PlayableRecord.getStackAlbum(discStack).map(TrackData::url).orElse(null);
             }
+            if (!TrackData.isValidURL(this.url)) {
+                return;
+            }
+
+            int currentId = this.currentRequestId = this.urlId;
+            this.currentRequest = CompletableFuture.supplyAsync(() -> {
+                ItemStack resultStack = new ItemStack(EtchedItems.ETCHED_MUSIC_DISC.get());
+                resultStack.setCount(1);
+
+                int discColor = 0x515151;
+                int primaryLabelColor = 0xFFFFFF;
+                int secondaryLabelColor = 0xFFFFFF;
+                TrackData[] data = new TrackData[]{TrackData.EMPTY};
+                if (discStack.getItem() == EtchedItems.ETCHED_MUSIC_DISC.get()) {
+                    discColor = EtchedMusicDiscItem.getDiscColor(discStack);
+                    primaryLabelColor = EtchedMusicDiscItem.getLabelPrimaryColor(discStack);
+                    secondaryLabelColor = EtchedMusicDiscItem.getLabelSecondaryColor(discStack);
+                    data = PlayableRecord.getStackMusic(discStack).orElse(data);
+                }
+                if (data.length == 1 && !labelStack.isEmpty()) {
+                    data[0] = data[0].withTitle(MusicLabelItem.getTitle(labelStack)).withArtist(MusicLabelItem.getAuthor(labelStack));
+                }
+                if (SoundSourceManager.isValidUrl(this.url)) {
+                    try {
+                        if (IGNORE_CACHE) {
+                            DATA_CACHE.invalidateAll();
+                        }
+                        data = DATA_CACHE.get(this.url, () -> SoundSourceManager.resolveTracks(this.url, null, Proxy.NO_PROXY)).join();
+                    } catch (Exception e) {
+                        if (!level.isClientSide()) {
+                            var exceptionPacket = new ClientboundInvalidEtchUrlPacket(e instanceof CompletionException ? e.getCause().getMessage() : e.getMessage());
+                            exceptionPacket.sendToClient((ServerPlayer) this.player);
+                            //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), new ClientboundInvalidEtchUrlPacket(e instanceof CompletionException ? e.getCause().getMessage() : e.getMessage()));
+                        }
+                        if (e instanceof CompletionException) {
+                            throw (CompletionException) e;
+                        }
+                        throw new CompletionException(e);
+                    }
+                } else if (!TrackData.isLocalSound(this.url)) {
+                    try {
+                        checkStatus(this.url);
+                        data = new TrackData[]{data[0].withUrl(this.url)};
+                    } catch (UnknownHostException e) {
+                        if (!level.isClientSide()) {
+                            var exception = new ClientboundInvalidEtchUrlPacket("Unknown host: " + this.url);
+                            exception.sendToClient((ServerPlayer) this.player);
+                            //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), );
+                        }
+                        throw new CompletionException("Invalid URL", e);
+                    } catch (Exception e) {
+                        if (!level.isClientSide()) {
+                            var exception = new ClientboundInvalidEtchUrlPacket(e.getLocalizedMessage());
+                            exception.sendToClient((ServerPlayer)this.player);
+                            //EtchedMessages.PLAY.send(PacketDistributor.PLAYER.with(() -> (ServerPlayer) this.player), new ClientboundInvalidEtchUrlPacket(e.getLocalizedMessage()));
+                        }
+                        throw new CompletionException("Invalid URL", e);
+                    }
+                }
+                if (discStack.getItem() instanceof BlankMusicDiscItem) {
+                    discColor = ((BlankMusicDiscItem) discStack.getItem()).getColor(discStack);
+                }
+                if (labelStack.getItem() instanceof MusicLabelItem) {
+                    primaryLabelColor = MusicLabelItem.getLabelColor(labelStack);
+                    secondaryLabelColor = primaryLabelColor;
+                } else if (labelStack.getItem() instanceof ComplexMusicLabelItem) {
+                    primaryLabelColor = ComplexMusicLabelItem.getPrimaryColor(labelStack);
+                    secondaryLabelColor = ComplexMusicLabelItem.getSecondaryColor(labelStack);
+                }
+
+                for (int i = 0; i < data.length; i++) {
+                    TrackData trackData = data[i];
+                    if (trackData.artist().equals(TrackData.EMPTY.artist())) {
+                        trackData = trackData.withArtist(MusicLabelItem.getAuthor(labelStack));
+                    }
+                    if (TrackData.isLocalSound(this.url)) {
+                        trackData = trackData.withUrl(gg.moonflower.etched.api.util.EtchedResourceLocation.of(this.url).toString());
+                    }
+                    data[i] = trackData;
+                }
+
+                EtchedMusicDiscItem.setMusic(resultStack, data);
+                EtchedMusicDiscItem.setColor(resultStack, discColor, primaryLabelColor, secondaryLabelColor);
+
+                return resultStack;
+            }, gg.moonflower.etched.core.Etched.downloadExecutor()).thenAcceptAsync(resultStack -> {
+                if (this.urlId == currentId && !ItemStack.matches(resultStack, this.resultSlot.getItem()) && !ItemStack.matches(resultStack, this.discSlot.getItem())) {
+                    this.resultSlot.set(resultStack);
+                    this.urlId++;
+                    this.urlId %= 1000;
+                    this.broadcastChanges();
+                }
+            }, level.getServer()).exceptionally(e -> {
+                e.printStackTrace();
+                return null;
+            });
         }
+    
     }
-
-    public int getLabelIndex() {
-        return this.labelIndex.get();
-    }
-
     public void setUrl(String string) {
         if (!Objects.equals(this.url, string)) {
             this.url = string;

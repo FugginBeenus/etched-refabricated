@@ -15,13 +15,6 @@ inside its square, as the current sheet shows.
 These are Moonflower Studio's work. Permission to use them was refused, so none of them
 can ship. Every one has to be replaced with original art before release.
 
-### Etching Table (4)
-
-- [ ] `models/block/etching_table.json` (3D model)
-- [ ] `textures/block/etching_table.png` (32x32, one sheet for the whole block)
-- [ ] `textures/item/empty_etching_table_slot_music_disc.png` (16x16)
-- [ ] `textures/item/empty_etching_table_slot_music_label.png` (16x16)
-
 ### Radio (6)
 
 - [ ] `models/block/radio.json` (3D model)
@@ -42,25 +35,6 @@ can ship. Every one has to be replaced with original art before release.
 - [ ] `textures/item/boombox.png` (16x16)
 - [ ] `textures/item/boombox_model.png` (32x32)
 
-### Album Cover (4)
-
-- [ ] `textures/item/album_cover_overlay.png` (16x16)
-- [ ] `textures/item/blank_album_cover.png` (16x16)
-- [ ] `textures/item/default_album_cover.png` (16x16)
-- [ ] `textures/item/vanilla_album_cover.png` (16x16)
-
-### Music Discs (2)
-
-- [ ] `textures/item/blank_music_disc.png` (16x16)
-- [ ] `textures/item/etched_music_disc.png` (16x16)
-
-### Music Label (4)
-
-- [ ] `textures/item/flat_label_bottom.png` (16x16)
-- [ ] `textures/item/flat_label_top.png` (16x16)
-- [ ] `textures/item/music_label_bottom.png` (16x16)
-- [ ] `textures/item/music_label_top.png` (16x16)
-
 ### Jukebox Minecart (1)
 
 - [ ] `textures/item/jukebox_minecart.png` (16x16)
@@ -78,11 +52,25 @@ want them redone to match the new look.
 - [ ] `models/block/album_jukebox_full.json` (3D model)
 - [ ] `textures/block/album_jukebox.png` (64x32)
 
+### Etching Table (4)
+
+- [ ] `models/block/etching_table.json` (3D model)
+- [ ] `textures/block/etching_table.png` (32x32)
+- [ ] `textures/item/empty_etching_table_slot_music_disc.png` (16x16)
+- [ ] `textures/item/empty_etching_table_slot_music_label.png` (16x16)
+
 ### Radio Station (3)
 
 - [ ] `textures/block/radio_station_front.png` (16x16)
 - [ ] `textures/block/radio_station_side.png` (16x16)
 - [ ] `textures/block/radio_station_top.png` (16x16)
+
+### Album Cover (4)
+
+- [ ] `textures/item/album_cover_overlay.png` (16x16)
+- [ ] `textures/item/blank_album_cover.png` (16x16)
+- [ ] `textures/item/default_album_cover.png` (16x16)
+- [ ] `textures/item/vanilla_album_cover.png` (16x16)
 
 ### Album Crate (5)
 
@@ -129,6 +117,19 @@ want them redone to match the new look.
 
 - [ ] `textures/item/transmitter.png` (16x16)
 
+### Music Discs (2)
+
+- [ ] `textures/item/blank_music_disc.png` (16x16)
+- [ ] `textures/item/etched_music_disc.png` (16x16)
+
+### Music Label (5)
+
+- [ ] `textures/item/flat_label_bottom.png` (16x16)
+- [ ] `textures/item/flat_label_top.png` (16x16)
+- [ ] `textures/item/music_label_bottom.png` (16x16)
+- [ ] `textures/item/music_label_paper.png` (16x16)
+- [ ] `textures/item/music_label_top.png` (16x16)
+
 ---
 
 ## 3. Not blocks or items, still must be redone
@@ -158,5 +159,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 26 blocks and items, plus 11 others.**
-**Optional: 30.**
+**Must be redone: 12 blocks and items, plus 11 others.**
+**Optional: 45.**

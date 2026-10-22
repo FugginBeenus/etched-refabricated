@@ -2,6 +2,7 @@
   "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "etched:item/music_label_top",
-    "layer1": "etched:item/music_label_bottom"
+    "layer1": "etched:item/music_label_bottom",
+    "layer2": "etched:item/music_label_paper"
   }
 }

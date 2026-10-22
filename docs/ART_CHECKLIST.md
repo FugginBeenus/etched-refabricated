@@ -15,10 +15,6 @@ inside its square, as the current sheet shows.
 These are Moonflower Studio's work. Permission to use them was refused, so none of them
 can ship. Every one has to be replaced with original art before release.
 
-### Album Jukebox (1)
-
-- [ ] `textures/block/album_jukebox.png` (32x32, one sheet for the whole block)
-
 ### Etching Table (4)
 
 - [ ] `models/block/etching_table.json` (3D model)
@@ -75,6 +71,12 @@ can ship. Every one has to be replaced with original art before release.
 
 These were made for this fork, so there is no need to touch them. Listed only in case you
 want them redone to match the new look.
+
+### Album Jukebox (3)
+
+- [ ] `models/block/album_jukebox.json` (3D model)
+- [ ] `models/block/album_jukebox_full.json` (3D model)
+- [ ] `textures/block/album_jukebox.png` (64x32)
 
 ### Radio Station (3)
 
@@ -156,5 +158,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 27 blocks and items, plus 11 others.**
-**Optional: 27.**
+**Must be redone: 26 blocks and items, plus 11 others.**
+**Optional: 30.**

@@ -257,6 +257,8 @@ public class AlbumJukeboxBlockEntity extends RandomizableContainerBlockEntity im
     public void setStoredCover(ItemStack stack) {
         this.storedCover = stack;
         this.setChanged();
+        // The front window shows this album's art, so players nearby need to hear about it.
+        this.updatePlaying();
     }
 
     @Override

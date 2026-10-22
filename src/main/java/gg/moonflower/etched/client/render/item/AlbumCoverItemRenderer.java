@@ -168,6 +168,17 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         poseStack.popPose();
     }
 
+    /**
+     * A stack's cover art as one flat picture, for drawing it on a surface instead of as an item.
+     * A real image comes back shrunk, so it holds steady when drawn small instead of shimmering.
+     */
+    public FlatArt getFlatArt(ItemStack stack) {
+        return this.resolveModel(stack).flat();
+    }
+
+    public record FlatArt(ResourceLocation texture, float u0, float v0, float u1, float v1) {
+    }
+
     // The cover disc lives in the AlbumCoverComponent on 1.21 (item NBT on 1.20.1); read it through
     // AlbumCoverItem.getCoverStack so both backends work. The serialized cover disc is the cache key.
     private ModelData resolveModel(ItemStack stack) {
@@ -285,6 +296,12 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         }
 
         @Override
+        public FlatArt flat() {
+            TextureAtlasSprite sprite = Minecraft.getInstance().getModelManager().getModel(this.model).getParticleIcon();
+            return new FlatArt(sprite.atlasLocation(), sprite.getU0(), sprite.getV0(), sprite.getU1(), sprite.getV1());
+        }
+
+        @Override
         public void close() {
         }
     }
@@ -292,7 +309,9 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
     private static class DynamicModelData extends TextureAtlasSprite implements ModelData {
 
         private static final ResourceLocation ATLAS = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, DigestUtils.md5Hex(UUID.randomUUID().toString()));
+        private static final int FLAT_SIZE = 32;
         private BakedModel model;
+        private ResourceLocation flatTexture;
 
         private DynamicModelData(NativeImage image) {
             //? if >=1.21 {
@@ -339,6 +358,47 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         }
 
         @Override
+        public FlatArt flat() {
+            if (this.flatTexture == null) {
+                this.flatTexture = gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, DigestUtils.md5Hex(UUID.randomUUID().toString()));
+                Minecraft.getInstance().getTextureManager().register(this.flatTexture, new DynamicTexture(shrink(this.getImage(), FLAT_SIZE)));
+            }
+            return new FlatArt(this.flatTexture, 0.0F, 0.0F, 1.0F, 1.0F);
+        }
+
+        // Averages each block of pixels, so fine detail turns into its average colour instead of flicker.
+        private static NativeImage shrink(NativeImage image, int size) {
+            int width = image.getWidth();
+            int height = image.getHeight();
+            if (width <= size && height <= size) {
+                NativeImage copy = new NativeImage(width, height, false);
+                copy.copyFrom(image);
+                return copy;
+            }
+            NativeImage out = new NativeImage(size, size, false);
+            for (int y = 0; y < size; y++) {
+                for (int x = 0; x < size; x++) {
+                    int x0 = x * width / size, x1 = Math.max(x0 + 1, (x + 1) * width / size);
+                    int y0 = y * height / size, y1 = Math.max(y0 + 1, (y + 1) * height / size);
+                    long c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+                    int count = 0;
+                    for (int yy = y0; yy < y1; yy++) {
+                        for (int xx = x0; xx < x1; xx++) {
+                            int pixel = image.getPixelRGBA(xx, yy);
+                            c0 += pixel & 0xFF;
+                            c1 += pixel >> 8 & 0xFF;
+                            c2 += pixel >> 16 & 0xFF;
+                            c3 += pixel >>> 24;
+                            count++;
+                        }
+                    }
+                    out.setPixelRGBA(x, y, (int) (c3 / count) << 24 | (int) (c2 / count) << 16 | (int) (c1 / count) << 8 | (int) (c0 / count));
+                }
+            }
+            return out;
+        }
+
+        @Override
         public float uvShrinkRatio() {
             return 0.0F;
         }
@@ -352,6 +412,9 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         public void close() {
             this.contents().close();
             Minecraft.getInstance().getTextureManager().release(this.contents().name());
+            if (this.flatTexture != null) {
+                Minecraft.getInstance().getTextureManager().release(this.flatTexture);
+            }
         }
     }
 
@@ -369,6 +432,8 @@ public class AlbumCoverItemRenderer extends BlockEntityWithoutLevelRenderer impl
         }
 
         void render(ItemStack stack, ItemDisplayContext transformType, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, int combinedOverlay);
+
+        FlatArt flat();
 
         void close();
     }

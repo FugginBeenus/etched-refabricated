@@ -1,6 +1,3 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "etched:item/album_crate"
-  }
+  "parent": "etched:block/album_crate"
 }

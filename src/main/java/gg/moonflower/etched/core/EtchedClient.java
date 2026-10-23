@@ -111,16 +111,16 @@ public class EtchedClient {
     }
     //?}
 
-    // boombox_in_hand overrides to boombox_playing on "etched:playing", which gives the boombox its
-    // shoulder-carry transform while a record is going. Nothing ever registered that property on this
-    // port, so the override could never fire and the playing model was dead content. Resolved per
-    // frame, so registering it here is enough.
     // The radio station's sculk tendrils have see-through pixels.
     public static void registerRenderLayers() {
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(EtchedBlocks.RADIO_STATION.get(),
                 net.minecraft.client.renderer.RenderType.cutout());
     }
 
+    // boombox_in_hand overrides to boombox_playing on "etched:playing", which gives the boombox its
+    // shoulder-carry transform while a record is going. Nothing ever registered that property on this
+    // port, so the override could never fire and the playing model was dead content. Resolved per
+    // frame, so registering it here is enough.
     public static void registerItemProperties() {
         net.minecraft.client.renderer.item.ItemProperties.register(EtchedItems.BOOMBOX.get(),
                 gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "playing"),

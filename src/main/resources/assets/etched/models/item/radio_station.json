@@ -1,1 +1,22 @@
-{ "parent": "etched:block/radio_station" }
+{
+  "parent": "etched:block/radio_station_on",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "translation": [
+        0,
+        -1.25,
+        0
+      ],
+      "scale": [
+        0.55,
+        0.55,
+        0.55
+      ]
+    }
+  }
+}

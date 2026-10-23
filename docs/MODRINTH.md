@@ -21,22 +21,10 @@ Etched Refabricated is a Fabric continuation of Etched. Etch a link onto a blank
 
 Vanilla music discs play through speakers too, not only etched ones.
 
-## Requirements
-
-- Fabric Loader and Fabric API
-- [YetAnotherConfigLib](https://modrinth.com/mod/yacl)
-
-## Supported versions
-
-- Minecraft 1.20.1
-- Minecraft 1.21.1
-
 ## Known gaps
 
-- Discs from this mod don't work in Sophisticated Backpacks' Jukebox Upgrade. Its Fabric port predates the disc handler API that would make this possible.
+- Discs from this mod don't work in Sophisticated Backpacks' Jukebox Upgrade. Its Fabric port predates the disc handler API that would make this possible. Once updated, the feature will be implemented. 
 
 ## Credits
 
-Etched Refabricated is an unofficial fork of Etched, by Moonflower Studio (Jackson, Ocelot, Farcr, Echolite and AstraZoey). The Fabric port work it continues is by Aikoyori and VanderCat. None of the original mod's art ships in this fork.
-
-The code and this fork's art are GPL-3.0. Source, issues and the full content disclosure are on [GitHub](https://github.com/FugginBeenus/etched-refabricated).
+Etched Refabricated is an unofficial fork of Etched, by Moonflower Studio (Jackson, Ocelot, Farcr, Echolite and AstraZoey). The Fabric port work it continues is by Aikoyori and VanderCat. None of the original mod's art ships in this fork. Thanks to Beenuscore and Mr Beenus for the sounds. 

@@ -27,19 +27,9 @@ The Stereo takes two kinds of upgrade. Preamps raise how many speakers it can dr
 
 Vanilla music discs play through speakers too, not only etched ones.
 
-## Requirements
-
-- Fabric Loader and Fabric API
-- [YetAnotherConfigLib](https://modrinth.com/mod/yacl)
-
-## Supported versions
-
-- Minecraft 1.20.1 (Fabric)
-- Minecraft 1.21.1 (Fabric)
-
 ## What's different in this fork
 
-- New art throughout. Every block, item, screen and the Bard were redrawn for this fork, so none of the original mod's art ships any more. See [How this fork was made](#how-this-fork-was-made).
+- New art throughout. Every block, item, screen and the Bard were redrawn for this fork, so none of the original mod's art ships any more.
 - Non-OGG audio (many MP3 and streamed links) plays reliably. Format detection no longer relies on a tiny mark and reset buffer.
 - AAC (`.m4a`) and FLAC playback.
 - The Speaker and Stereo system, with wireless pairing, volume control, and hearing distance that follows volume.
@@ -50,36 +40,11 @@ Vanilla music discs play through speakers too, not only etched ones.
 
 ## Known gaps
 
-Discs from this mod don't work in Sophisticated Backpacks' Jukebox Upgrade. Its Fabric port predates the disc handler API that would make this possible.
-
-## Building
-
-Gradle needs JDK 21. Minecraft 1.20.1 itself still compiles to and runs on Java 17.
-
-The project uses [Stonecutter](https://stonecutter.kikugie.dev/) to build one source tree for several Minecraft versions. Building from the root makes a jar for every supported version:
-
-```
-./gradlew build
-```
-
-To run the development client for one version:
-
-```
-./gradlew :1.20.1:runClient
-./gradlew :1.21.1:runClient
-```
-
-Jars land in `versions/<version>/build/libs/`.
-
-Source files use Stonecutter comments (`//? if >=1.21 {`) to hold both versions in one tree. The commented-out branch is live code for the other version, so leave anything marked `//?` alone.
-
-## How this fork was made
-
-This fork was built with help from an AI assistant (Anthropic's Claude). It wrote much of the fork's new code, and it made the new textures, models, screen art and mod icon from the maintainer's art direction. The maintainer reviewed every change, tested it in game, and edited several models and textures by hand. The full breakdown is in [CONTENT_DISCLOSURE.md](docs/CONTENT_DISCLOSURE.md).
+Discs from this mod don't work in Sophisticated Backpacks' Jukebox Upgrade. Its Fabric port predates the disc handler API that would make this possible. Once updated, the feature will be added. 
 
 ## Credits and licensing
 
-Etched Refabricated is an unofficial fork of Etched, by Moonflower Studio (Jackson, Ocelot, Farcr, Echolite and AstraZoey). The Fabric port work it continues is by Aikoyori and VanderCat.
+Etched Refabricated is an unofficial fork of Etched, by Moonflower Studio (Jackson, Ocelot, Farcr, Echolite and AstraZoey). The Fabric port work it continues is by Aikoyori and VanderCat. Thanks to Beenuscore and Mr Beenus for the sounds. 
 
 - The code and this fork's own art are licensed under GPL-3.0, the same license as the original code.
 - Some data and text files in `src/main/resources/` (translations, recipes, loot tables, advancements, tags, item model files and a few config files) come from the original mod and stay All Rights Reserved by Moonflower Studio. LICENSE lists each one.

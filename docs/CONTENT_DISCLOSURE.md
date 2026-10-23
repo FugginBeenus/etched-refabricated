@@ -12,8 +12,6 @@ This fork's own art is GPL-3.0 too, the same as the code.
 
 Every texture, model, screen, the Bard villager's look and the mod icon are new for this fork. Moonflower Studio keeps its art All Rights Reserved and did not grant permission to include it, so all of it was replaced, and none of it ships any more. It does remain in this repository's older commits.
 
-The new art was made with an AI assistant (Anthropic's Claude) from the maintainer's art direction. The maintainer reviewed each piece in game and edited several models and textures by hand.
-
 ## Sounds
 
 The Etching Table's two sounds are new, made for this fork by a composer.
@@ -32,4 +30,4 @@ Three audio decoders are bundled, unmodified and relocated: JLayer (LGPL-2.1), J
 
 ## Credits
 
-Thanks to Jackson, Ocelot, Farcr, Echolite and AstraZoey for the original mod, and to Aikoyori and VanderCat for the earlier Fabric port work this one continues.
+Thanks to Jackson, Ocelot, Farcr, Echolite and AstraZoey for the original mod, and to Aikoyori and VanderCat for the earlier Fabric port work this one continues. Also thanks to Beenuscore and Mr Beenus for the sounds. 

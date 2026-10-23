@@ -1,9 +1,9 @@
 {
   "parent": "block/block",
   "textures": {
-    "wood": "minecraft:block/spruce_planks",
-    "trim": "minecraft:block/stripped_spruce_log",
-    "particle": "minecraft:block/spruce_planks"
+    "wood": "etched:block/album_crate_wood",
+    "trim": "etched:block/album_crate_trim",
+    "particle": "etched:block/album_crate_wood"
   },
   "elements": [
     {

@@ -6,7 +6,7 @@
   ],
   "textures": {
     "texture": "etched:block/radio",
-    "particle": "minecraft:block/note_block"
+    "particle": "block/note_block"
   },
   "elements": [
     {
@@ -23,55 +23,55 @@
       "faces": {
         "north": {
           "uv": [
-            0.0,
-            0.0,
-            6.0,
-            4.0
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            6.0,
-            0.0,
-            12.0,
-            4.0
+            0,
+            0,
+            6,
+            4
           ],
           "texture": "#texture"
         },
         "east": {
           "uv": [
-            0.0,
-            7.0,
-            3.0,
-            11.0
+            0,
+            7,
+            3,
+            11
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            6,
+            0,
+            12,
+            4
           ],
           "texture": "#texture"
         },
         "west": {
           "uv": [
-            3.0,
-            7.0,
-            6.0,
-            11.0
+            3,
+            7,
+            6,
+            11
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            0.0,
-            4.0,
-            6.0,
-            7.0
+            0,
+            4,
+            6,
+            7
           ],
           "texture": "#texture"
         },
         "down": {
           "uv": [
-            6.0,
-            4.0,
-            12.0,
-            7.0
+            6,
+            4,
+            12,
+            7
           ],
           "texture": "#texture"
         }
@@ -88,39 +88,21 @@
     },
     {
       "from": [
-        11,
+        11.2,
         8,
-        8.5
+        8.7
       ],
       "to": [
-        12,
-        15,
-        9.5
+        11.8,
+        13,
+        9.3
       ],
       "faces": {
         "north": {
           "uv": [
-            13.0,
-            0.0,
+            13,
+            0,
             13.5,
-            0.5
-          ],
-          "texture": "#texture"
-        },
-        "west": {
-          "uv": [
-            13.0,
-            0.0,
-            13.5,
-            0.5
-          ],
-          "texture": "#texture"
-        },
-        "south": {
-          "uv": [
-            13.5,
-            0.0,
-            14.0,
             0.5
           ],
           "texture": "#texture"
@@ -128,16 +110,34 @@
         "east": {
           "uv": [
             13.5,
-            0.0,
-            14.0,
+            0,
+            14,
+            0.5
+          ],
+          "texture": "#texture"
+        },
+        "south": {
+          "uv": [
+            13.5,
+            0,
+            14,
+            0.5
+          ],
+          "texture": "#texture"
+        },
+        "west": {
+          "uv": [
+            13,
+            0,
+            13.5,
             0.5
           ],
           "texture": "#texture"
         },
         "up": {
           "uv": [
-            14.0,
-            0.0,
+            14,
+            0,
             14.5,
             0.5
           ],

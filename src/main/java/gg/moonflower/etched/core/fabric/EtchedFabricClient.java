@@ -25,6 +25,7 @@ public class EtchedFabricClient implements ClientModInitializer {
         EtchedClient.registerItemGroups();
         EtchedClient.registerRenderers();
         EtchedClient.registerRenderLayers();
+        EtchedClient.registerEntityLayers();
 
         ClientPickBlockGatherCallback.EVENT.register((player, result) -> {
             if (result.getType() == HitResult.Type.ENTITY) {

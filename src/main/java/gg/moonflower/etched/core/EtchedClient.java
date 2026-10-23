@@ -111,6 +111,17 @@ public class EtchedClient {
     }
     //?}
 
+    // The bard's real feather and lute, drawn over villagers and zombie villagers.
+    public static void registerEntityLayers() {
+        net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback.EVENT.register((type, renderer, helper, context) -> {
+            if (renderer instanceof net.minecraft.client.renderer.entity.VillagerRenderer villager) {
+                helper.register(new gg.moonflower.etched.client.render.BardGearLayer<>(villager));
+            } else if (renderer instanceof net.minecraft.client.renderer.entity.ZombieVillagerRenderer zombie) {
+                helper.register(new gg.moonflower.etched.client.render.BardGearLayer<>(zombie));
+            }
+        });
+    }
+
     // The radio station's sculk tendrils have see-through pixels.
     public static void registerRenderLayers() {
         net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap.INSTANCE.putBlock(EtchedBlocks.RADIO_STATION.get(),

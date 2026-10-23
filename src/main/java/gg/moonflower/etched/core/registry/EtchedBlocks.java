@@ -122,12 +122,7 @@ public class EtchedBlocks {
 */
     public static final BlockEntry<gg.moonflower.etched.common.block.RadioStationBlock> RADIO_STATION =
             Etched.REGISTRATE.block("radio_station", gg.moonflower.etched.common.block.RadioStationBlock::new)
-                    .properties(properties -> properties
-                            .mapColor(MapColor.COLOR_BLACK)
-                            .strength(3.0f)
-                            .sound(SoundType.STONE)
-                            .requiresCorrectToolForDrops()
-                    )
+                    .initialProperties(() -> Blocks.JUKEBOX)
                     .item().tab(CreativeModeTabs.FUNCTIONAL_BLOCKS).build()
                     .register();
 

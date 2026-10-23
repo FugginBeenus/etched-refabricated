@@ -48,7 +48,7 @@ public class EtchedConfig {
     @SerialEntry(comment = "Always plays tracks in stereo even when in-world.")
     public boolean forceStereo = false;
 
-    @SerialEntry(comment = "Adds bard houses to villages as they generate. Turn off if a village overhaul mod should own village layout entirely.")
+    @SerialEntry(comment = "Adds bard stalls to villages as they generate. Turn off if a village overhaul mod should own village layout entirely.")
     public boolean addBardHousesToVillages = true;
 
     @SerialEntry(comment = "Domains that discs and radios are allowed to stream from, such as \"files.catbox.moe\". Subdomains of a listed domain are allowed too. Leave empty to allow any domain. The server's own list is what counts, so a client cannot talk its way past it.")
@@ -117,9 +117,9 @@ public class EtchedConfig {
                                         .controller(TickBoxControllerBuilder::create)
                                         .build())
                                 .option(Option.<Boolean>createBuilder()
-                                        .name(Component.literal("Bard Houses In Villages"))
+                                        .name(Component.literal("Bard Stalls In Villages"))
                                         .description(OptionDescription.createBuilder()
-                                                .text(Component.literal("Adds bard houses to villages as they generate. Turn off if a village overhaul mod should own village layout entirely. Takes effect next time the world loads."))
+                                                .text(Component.literal("Adds bard stalls to villages as they generate. Turn off if a village overhaul mod should own village layout entirely. Takes effect next time the world loads."))
                                                 .build())
                                         .binding(true,() -> this.addBardHousesToVillages,aBoolean -> {this.addBardHousesToVillages = aBoolean;})
                                         .controller(TickBoxControllerBuilder::create)

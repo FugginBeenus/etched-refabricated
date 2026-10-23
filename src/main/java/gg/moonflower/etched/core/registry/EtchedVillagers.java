@@ -44,6 +44,12 @@ import java.util.stream.Stream;
 public class EtchedVillagers {
 
     private static final String BARD = "bard";
+    // 1.21 renamed the data pack folder.
+    //? if >=1.21 {
+    /*private static final String STRUCTURES = "structure/";
+    *///?} else {
+    private static final String STRUCTURES = "structures/";
+    //?}
 
     public static final PoiType BARD_POI = PointOfInterestHelper.register(
             EtchedResourceLocation.of(Etched.MOD_ID, BARD), 1, 1,
@@ -193,12 +199,12 @@ public class EtchedVillagers {
         return filled;
     }
 
-    // structures/village/<village>/houses/<village>_bard_house_<n>.nbt, from 1 with no gaps
+    // village/<village>/houses/<village>_bard_house_<n>.nbt, from 1 with no gaps
     private static List<ResourceLocation> housePieces(ResourceManager resources, String village) {
         List<ResourceLocation> pieces = new java.util.ArrayList<>();
         for (int variant = 1; ; variant++) {
             String path = "village/" + village + "/houses/" + village + "_" + BARD + "_house_" + variant;
-            if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, "structures/" + path + ".nbt")).isEmpty()) {
+            if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, STRUCTURES + path + ".nbt")).isEmpty()) {
                 return pieces;
             }
             pieces.add(EtchedResourceLocation.of(Etched.MOD_ID, path));

@@ -1,8 +1,12 @@
 {
   "variants": {
-    "facing=north": { "model": "etched:block/radio_station" },
-    "facing=east":  { "model": "etched:block/radio_station", "y": 90 },
-    "facing=south": { "model": "etched:block/radio_station", "y": 180 },
-    "facing=west":  { "model": "etched:block/radio_station", "y": 270 }
+    "facing=north,on_air=false": { "model": "etched:block/radio_station" },
+    "facing=east,on_air=false": { "model": "etched:block/radio_station", "y": 90 },
+    "facing=south,on_air=false": { "model": "etched:block/radio_station", "y": 180 },
+    "facing=west,on_air=false": { "model": "etched:block/radio_station", "y": 270 },
+    "facing=north,on_air=true": { "model": "etched:block/radio_station_on" },
+    "facing=east,on_air=true": { "model": "etched:block/radio_station_on", "y": 90 },
+    "facing=south,on_air=true": { "model": "etched:block/radio_station_on", "y": 180 },
+    "facing=west,on_air=true": { "model": "etched:block/radio_station_on", "y": 270 }
   }
 }

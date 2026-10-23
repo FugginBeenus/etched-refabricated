@@ -2,6 +2,7 @@ package gg.moonflower.etched.common.blockentity;
 
 import gg.moonflower.etched.api.record.PlayableRecord;
 import gg.moonflower.etched.api.record.TrackData;
+import gg.moonflower.etched.common.block.RadioStationBlock;
 import gg.moonflower.etched.common.menu.RadioStationMenu;
 import gg.moonflower.etched.core.registry.EtchedBlocks;
 import net.minecraft.core.BlockPos;
@@ -197,6 +198,11 @@ public class RadioStationBlockEntity extends RandomizableContainerBlockEntity {
      * broken or switched off used to report the track as finished and skipped it for everyone listening.
      */
     public static void serverTick(net.minecraft.world.level.Level level, BlockPos pos, BlockState state, RadioStationBlockEntity station) {
+        boolean onAir = station.airUrl != null;
+        if (state.getValue(RadioStationBlock.ON_AIR) != onAir) {
+            level.setBlock(pos, state.setValue(RadioStationBlock.ON_AIR, onAir), 3);
+        }
+
         if (station.airUrl == null) {
             // Look again now and then, to pick up discs put in while nothing was on air.
             if (level.getGameTime() % 20L == 0L && station.getCurrentUrl() != null) {

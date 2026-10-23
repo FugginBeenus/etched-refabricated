@@ -45,11 +45,18 @@ want them redone to match the new look.
 - [ ] `textures/item/empty_etching_table_slot_music_disc.png` (16x16)
 - [ ] `textures/item/empty_etching_table_slot_music_label.png` (16x16)
 
-### Radio Station (3)
+### Radio Station (10)
 
+- [ ] `models/block/radio_station.json` (3D model)
+- [ ] `models/block/radio_station_on.json` (3D model)
+- [ ] `textures/block/radio_station_bottom.png` (16x16)
 - [ ] `textures/block/radio_station_front.png` (16x16)
+- [ ] `textures/block/radio_station_front_on.png` (16x128)
+- [ ] `textures/block/radio_station_front_on.png.mcmeta` (animation data)
 - [ ] `textures/block/radio_station_side.png` (16x16)
+- [ ] `textures/block/radio_station_side_on.png` (16x16)
 - [ ] `textures/block/radio_station_top.png` (16x16)
+- [ ] `textures/block/radio_station_top_on.png` (16x16)
 
 ### Radio (6)
 
@@ -167,4 +174,4 @@ an item or block artist's job.
 ---
 
 **Must be redone: 4 blocks and items, plus 11 others.**
-**Optional: 57.**
+**Optional: 64.**

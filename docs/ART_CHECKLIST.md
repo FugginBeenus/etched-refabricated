@@ -164,13 +164,6 @@ an item or block artist's job.
 - [ ] `textures/gui/label.png` (256x256)
 - [ ] `textures/gui/radio.png` (256x256)
 
-### Bard / villager (4)
-
-- [ ] `textures/entity/villager/profession/bard.png` (64x64)
-- [ ] `textures/entity/villager/profession/bard.png.mcmeta` (animation data)
-- [ ] `textures/entity/zombie_villager/profession/bard.png` (64x64)
-- [ ] `textures/entity/zombie_villager/profession/bard.png.mcmeta` (animation data)
-
 ### Sounds (2)
 
 - [ ] `sounds/ui/etching_table/take_result1.ogg` (sound)
@@ -178,5 +171,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 0 blocks and items, plus 11 others.**
+**Must be redone: 0 blocks and items, plus 7 others.**
 **Optional: 73.**

@@ -1,6 +1,6 @@
 {
-  "parent": "etched:item/boombox_in_hand",
-  "overrides": [
-    {"predicate": {"etched:playing": 1}, "model": "etched:item/boombox_playing"}
-  ]
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "etched:item/boombox"
+  }
 }

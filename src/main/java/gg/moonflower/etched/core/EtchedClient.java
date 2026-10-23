@@ -32,7 +32,12 @@ import net.minecraft.world.item.CreativeModeTab;
 
 @Environment(EnvType.CLIENT)
 public class EtchedClient {
+    // The 3D boombox, for hands and head.
+    //? if >=1.21 {
+    /*public static final ModelResourceLocation BOOMBOX_IN_HAND_MODEL = new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath(Etched.MOD_ID, "item/boombox_in_hand"), "fabric_resource");
+    *///?} else {
     public static final ModelResourceLocation BOOMBOX_IN_HAND_MODEL = new ModelResourceLocation(gg.moonflower.etched.api.util.EtchedResourceLocation.of(Etched.MOD_ID, "boombox_in_hand"), "inventory");
+    //?}
 
     public static void registerItemGroups() {
         MenuScreens.register(EtchedMenus.ETCHING_MENU, EtchingScreen::new);
@@ -72,6 +77,7 @@ public class EtchedClient {
                 .registerReloadListener(AlbumCoverItemRenderer.INSTANCE);
 
         net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin.register(pluginContext -> {
+            pluginContext.addModels(BOOMBOX_IN_HAND_MODEL.id());
             net.minecraft.server.packs.resources.ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
             String folder = "models/item/" + AlbumCoverItemRenderer.FOLDER_NAME;
             for (ResourceLocation loc : resourceManager.listResources(folder, name -> name.getPath().endsWith(".json")).keySet()) {

@@ -108,15 +108,17 @@ want them redone to match the new look.
 ### Speaker (4)
 
 - [ ] `models/block/speaker.json` (3D model)
-- [ ] `textures/block/speaker.png` (128x128)
-- [ ] `textures/block/speaker_particle.png` (32x32)
-- [ ] `textures/item/speaker.png` (16x16)
+- [ ] `models/block/speaker_left.json` (3D model)
+- [ ] `models/block/speaker_right.json` (3D model)
+- [ ] `textures/block/speaker.png` (64x32)
 
-### Stereo (4)
+### Stereo (6)
 
 - [ ] `models/block/stereo.json` (3D model)
 - [ ] `textures/block/stereo.png` (64x64)
 - [ ] `textures/block/stereo_particle.png` (32x32)
+- [ ] `textures/block/stereo_screen.png` (16x256)
+- [ ] `textures/block/stereo_screen.png.mcmeta` (animation data)
 - [ ] `textures/item/stereo.png` (16x16)
 
 ### Preamp (1)
@@ -174,4 +176,4 @@ an item or block artist's job.
 ---
 
 **Must be redone: 4 blocks and items, plus 11 others.**
-**Optional: 64.**
+**Optional: 66.**

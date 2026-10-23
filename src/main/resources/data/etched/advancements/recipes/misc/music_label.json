@@ -1,17 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "etched:music_label"
-    ]
-  },
   "criteria": {
-    "has_blank_music_disc": {
+    "has_paper": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "item": "etched:blank_music_disc"
+            "tag": "c:paper"
           }
         ]
       }
@@ -25,8 +20,13 @@
   },
   "requirements": [
     [
-      "has_blank_music_disc",
+      "has_paper",
       "has_the_recipe"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:music_label"
+    ]
+  }
 }

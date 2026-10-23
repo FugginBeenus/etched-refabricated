@@ -1,17 +1,14 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "etched:album_jukebox"
-    ]
-  },
   "criteria": {
-    "has_redstone": {
+    "has_repeater": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "c:redstone_dusts"
+            "items": [
+              "minecraft:repeater"
+            ]
           }
         ]
       }
@@ -21,7 +18,9 @@
       "conditions": {
         "items": [
           {
-            "item": "minecraft:jukebox"
+            "items": [
+              "minecraft:jukebox"
+            ]
           }
         ]
       }
@@ -35,9 +34,14 @@
   },
   "requirements": [
     [
-      "has_redstone",
+      "has_repeater",
       "has_jukebox",
       "has_the_recipe"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:album_jukebox"
+    ]
+  }
 }

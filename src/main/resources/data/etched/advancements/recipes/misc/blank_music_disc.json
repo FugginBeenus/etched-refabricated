@@ -1,12 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "etched:blank_music_disc"
-    ]
-  },
   "criteria": {
-    "has_music_disc": {
+    "has_music_discs": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
@@ -25,8 +20,13 @@
   },
   "requirements": [
     [
-      "has_music_disc",
+      "has_music_discs",
       "has_the_recipe"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:blank_music_disc"
+    ]
+  }
 }

@@ -1,12 +1,7 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "etched:etching_table"
-    ]
-  },
   "criteria": {
-    "has_diamond": {
+    "has_diamonds": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
@@ -16,12 +11,14 @@
         ]
       }
     },
-    "has_iron": {
+    "has_note_block": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "c:iron_ingots"
+            "items": [
+              "minecraft:note_block"
+            ]
           }
         ]
       }
@@ -35,9 +32,14 @@
   },
   "requirements": [
     [
-      "has_diamond",
-      "has_iron",
+      "has_diamonds",
+      "has_note_block",
       "has_the_recipe"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:etching_table"
+    ]
+  }
 }

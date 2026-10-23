@@ -1,0 +1,60 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_transmitter": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "etched:transmitter"
+            ]
+          }
+        ]
+      }
+    },
+    "has_radio": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "etched:radio"
+            ]
+          }
+        ]
+      }
+    },
+    "has_sculk_sensor": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "minecraft:sculk_sensor"
+            ]
+          }
+        ]
+      }
+    },
+    "has_the_recipe": {
+      "trigger": "minecraft:recipe_unlocked",
+      "conditions": {
+        "recipe": "etched:radio_station"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_transmitter",
+      "has_radio",
+      "has_sculk_sensor",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:radio_station"
+    ]
+  }
+}

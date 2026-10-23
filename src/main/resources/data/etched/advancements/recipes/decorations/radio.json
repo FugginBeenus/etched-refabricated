@@ -1,37 +1,14 @@
 {
   "parent": "minecraft:recipes/root",
-  "rewards": {
-    "recipes": [
-      "etched:radio"
-    ]
-  },
   "criteria": {
-    "has_redstone": {
+    "has_note_block": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
-            "tag": "c:redstone_dusts"
-          }
-        ]
-      }
-    },
-    "has_iron": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "tag": "c:iron_ingots"
-          }
-        ]
-      }
-    },
-    "has_copper": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "tag": "c:copper_ingots"
+            "items": [
+              "minecraft:note_block"
+            ]
           }
         ]
       }
@@ -45,10 +22,13 @@
   },
   "requirements": [
     [
-      "has_redstone",
-      "has_iron",
-      "has_copper",
+      "has_note_block",
       "has_the_recipe"
     ]
-  ]
+  ],
+  "rewards": {
+    "recipes": [
+      "etched:radio"
+    ]
+  }
 }

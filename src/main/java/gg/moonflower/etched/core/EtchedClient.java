@@ -62,6 +62,8 @@ public class EtchedClient {
                 gg.moonflower.etched.client.render.AlbumCrateRenderer::new);
         net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_JUKEBOX_BE.get(),
                 gg.moonflower.etched.client.render.AlbumJukeboxRenderer::new);
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.STEREO_BE.get(),
+                gg.moonflower.etched.client.render.StereoRenderer::new);
 
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));
@@ -86,6 +88,8 @@ public class EtchedClient {
                 gg.moonflower.etched.client.render.AlbumCrateRenderer::new);
         net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.ALBUM_JUKEBOX_BE.get(),
                 gg.moonflower.etched.client.render.AlbumJukeboxRenderer::new);
+        net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(EtchedBlocks.STEREO_BE.get(),
+                gg.moonflower.etched.client.render.StereoRenderer::new);
 
         net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.INSTANCE.register(EtchedItems.ALBUM_COVER.get(),
                 (stack, ctx, pose, buffers, light, overlay) -> AlbumCoverItemRenderer.INSTANCE.renderByItem(stack, ctx, pose, buffers, light, overlay));

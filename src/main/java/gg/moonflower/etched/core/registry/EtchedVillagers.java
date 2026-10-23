@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class EtchedVillagers {
 
@@ -139,6 +140,11 @@ public class EtchedVillagers {
         Registry<StructureTemplatePool> pools = poolRegistry.get();
         Registry<StructureProcessorList> processors = processorRegistry.get();
         ResourceManager resources = server.getResourceManager();
+        // No house files: say so once, not a warning.
+        if (Stream.of("plains", "desert", "savanna", "snowy", "taiga").allMatch(village -> housePieces(resources, village).isEmpty())) {
+            Etched.LOGGER.info("No bard houses ship with this build. Bards appear where an etching table is placed by hand.");
+            return;
+        }
         int filled = 0;
         filled += addHouses(resources, pools, processors, "plains", 2, ProcessorLists.MOSSIFY_10_PERCENT, ProcessorLists.ZOMBIE_PLAINS);
         filled += addHouses(resources, pools, processors, "desert", 2, ProcessorLists.EMPTY, ProcessorLists.ZOMBIE_DESERT);
@@ -160,14 +166,7 @@ public class EtchedVillagers {
                                  String village, int weight,
                                  ResourceKey<StructureProcessorList> processor,
                                  ResourceKey<StructureProcessorList> zombieProcessor) {
-        List<ResourceLocation> pieces = new java.util.ArrayList<>();
-        for (int variant = 1; ; variant++) {
-            String path = "village/" + village + "/houses/" + village + "_" + BARD + "_house_" + variant;
-            if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, "structures/" + path + ".nbt")).isEmpty()) {
-                break;
-            }
-            pieces.add(EtchedResourceLocation.of(Etched.MOD_ID, path));
-        }
+        List<ResourceLocation> pieces = housePieces(resources, village);
         if (pieces.isEmpty()) {
             return 0;
         }
@@ -192,6 +191,18 @@ public class EtchedVillagers {
             }
         }
         return filled;
+    }
+
+    // structures/village/<village>/houses/<village>_bard_house_<n>.nbt, from 1 with no gaps
+    private static List<ResourceLocation> housePieces(ResourceManager resources, String village) {
+        List<ResourceLocation> pieces = new java.util.ArrayList<>();
+        for (int variant = 1; ; variant++) {
+            String path = "village/" + village + "/houses/" + village + "_" + BARD + "_house_" + variant;
+            if (resources.getResource(EtchedResourceLocation.of(Etched.MOD_ID, "structures/" + path + ".nbt")).isEmpty()) {
+                return pieces;
+            }
+            pieces.add(EtchedResourceLocation.of(Etched.MOD_ID, path));
+        }
     }
 
     private static boolean isVillageHousePool(String path, String village) {

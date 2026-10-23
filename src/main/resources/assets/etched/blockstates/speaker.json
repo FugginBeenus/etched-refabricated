@@ -1,8 +1,16 @@
 {
   "variants": {
-    "facing=north": { "model": "etched:block/speaker" },
-    "facing=east":  { "model": "etched:block/speaker", "y": 90 },
-    "facing=south": { "model": "etched:block/speaker", "y": 180 },
-    "facing=west":  { "model": "etched:block/speaker", "y": 270 }
+    "facing=north,snug=none": { "model": "etched:block/speaker" },
+    "facing=east,snug=none": { "model": "etched:block/speaker", "y": 90 },
+    "facing=south,snug=none": { "model": "etched:block/speaker", "y": 180 },
+    "facing=west,snug=none": { "model": "etched:block/speaker", "y": 270 },
+    "facing=north,snug=left": { "model": "etched:block/speaker_left" },
+    "facing=east,snug=left": { "model": "etched:block/speaker_left", "y": 90 },
+    "facing=south,snug=left": { "model": "etched:block/speaker_left", "y": 180 },
+    "facing=west,snug=left": { "model": "etched:block/speaker_left", "y": 270 },
+    "facing=north,snug=right": { "model": "etched:block/speaker_right" },
+    "facing=east,snug=right": { "model": "etched:block/speaker_right", "y": 90 },
+    "facing=south,snug=right": { "model": "etched:block/speaker_right", "y": 180 },
+    "facing=west,snug=right": { "model": "etched:block/speaker_right", "y": 270 }
   }
 }

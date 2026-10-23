@@ -15,10 +15,6 @@ inside its square, as the current sheet shows.
 These are Moonflower Studio's work. Permission to use them was refused, so none of them
 can ship. Every one has to be replaced with original art before release.
 
-### Jukebox Minecart (1)
-
-- [ ] `textures/item/jukebox_minecart.png` (16x16)
-
 ---
 
 ## 2. Optional: already ours
@@ -84,12 +80,14 @@ want them redone to match the new look.
 - [ ] `textures/item/default_album_cover.png` (16x16)
 - [ ] `textures/item/vanilla_album_cover.png` (16x16)
 
-### Album Crate (5)
+### Album Crate (7)
 
 - [ ] `models/block/album_crate.json` (3D model)
 - [ ] `models/block/album_crate_22.json` (3D model)
 - [ ] `models/block/album_crate_45.json` (3D model)
 - [ ] `models/block/album_crate_n22.json` (3D model)
+- [ ] `textures/block/album_crate_trim.png` (16x16)
+- [ ] `textures/block/album_crate_wood.png` (16x16)
 - [ ] `textures/item/album_crate.png` (16x16)
 
 ### Album Display (5)
@@ -143,6 +141,10 @@ want them redone to match the new look.
 - [ ] `textures/item/music_label_paper.png` (16x16)
 - [ ] `textures/item/music_label_top.png` (16x16)
 
+### Jukebox Minecart (1)
+
+- [ ] `textures/item/jukebox_minecart.png` (16x16)
+
 ### Other (1)
 
 - [ ] `models/item/etched_album_cover/default.json` (3D model)
@@ -176,5 +178,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 1 blocks and items, plus 11 others.**
-**Optional: 70.**
+**Must be redone: 0 blocks and items, plus 11 others.**
+**Optional: 73.**

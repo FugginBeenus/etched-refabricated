@@ -15,20 +15,6 @@ inside its square, as the current sheet shows.
 These are Moonflower Studio's work. Permission to use them was refused, so none of them
 can ship. Every one has to be replaced with original art before release.
 
-### Radio (6)
-
-- [ ] `models/block/radio.json` (3D model)
-- [ ] `models/block/radio_225.json` (3D model)
-- [ ] `models/block/radio_45.json` (3D model)
-- [ ] `models/block/radio_675.json` (3D model)
-- [ ] `textures/block/radio.png` (32x32)
-- [ ] `textures/item/radio.png` (16x16)
-
-### Portal Radio (2)
-
-- [ ] `textures/block/portal_radio.png` (32x32)
-- [ ] `textures/item/portal_radio.png` (16x16)
-
 ### Boombox (3)
 
 - [ ] `models/item/boombox_in_hand.json` (3D model)
@@ -65,6 +51,24 @@ want them redone to match the new look.
 - [ ] `textures/block/radio_station_side.png` (16x16)
 - [ ] `textures/block/radio_station_top.png` (16x16)
 
+### Radio (6)
+
+- [ ] `models/block/radio.json` (3D model)
+- [ ] `models/block/radio_225.json` (3D model)
+- [ ] `models/block/radio_45.json` (3D model)
+- [ ] `models/block/radio_675.json` (3D model)
+- [ ] `textures/block/radio.png` (32x32)
+- [ ] `textures/item/radio.png` (16x16)
+
+### Portal Radio (6)
+
+- [ ] `models/block/portal_radio.json` (3D model)
+- [ ] `models/block/portal_radio_225.json` (3D model)
+- [ ] `models/block/portal_radio_45.json` (3D model)
+- [ ] `models/block/portal_radio_675.json` (3D model)
+- [ ] `textures/block/portal_radio.png` (32x32)
+- [ ] `textures/item/portal_radio.png` (16x16)
+
 ### Album Cover (4)
 
 - [ ] `textures/item/album_cover_overlay.png` (16x16)
@@ -88,11 +92,10 @@ want them redone to match the new look.
 - [ ] `models/block/album_display_stand_n22.json` (3D model)
 - [ ] `textures/item/album_display.png` (16x16)
 
-### Album Printer (4)
+### Album Printer (3)
 
 - [ ] `models/block/album_printer.json` (3D model)
-- [ ] `textures/block/album_printer.png` (128x128)
-- [ ] `textures/block/album_printer_particle.png` (64x64)
+- [ ] `textures/block/album_printer.png` (64x32)
 - [ ] `textures/item/album_printer.png` (16x16)
 
 ### Speaker (4)
@@ -130,6 +133,10 @@ want them redone to match the new look.
 - [ ] `textures/item/music_label_paper.png` (16x16)
 - [ ] `textures/item/music_label_top.png` (16x16)
 
+### Other (1)
+
+- [ ] `models/item/etched_album_cover/default.json` (3D model)
+
 ---
 
 ## 3. Not blocks or items, still must be redone
@@ -159,5 +166,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 12 blocks and items, plus 11 others.**
-**Optional: 45.**
+**Must be redone: 4 blocks and items, plus 11 others.**
+**Optional: 57.**

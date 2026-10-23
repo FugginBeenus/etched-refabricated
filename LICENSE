@@ -1,7 +1,103 @@
-The following directories, their subdirectories, and any files inside said directories or subdirectories are subject to
-the license below.
+Etched Refabricated is an unofficial fork of Etched by Moonflower Studio.
 
-/src/main/resources/
+The following files come from the original Etched and are subject to the license below. This fork's own art and
+every other file in this repository are under the GNU General Public License further down.
+
+/src/main/resources/assets/etched/blockstates/album_jukebox.json
+/src/main/resources/assets/etched/blockstates/etching_table.json
+/src/main/resources/assets/etched/blockstates/radio.json
+/src/main/resources/assets/etched/lang/en_pt.json
+/src/main/resources/assets/etched/lang/en_us.json
+/src/main/resources/assets/etched/lang/es_mx.json
+/src/main/resources/assets/etched/lang/fr_fr.json
+/src/main/resources/assets/etched/lang/it_it.json
+/src/main/resources/assets/etched/lang/ja_jp.json
+/src/main/resources/assets/etched/lang/pt_br.json
+/src/main/resources/assets/etched/lang/ru_ru.json
+/src/main/resources/assets/etched/lang/uk_ua.json
+/src/main/resources/assets/etched/lang/zh_cn.json
+/src/main/resources/assets/etched/models/item/album_cover.json
+/src/main/resources/assets/etched/models/item/album_jukebox.json
+/src/main/resources/assets/etched/models/item/blank_music_disc.json
+/src/main/resources/assets/etched/models/item/boombox.json
+/src/main/resources/assets/etched/models/item/boombox_playing.json
+/src/main/resources/assets/etched/models/item/complex_music_label.json
+/src/main/resources/assets/etched/models/item/etched_album_cover/blank.json
+/src/main/resources/assets/etched/models/item/etched_album_cover/vanilla.json
+/src/main/resources/assets/etched/models/item/etched_music_disc.json
+/src/main/resources/assets/etched/models/item/etching_table.json
+/src/main/resources/assets/etched/models/item/jukebox_minecart.json
+/src/main/resources/assets/etched/models/item/music_label.json
+/src/main/resources/assets/etched/models/item/portal_radio.json
+/src/main/resources/assets/etched/models/item/radio.json
+/src/main/resources/assets/etched/sounds.json
+/src/main/resources/assets/etched/textures/entity/villager/profession/bard.png.mcmeta
+/src/main/resources/assets/etched/textures/entity/zombie_villager/profession/bard.png.mcmeta
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_11.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_13.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_5.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_blocks.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_cat.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_chirp.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_far.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_mall.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_mellohi.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_otherside.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_pigstep.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_relic.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_stal.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_strad.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_wait.json
+/src/main/resources/assets/minecraft/models/item/etched_album_cover/music_disc_ward.json
+/src/main/resources/data/c/tags/items/copper_ingots.json
+/src/main/resources/data/c/tags/items/diamonds.json
+/src/main/resources/data/c/tags/items/iron_ingots.json
+/src/main/resources/data/c/tags/items/paper.json
+/src/main/resources/data/c/tags/items/redstone_dusts.json
+/src/main/resources/data/c/tags/items/wooden_chests.json
+/src/main/resources/data/etched/advancements/recipes/decorations/album_jukebox.json
+/src/main/resources/data/etched/advancements/recipes/decorations/etching_table.json
+/src/main/resources/data/etched/advancements/recipes/decorations/radio.json
+/src/main/resources/data/etched/advancements/recipes/misc/album_cover.json
+/src/main/resources/data/etched/advancements/recipes/misc/blank_music_disc.json
+/src/main/resources/data/etched/advancements/recipes/misc/boombox.json
+/src/main/resources/data/etched/advancements/recipes/misc/music_label.json
+/src/main/resources/data/etched/advancements/recipes/transportation/jukebox_minecart.json
+/src/main/resources/data/etched/loot_table/blocks/album_crate.json
+/src/main/resources/data/etched/loot_table/blocks/album_jukebox.json
+/src/main/resources/data/etched/loot_table/blocks/album_printer.json
+/src/main/resources/data/etched/loot_table/blocks/etching_table.json
+/src/main/resources/data/etched/loot_table/blocks/radio.json
+/src/main/resources/data/etched/loot_table/blocks/radio_station.json
+/src/main/resources/data/etched/loot_tables/blocks/album_crate.json
+/src/main/resources/data/etched/loot_tables/blocks/album_jukebox.json
+/src/main/resources/data/etched/loot_tables/blocks/album_printer.json
+/src/main/resources/data/etched/loot_tables/blocks/etching_table.json
+/src/main/resources/data/etched/loot_tables/blocks/radio.json
+/src/main/resources/data/etched/loot_tables/blocks/radio_station.json
+/src/main/resources/data/etched/recipe/album_crate.json
+/src/main/resources/data/etched/recipe/complex_music_label.json
+/src/main/resources/data/etched/recipes/album_cover.json
+/src/main/resources/data/etched/recipes/album_crate.json
+/src/main/resources/data/etched/recipes/album_jukebox.json
+/src/main/resources/data/etched/recipes/blank_music_disc.json
+/src/main/resources/data/etched/recipes/boombox.json
+/src/main/resources/data/etched/recipes/complex_music_label.json
+/src/main/resources/data/etched/recipes/etching_table.json
+/src/main/resources/data/etched/recipes/jukebox_minecart.json
+/src/main/resources/data/etched/recipes/music_label.json
+/src/main/resources/data/etched/recipes/radio.json
+/src/main/resources/data/etched/tags/blocks/audio_providers.json
+/src/main/resources/data/minecraft/tags/block/mineable/axe.json
+/src/main/resources/data/minecraft/tags/blocks/mineable/axe.json
+/src/main/resources/data/minecraft/tags/item/music_discs.json
+/src/main/resources/data/minecraft/tags/items/music_discs.json
+/src/main/resources/data/minecraft/tags/point_of_interest_type/acquirable_job_site.json
+/src/main/resources/etched-1_21.accesswidener
+/src/main/resources/etched.accesswidener
+/src/main/resources/etched.mixins.json
+/src/main/resources/fabric.mod.json
+/src/main/resources/pack.mcmeta
 
 All Rights Reserved
 Copyright (c) 2021 Moonflower Studio

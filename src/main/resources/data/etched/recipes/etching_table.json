@@ -7,10 +7,10 @@
   ],
   "key": {
     "D": {
-      "tag": "c:gems/diamond"
+      "tag": "c:diamonds"
     },
     "I": {
-      "tag": "c:ingots/iron"
+      "tag": "c:iron_ingots"
     },
     "N": {
       "item": "minecraft:note_block"

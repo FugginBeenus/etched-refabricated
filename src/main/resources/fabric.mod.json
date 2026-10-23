@@ -6,7 +6,7 @@
   "description": "${mod_description}",
   "icon": "etched.icon.png",
   "authors": ["FugginBeenus - Refabricated Maintainer"],
-  "contributors": ["Jackson - Original Etched Owner","Ocelot - Original Etched Maintainer","Farcr - Original Etched Art","Echolite - Original Etched Art","AstraZoey - Original Etched Sound Design","Aikoyori - Earlier Fabric Port","VanderCat - Earlier Quilt Port"],
+  "contributors": ["Beenuscore - Sound Design","Mr Beenus - Sound Design","Jackson - Original Etched Owner","Ocelot - Original Etched Maintainer","Farcr - Original Etched Art","Echolite - Original Etched Art","AstraZoey - Original Etched Sound Design","Aikoyori - Earlier Fabric Port","VanderCat - Earlier Quilt Port"],
   "contact": {
     "homepage": "https://modrinth.com/mod/etched-refabricated",
     "sources": "https://github.com/FugginBeenus/etched-refabricated",

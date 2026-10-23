@@ -1,6 +1,7 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "etched:item/jukebox_minecart"
+    "layer0": "minecraft:item/minecart",
+    "layer1": "etched:item/jukebox_minecart"
   }
 }

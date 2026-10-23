@@ -15,12 +15,6 @@ inside its square, as the current sheet shows.
 These are Moonflower Studio's work. Permission to use them was refused, so none of them
 can ship. Every one has to be replaced with original art before release.
 
-### Boombox (3)
-
-- [ ] `models/item/boombox_in_hand.json` (3D model)
-- [ ] `textures/item/boombox.png` (16x16)
-- [ ] `textures/item/boombox_model.png` (32x32)
-
 ### Jukebox Minecart (1)
 
 - [ ] `textures/item/jukebox_minecart.png` (16x16)
@@ -75,6 +69,13 @@ want them redone to match the new look.
 - [ ] `models/block/portal_radio_675.json` (3D model)
 - [ ] `textures/block/portal_radio.png` (32x32)
 - [ ] `textures/item/portal_radio.png` (16x16)
+
+### Boombox (4)
+
+- [ ] `models/item/boombox_in_hand.json` (3D model)
+- [ ] `textures/item/boombox_model.png` (32x32)
+- [ ] `textures/item/boombox_playing.png` (32x256)
+- [ ] `textures/item/boombox_playing.png.mcmeta` (animation data)
 
 ### Album Cover (4)
 
@@ -175,5 +176,5 @@ an item or block artist's job.
 
 ---
 
-**Must be redone: 4 blocks and items, plus 11 others.**
-**Optional: 66.**
+**Must be redone: 1 blocks and items, plus 11 others.**
+**Optional: 70.**

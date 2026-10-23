@@ -18,7 +18,7 @@ The Etching Table's two sounds are new, made for this fork by a composer.
 
 ## Structures
 
-The bard's village stalls are new for this fork. They replace the original mod's bard houses, and were made with the same AI assistant from the maintainer's direction.
+The bard's village stalls are new for this fork. They replace the original mod's bard houses.
 
 ## Carried over from the original
 

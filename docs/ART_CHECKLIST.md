@@ -168,9 +168,8 @@ folder stays on this machine only: it never ships and git ignores it.
   vanilla's cartography table sound. Drop the new files in as
   `sounds/ui/etching_table/take_result1.ogg` and `take_result2.ogg`, then point
   `ui.etching_table.take_result` in `sounds.json` back at them.
-- [ ] **Bard village houses.** Villages get none until new ones ship. Each goes in
-  `data/etched/structures/village/<village>/houses/<village>_bard_house_<n>.nbt` for plains,
-  desert, savanna, snowy and taiga, numbered from 1. The game picks them up by name.
+- [x] **Bard village houses.** Replaced by new bard stalls for plains, desert, savanna, snowy
+  and taiga, in `data/etched/structures/` for 1.20.1 and `data/etched/structure/` for 1.21.1.
 - [x] **Mod icon.** Redrawn: our etched disc with a gold label on light grey, after the gold variant.
 - [x] **Logo and the old villager model files.** Nothing used them, so they are gone.
 

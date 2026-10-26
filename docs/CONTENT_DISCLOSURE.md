@@ -14,7 +14,7 @@ Every texture, model, screen, the Bard villager's look and the mod icon are new 
 
 ## Sounds
 
-The Etching Table's two sounds are new, made for this fork by a composer.
+No sound files ship yet. For now the Etching Table plays vanilla's cartography table sound. Its own two sounds are being made for this fork by Beenuscore and Mr Beenus.
 
 ## Structures
 

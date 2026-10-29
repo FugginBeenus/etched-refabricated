@@ -1,3 +1,7 @@
+# 2.0.1
+
+- The record in the label editor is simpler.
+
 # 2.0.0
 
 ## New art throughout
